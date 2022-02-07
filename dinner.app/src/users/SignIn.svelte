@@ -1,17 +1,22 @@
 <script lang="ts">
 	import { client } from "../lib/client";
 
+	let isLoading: boolean;
 	let username: string;
 	let password: string;
 	let error: string;
 
 	async function onSubmit() {
+		isLoading = true;
+
 		const response = await client.auth.signIn({
 			email: username,
 			password: password,
 		});
 
 		error = response.error?.message;
+
+		isLoading = false;
 	}
 </script>
 
@@ -32,7 +37,7 @@
 		required
 		bind:value="{password}"
 	/>
-	<button type="submit">SIGN IN</button>
+	<button type="submit" disabled="{isLoading}">SIGN IN</button>
 </form>
 
 <p>{error}</p>
