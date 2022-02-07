@@ -1,9 +1,13 @@
 <script lang="ts">
-	import { client } from "../lib/client";
+	import { signOut } from "./_users";
+
+	const signout = signOut();
 
 	async function onSignOut() {
-		await client.auth.signOut();
+		await signout.execute(null);
 	}
 </script>
 
-<button type="input" on:click="{onSignOut}">SIGN OUT</button>
+<button type="input" disabled="{$signout.loading}" on:click="{onSignOut}">
+	SIGN OUT
+</button>

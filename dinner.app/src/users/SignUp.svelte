@@ -1,12 +1,15 @@
 <script lang="ts">
-	import { client } from "../lib/client";
+	import { signUp } from "./_users";
+	import Credentials from "./Credentials.svelte";
 
 	let username: string;
 	let password: string;
 	let message: string;
 
+	const signup = signUp();
+
 	async function onSubmit() {
-		const response = await client.auth.signUp({
+		const response = await signup.execute({
 			email: username,
 			password: password,
 		});
@@ -26,21 +29,8 @@
 <h3>Sign Up</h3>
 
 <form on:submit|preventDefault="{onSubmit}">
-	<input
-		name="username"
-		type="email"
-		placeholder="username"
-		required
-		bind:value="{username}"
-	/>
-	<input
-		name="password"
-		type="password"
-		placeholder="password"
-		required
-		bind:value="{password}"
-	/>
-	<button type="submit">SIGN UP</button>
+	<Credentials bind:username bind:password />
+	<button type="submit" disabled="{$signup.loading}">SIGN UP</button>
 </form>
 
 <p>{message}</p>
