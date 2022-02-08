@@ -1,19 +1,14 @@
 <script lang="ts">
 	import { user } from "./lib/client";
-	import SignIn from "./users/SignIn.svelte";
+	import { authRoutes, noAuthRoutes } from "./lib/routes";
+	import Router from "svelte-spa-router";
 	import SignOut from "./users/SignOut.svelte";
-	import SignUp from "./users/SignUp.svelte";
 </script>
 
 <main>
-	<p>Hello, world.</p>
-	<p>{$user?.email}</p>
-
-	{#if $user == null}
-		<SignIn />
-		<hr />
-		<SignUp />
+	{#if $user != null}
+		<Router routes="{authRoutes}" />
 	{:else}
-		<SignOut />
+		<Router routes="{noAuthRoutes}" />
 	{/if}
 </main>
