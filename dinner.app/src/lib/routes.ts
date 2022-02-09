@@ -8,7 +8,7 @@ export const authRoutes = {
 	"/meals": MealIndex,
 	"/signin": SignIn,
 	"/signup": SignUp,
-	"*": NotFound,
+	"*": MealIndex,
 };
 
 export const noAuthRoutes = {
