@@ -3,8 +3,10 @@ import SignIn from "../users/SignIn.svelte";
 import Unauthorized from "../users/Unauthorized.svelte";
 import NotFound from "../components/NotFound.svelte";
 import MealIndex from "../meals/Index.svelte";
+import MealEdit from "../meals/Edit.svelte";
 
 export const authRoutes = {
+	"/meals/:id": MealEdit,
 	"/meals": MealIndex,
 	"/signin": SignIn,
 	"/signup": SignUp,

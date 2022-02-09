@@ -1,23 +1,12 @@
 <script lang="ts">
-	import { client } from "../lib/client";
-	import { query } from "../lib/operations";
+	import { retrieveMeals } from "./_meals";
 	import SignOut from "../users/SignOut.svelte";
 
-	type Meal = {
-		id: string;
-		updated_on: Date;
-		name: string;
-		notes: string;
-	};
-
-	async function retrieveMeals() {
-		return await client.from<Meal>("meals").select("*");
-	}
-
-	const meals = query((_) => retrieveMeals(), null);
+	const meals = retrieveMeals();
+	meals.execute(null);
 
 	function onRefresh() {
-		meals.refetch(null);
+		meals.execute(null);
 	}
 </script>
 
@@ -29,8 +18,14 @@
 	<p>Loading...</p>
 {/if}
 
-{#each $meals.result?.data || [] as meal}
-	<p>{meal.name}</p>
+{#if $meals.error}
+	<p>{$meals.error}</p>
+{/if}
+
+{#each $meals.result || [] as meal}
+	<p>
+		<a href="#/meals/{meal.id}">{meal.name}</a>
+	</p>
 {/each}
 
 <SignOut />

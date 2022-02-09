@@ -1,6 +1,5 @@
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
-import { subscribe } from "svelte/internal";
 import { writable } from "svelte/store";
 
 const client = createClient(
