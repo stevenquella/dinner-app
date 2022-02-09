@@ -1,0 +1,12 @@
+{
+	"prettier.useTabs": true,
+	"prettier.tabWidth": 4,
+	"svelte.enable-ts-plugin": true,
+	"svelte.plugin.svelte.defaultScriptLanguage": "ts",
+	"svelte.plugin.svelte.format.config.svelteAllowShorthand": false,
+	"svelte.plugin.svelte.format.config.svelteStrictMode": true,
+	"svelte.plugin.svelte.useNewTransformation": true,
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+	"svelte.plugin.svelte.format.config.svelteBracketNewLine": false
+}
