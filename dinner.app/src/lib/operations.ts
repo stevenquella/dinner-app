@@ -18,7 +18,7 @@ export type CommandStore<TInput, TOutput> = Readable<Operation> & {
 	execute: (input: TInput) => Promise<TOutput>;
 };
 
-/** construct query, will immediately execute */
+/** construct query, will execute on first subscription */
 export function query<TInput, TOutput>(
 	op: (TInput) => Promise<TOutput>,
 	input: TInput
