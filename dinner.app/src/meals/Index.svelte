@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { retrieveMeals } from "./_meals";
 	import SignOut from "../users/SignOut.svelte";
+	import QueryStatus from "../components/QueryStatus.svelte";
 
 	const meals = retrieveMeals();
 	meals.execute(null);
@@ -12,15 +13,10 @@
 
 <p>Meals index.</p>
 
+<a href="#/meals/create">Create</a>
 <button on:click="{onRefresh}">Refresh</button>
 
-{#if $meals.loading}
-	<p>Loading...</p>
-{/if}
-
-{#if $meals.error}
-	<p>{$meals.error}</p>
-{/if}
+<QueryStatus query="{meals}" />
 
 {#each $meals.result || [] as meal}
 	<p>
