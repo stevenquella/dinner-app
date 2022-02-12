@@ -7,21 +7,21 @@ import type {
 import { client } from "../lib/client";
 import { command } from "../lib/operations";
 
-export interface ClientUserResponse {
+export type ClientUserResponse = {
 	error: ApiError;
 	user: User;
 	session: Session;
-}
+};
 
 export function signUp() {
-	return command<UserCredentials, ClientUserResponse>((input) =>
-		client.auth.signUp(input)
+	return command<UserCredentials, ClientUserResponse>(
+		async (input) => await client.auth.signUp(input)
 	);
 }
 
 export function signIn() {
-	return command<UserCredentials, ClientUserResponse>((input) =>
-		client.auth.signIn(input)
+	return command<UserCredentials, ClientUserResponse>(
+		async (input) => await client.auth.signIn(input)
 	);
 }
 

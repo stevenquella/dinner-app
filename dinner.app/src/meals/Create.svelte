@@ -17,9 +17,11 @@
 
 	async function onSubmit() {
 		const response = await mealCreate.execute(inputs);
-
-		console.log(response);
-		replace("/meals/");
+		if (response.error) {
+			console.error(response.error);
+		} else {
+			replace("/meals/");
+		}
 	}
 </script>
 

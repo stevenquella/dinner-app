@@ -1,6 +1,4 @@
 <script lang="ts">
-	import type { MealCreate, MealEdit } from "./_meals";
-
 	export let inputs: { name: string; notes: string } = {
 		name: "",
 		notes: "",

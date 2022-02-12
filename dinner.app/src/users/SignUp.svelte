@@ -19,8 +19,8 @@
 		// will return the user, but does not change the auth state, requires email confirmation
 		if (response.error) {
 			message = response.error.message;
-		} else if (response.user) {
-			message = `Sign up submitted successfully. Please confirm at ${response.user.email}.`;
+		} else if (response.result?.user) {
+			message = `Sign up submitted successfully. Please confirm at ${response.result.user.email}.`;
 		} else {
 			console.debug(response);
 			message = "Unknown result. Please try again.";

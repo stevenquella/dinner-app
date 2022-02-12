@@ -36,12 +36,21 @@
 
 	async function onSubmit() {
 		const response = await mealUpdate.execute(inputs);
-		replace("/meals/");
+
+		if (response.error) {
+			console.error(response.error);
+		} else {
+			replace("/meals/");
+		}
 	}
 
 	async function onDelete() {
 		const response = await mealDelete.execute(params.id);
-		replace("/meals/");
+		if (response.error) {
+			console.error(response.error);
+		} else {
+			replace("/meals/");
+		}
 	}
 
 	onDestroy(unsubscribe);

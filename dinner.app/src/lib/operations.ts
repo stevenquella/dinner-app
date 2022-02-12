@@ -27,7 +27,7 @@ export type CommandResult<TOut> = {
 
 /** query the client expecting a collection */
 export function queryCollection<TIn, TOut>(
-	op: (TIn) => Promise<PostgrestResponse<TOut>>
+	op: (arg: TIn) => Promise<PostgrestResponse<TOut>>
 ): QueryStore<TIn, TOut[]> {
 	// initialize the store, execute to set stream of values and get single result
 	const { subscribe, set } = writable<QueryOp<TOut[]>>({ loading: false });
@@ -52,7 +52,7 @@ export function queryCollection<TIn, TOut>(
 
 /** query the client expecting a single item, will return null if not a single item */
 export function queryItem<TIn, TOut>(
-	op: (TIn) => Promise<PostgrestResponse<TOut>>
+	op: (arg: TIn) => Promise<PostgrestResponse<TOut>>
 ): QueryStore<TIn, TOut> {
 	// initialize the store, execute to set stream of values and get single result
 	const { subscribe, set } = writable<QueryOp<TOut>>({ loading: false });
@@ -77,7 +77,7 @@ export function queryItem<TIn, TOut>(
 
 /** command with the client assuming with a single item */
 export function commandItem<TIn, TOut>(
-	op: (TIn) => Promise<PostgrestResponse<TOut>>
+	op: (arg: TIn) => Promise<PostgrestResponse<TOut>>
 ): CommandStore<TIn, TOut> {
 	// initialize the store, execution to set stream of values
 	const { subscribe, set } = writable<CommandOp>({ loading: false });
@@ -101,7 +101,7 @@ export function commandItem<TIn, TOut>(
 
 /** generic command */
 export function command<TInput, TOutput>(
-	op: (TInput) => Promise<TOutput>
+	op: (arg: TInput) => Promise<TOutput>
 ): CommandStore<TInput, TOutput> {
 	// initialize the store, execution to set stream of values
 	const { subscribe, set } = writable<CommandOp>({ loading: false });
@@ -116,11 +116,6 @@ export function command<TInput, TOutput>(
 			return response;
 		},
 	};
-}
-
-/** key checking on select statements */
-export function buildColumns<T>(...columns: (keyof T)[]): string {
-	return columns.join(",");
 }
 
 /** Simplify postgrest response, assuming collection. */
