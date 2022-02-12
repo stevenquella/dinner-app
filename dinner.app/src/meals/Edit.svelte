@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from "svelte";
-	import { MealEdit, retrieveMeal, updateMeal } from "./_meals";
+	import { deleteMeal, MealEdit, retrieveMeal, updateMeal } from "./_meals";
 	import QueryStatus from "../components/QueryStatus.svelte";
 	import { replace } from "svelte-spa-router";
 	import { getUser } from "../lib/client";
@@ -19,6 +19,7 @@
 
 	const meal = retrieveMeal();
 	const mealUpdate = updateMeal();
+	const mealDelete = deleteMeal();
 
 	const unsubscribe = meal.subscribe((query) => {
 		if (query.result != null) {
@@ -38,6 +39,11 @@
 		replace("/meals/");
 	}
 
+	async function onDelete() {
+		const response = await mealDelete.execute(params.id);
+		replace("/meals/");
+	}
+
 	onDestroy(unsubscribe);
 </script>
 
@@ -50,6 +56,16 @@
 
 	<form on:submit|preventDefault="{onSubmit}">
 		<Inputs bind:inputs />
-		<button type="submit" disabled="{$mealUpdate.loading}">SAVE</button>
+		<button
+			type="submit"
+			disabled="{$mealUpdate.loading || $mealDelete.loading}"
+			>SAVE</button>
 	</form>
+
+	<button
+		on:click="{onDelete}"
+		type="input"
+		disabled="{$mealUpdate.loading || $mealDelete.loading}">
+		DELETE
+	</button>
 {/if}

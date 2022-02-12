@@ -1,6 +1,6 @@
 import type { CommandStore, QueryStore } from "../lib/operations";
 import { queryItem } from "../lib/operations";
-import { queryCollection, buildColumns, command } from "../lib/operations";
+import { queryCollection, buildColumns, commandItem } from "../lib/operations";
 import { client } from "../lib/client";
 
 const table = "meals";
@@ -45,15 +45,23 @@ export function retrieveMeal(): QueryStore<string, Meal> {
 	);
 }
 
-export function updateMeal(): CommandStore<MealEdit, any> {
-	return command<MealEdit, any>(
-		async (input) =>
+export function updateMeal(): CommandStore<MealEdit, Meal> {
+	return commandItem(
+		async (input: MealEdit) =>
 			await client.from<Meal>(table).update(input).eq("id", input.id)
 	);
 }
 
-export function createMeal(): CommandStore<MealCreate, any> {
-	return command<MealCreate, any>(
-		async (input) => await client.from<Meal>(table).insert(input)
+export function createMeal(): CommandStore<MealCreate, Meal> {
+	return commandItem(
+		async (input: MealCreate) =>
+			await client.from<Meal>(table).insert(input)
+	);
+}
+
+export function deleteMeal(): CommandStore<string, Meal> {
+	return commandItem(
+		async (id: string) =>
+			await client.from<Meal>(table).delete().eq("id", id)
 	);
 }
