@@ -1,4 +1,8 @@
-import type { CommandStore, QueryStore } from "../lib/operations";
+import type {
+	CommandResult,
+	CommandStore,
+	QueryStore,
+} from "../lib/operations";
 import { queryCollection, queryItem, commandItem } from "../lib/operations";
 import { client } from "../lib/client";
 
@@ -43,36 +47,28 @@ export function retrieveMeal(): QueryStore<string, Meal> {
 	);
 }
 
-export function updateMeal(): CommandStore<MealEdit, Meal> {
+export function updateMeal(): CommandStore<MealEdit, CommandResult<Meal>> {
 	return commandItem(
 		async (input: MealEdit) =>
-			await client
-				.from<Meal>(_table)
-				.update(input, { returning: "minimal" })
-				.eq("id", input.id)
+			await client.from<Meal>(_table).update(input).eq("id", input.id)
 
 		// TODO, upsert tags
 	);
 }
 
-export function createMeal(): CommandStore<MealCreate, Meal> {
+export function createMeal(): CommandStore<MealCreate, CommandResult<Meal>> {
 	return commandItem(
 		async (input: MealCreate) =>
-			await client
-				.from<Meal>(_table)
-				.insert(input, { returning: "minimal" })
+			await client.from<Meal>(_table).insert(input)
 
 		// TODO, upsert tags
 	);
 }
 
-export function deleteMeal(): CommandStore<string, Meal> {
+export function deleteMeal(): CommandStore<string, CommandResult<Meal>> {
 	return commandItem(
 		async (id: string) =>
 			// TODO, delete tags
-			await client
-				.from<Meal>(_table)
-				.delete({ returning: "minimal" })
-				.eq("id", id)
+			await client.from<Meal>(_table).delete().eq("id", id)
 	);
 }

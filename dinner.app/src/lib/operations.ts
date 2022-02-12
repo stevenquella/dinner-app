@@ -17,7 +17,7 @@ export type CommandOp = {
 };
 
 export type CommandStore<TIn, TOut> = Readable<CommandOp> & {
-	execute: (input: TIn) => Promise<CommandResult<TOut>>;
+	execute: (input: TIn) => Promise<TOut>;
 };
 
 export type CommandResult<TOut> = {
@@ -78,7 +78,7 @@ export function queryItem<TIn, TOut>(
 /** command with the client assuming with a single item */
 export function commandItem<TIn, TOut>(
 	op: (arg: TIn) => Promise<PostgrestResponse<TOut>>
-): CommandStore<TIn, TOut> {
+): CommandStore<TIn, CommandResult<TOut>> {
 	// initialize the store, execution to set stream of values
 	const { subscribe, set } = writable<CommandOp>({ loading: false });
 
