@@ -29,7 +29,7 @@ export type CommandResult<TOut> = {
 export function queryCollection<TIn, TOut>(
 	op: (arg: TIn) => Promise<PostgrestResponse<TOut>>
 ): QueryStore<TIn, TOut[]> {
-	// initialize the store, execute to set stream of values and get single result
+	// initialize the store, execute to set stream of values and get collection
 	const { subscribe, set } = writable<QueryOp<TOut[]>>({ loading: false });
 
 	return {
@@ -75,7 +75,7 @@ export function queryItem<TIn, TOut>(
 	};
 }
 
-/** command with the client assuming with a single item */
+/** command with the client assuming a single item */
 export function commandItem<TIn, TOut>(
 	op: (arg: TIn) => Promise<PostgrestResponse<TOut>>
 ): CommandStore<TIn, CommandResult<TOut>> {

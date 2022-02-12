@@ -16,8 +16,6 @@
 			password: password,
 		});
 
-		console.log(response);
-
 		// will return the user, but does not change the auth state, requires email confirmation
 		if (response.error) {
 			message = response.error.message;
