@@ -3,29 +3,26 @@
 	import { deleteMeal, MealEdit, retrieveMeal, updateMeal } from "./_meals";
 	import QueryStatus from "../components/QueryStatus.svelte";
 	import { replace } from "svelte-spa-router";
-	import { getUser } from "../lib/client";
 	import Inputs from "./Inputs.svelte";
 
 	export let params: { id: string };
 
-	const user = getUser();
-
 	let inputs: MealEdit = {
-		id: params.id,
-		user_id: user.id,
-		name: "",
-		notes: "",
+		meal: {
+			id: params.id,
+			name: "",
+			notes: "",
+		},
+		tags: [],
 	};
-
 	const meal = retrieveMeal();
 	const mealUpdate = updateMeal();
 	const mealDelete = deleteMeal();
 
 	const unsubscribe = meal.subscribe((query) => {
 		if (query.result != null) {
-			inputs = {
+			inputs.meal = {
 				id: query.result.id,
-				user_id: user.id,
 				name: query.result.name,
 				notes: query.result.notes,
 			};
@@ -64,7 +61,7 @@
 	<p>{$meal.result.name}</p>
 
 	<form on:submit|preventDefault="{onSubmit}">
-		<Inputs bind:inputs />
+		<Inputs bind:inputs="{inputs.meal}" />
 		<button
 			type="submit"
 			disabled="{$mealUpdate.loading || $mealDelete.loading}"
