@@ -7,7 +7,7 @@
 
 <div>
 	<label for="name">Name: </label>
-	<input name="name" type="text" required bind:value="{inputs.name}" />
+	<input name="name" type="text" bind:value="{inputs.name}" />
 </div>
 <div>
 	<label for="notes">Notes: </label>

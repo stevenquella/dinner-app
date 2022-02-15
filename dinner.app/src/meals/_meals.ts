@@ -3,6 +3,7 @@ import type { CommandStore, QueryStore } from "../lib/operations";
 import { command, query, single } from "../lib/operations";
 import { client, getUser } from "../lib/client";
 import { v4 as uuidv4 } from "uuid";
+import { Validator, RuleForString } from "../lib/validations";
 
 const _tags_table = "tags";
 const _meal_table = "meals";
@@ -19,6 +20,10 @@ const _meal_select = `
 		updated_on
 	)
 `;
+
+const _meal_validator = new Validator<MealEdit>(
+	new RuleForString<MealEdit>("name").notEmpty("Name is required.")
+);
 
 export async function retrieveMeals(store: QueryStore<Meal[]>) {
 	await query(store, async () => {
@@ -72,6 +77,9 @@ async function upsertMeal(id: string, meal: MealEdit, tags: TagEdit[]) {
 
 	// TODO validation
 	// TODO return something
+	const validation = _meal_validator.validate(meal);
+	console.log(validation);
+	throw new Error();
 
 	const updatedMeal = await client
 		.from<Meal>(_meal_table)
