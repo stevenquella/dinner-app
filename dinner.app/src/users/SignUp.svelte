@@ -3,19 +3,22 @@
 	import { signUp } from "./_users";
 	import Credentials from "./Credentials.svelte";
 	import SignedIn from "./SignedIn.svelte";
+	import type { SignUpInput } from "./_types";
+	import { getCommandStore } from "../lib/operations";
 
-	let username: string = "";
-	let password: string = "";
 	let message: string;
+	let input: SignUpInput = {
+		email: "",
+		password: "",
+		confirm_password: "", // TODO
+	};
 
-	const signup = signUp();
+	const commandStore = getCommandStore();
 
 	async function onSubmit() {
-		const response = await signup.execute({
-			email: username,
-			password: password,
-		});
+		const response = await signUp(commandStore, input);
 
+		// TODO - this should probably be in _users.ts
 		// will return the user, but does not change the auth state, requires email confirmation
 		if (response.error) {
 			message = response.error.message;
@@ -32,8 +35,9 @@
 	<h3>Sign Up</h3>
 
 	<form on:submit|preventDefault="{onSubmit}">
-		<Credentials bind:username bind:password />
-		<button type="submit" disabled="{$signup.loading}">SIGN UP</button>
+		<Credentials bind:input />
+		<button type="submit" disabled="{$commandStore.loading}"
+			>SIGN UP</button>
 	</form>
 
 	<p>{message}</p>

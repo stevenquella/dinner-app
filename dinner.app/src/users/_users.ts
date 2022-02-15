@@ -1,30 +1,16 @@
-import type {
-	UserCredentials,
-	ApiError,
-	User,
-	Session,
-} from "@supabase/supabase-js";
+import type { CommandStore } from "../lib/operations";
 import { client } from "../lib/client";
 import { command } from "../lib/operations";
+import type { SignUpInput, SignInInput } from "./_types";
 
-export type ClientUserResponse = {
-	error: ApiError;
-	user: User;
-	session: Session;
-};
-
-export function signUp() {
-	return command<UserCredentials, ClientUserResponse>(
-		async (input) => await client.auth.signUp(input)
-	);
+export async function signUp(store: CommandStore, input: SignUpInput) {
+	return command(store, async () => await client.auth.signUp(input));
 }
 
-export function signIn() {
-	return command<UserCredentials, ClientUserResponse>(
-		async (input) => await client.auth.signIn(input)
-	);
+export async function signIn(store: CommandStore, input: SignInInput) {
+	return command(store, async () => await client.auth.signIn(input));
 }
 
-export function signOut() {
-	return command((_) => client.auth.signOut());
+export async function signOut(store: CommandStore) {
+	return command(store, async () => await client.auth.signOut());
 }

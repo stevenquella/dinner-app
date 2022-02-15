@@ -1,13 +1,14 @@
 <script lang="ts">
+	import { getCommandStore } from "../lib/operations";
 	import { signOut } from "./_users";
 
-	const signout = signOut();
+	const commandStore = getCommandStore();
 
 	async function onSignOut() {
-		await signout.execute(null);
+		await signOut(commandStore);
 	}
 </script>
 
-<button type="input" disabled="{$signout.loading}" on:click="{onSignOut}">
+<button type="input" disabled="{$commandStore.loading}" on:click="{onSignOut}">
 	SIGN OUT
 </button>

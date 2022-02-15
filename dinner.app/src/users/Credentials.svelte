@@ -1,17 +1,16 @@
 <script lang="ts">
-	export let username: string;
-	export let password: string;
+	export let input: { email: string; password: string };
 </script>
 
 <input
-	name="username"
+	name="email"
 	type="email"
-	placeholder="username"
+	placeholder="email"
 	required
-	bind:value="{username}" />
+	bind:value="{input.email}" />
 <input
 	name="password"
 	type="password"
 	placeholder="password"
 	required
-	bind:value="{password}" />
+	bind:value="{input.password}" />

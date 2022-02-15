@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { QueryStore } from "../lib/operations";
-	export let query: QueryStore<any, any>;
+	export let query: QueryStore<any>;
 </script>
 
 {#if $query.loading}

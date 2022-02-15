@@ -1,163 +1,69 @@
 import type { PostgrestResponse } from "@supabase/supabase-js";
-import type { Readable } from "svelte/store";
+import type { Writable } from "svelte/store";
 import { writable } from "svelte/store";
 
+// TODO - pull these into a types file
 export type QueryOp<TOut> = {
 	loading: boolean;
 	error?: any;
 	result?: TOut;
 };
 
-export type QueryStore<TIn, TOut> = Readable<QueryOp<TOut>> & {
-	execute: (input: TIn) => Promise<void> | void;
-};
+export type QueryStore<TOut> = Writable<QueryOp<TOut>>;
 
 export type CommandOp = {
 	loading: boolean;
 };
 
-export type CommandStore<TIn, TOut> = Readable<CommandOp> & {
-	execute: (input: TIn) => Promise<TOut>;
-};
+export type CommandStore = Writable<CommandOp>;
 
-export type CommandResult<TOut> = {
-	error?: any;
-	result?: TOut;
-};
-
-/** query the client expecting a collection */
-export function queryCollection<TIn, TOut>(
-	op: (arg: TIn) => Promise<PostgrestResponse<TOut>>
-): QueryStore<TIn, TOut[]> {
-	// initialize the store, execute to set stream of values and get collection
-	const { subscribe, set } = writable<QueryOp<TOut[]>>({ loading: false });
-
-	return {
-		subscribe,
-		execute: async function (input: TIn) {
-			set({ loading: true });
-
-			try {
-				const response = await op(input);
-				set({
-					loading: false,
-					...translatePostgrestResponse(response),
-				});
-			} catch (error) {
-				set({ loading: false, error });
-			}
-		},
-	};
+export function getQueryStore<T>(): QueryStore<T> {
+	return writable<QueryOp<T>>({ loading: true });
 }
 
-/** query the client expecting a single item, will return null if not a single item */
-export function queryItem<TIn, TOut>(
-	op: (arg: TIn) => Promise<PostgrestResponse<TOut>>
-): QueryStore<TIn, TOut> {
-	// initialize the store, execute to set stream of values and get single result
-	const { subscribe, set } = writable<QueryOp<TOut>>({ loading: false });
+export async function query<T>(
+	store: QueryStore<T>,
+	operation: () => Promise<T>
+) {
+	store.set({ loading: true });
 
-	return {
-		subscribe,
-		execute: async function (input: TIn) {
-			set({ loading: true });
-
-			try {
-				const response = await op(input);
-				set({
-					loading: false,
-					...translatePostgrestResponseItem(response),
-				});
-			} catch (error) {
-				set({ loading: false, error: error });
-			}
-		},
-	};
+	try {
+		const result: T = await operation();
+		store.set({ loading: false, result });
+	} catch (error) {
+		store.set({ loading: false, error });
+	}
 }
 
-/** command with the client assuming a single item */
-export function commandItem<TIn, TOut>(
-	op: (arg: TIn) => Promise<PostgrestResponse<TOut>>
-): CommandStore<TIn, CommandResult<TOut>> {
-	// initialize the store, execution to set stream of values
-	const { subscribe, set } = writable<CommandOp>({ loading: false });
-
-	return {
-		subscribe,
-		execute: async function (input: TIn) {
-			set({ loading: true });
-
-			try {
-				const response = await op(input);
-				set({ loading: false });
-				return translatePostgrestResponseItem(response);
-			} catch (error) {
-				set({ loading: false });
-				return { error: error, result: null };
-			}
-		},
-	};
+export function getCommandStore() {
+	return writable<CommandOp>({ loading: false });
 }
 
-/** generic command */
-export function command<TInput, TOutput>(
-	op: (arg: TInput) => Promise<TOutput>
-): CommandStore<TInput, TOutput> {
-	// initialize the store, execution to set stream of values
-	const { subscribe, set } = writable<CommandOp>({ loading: false });
+export async function command<T>(
+	store: CommandStore,
+	operation: () => Promise<T>
+) {
+	store.set({ loading: true });
 
-	return {
-		subscribe,
-		execute: async function (input: TInput) {
-			set({ loading: true });
-			const response: TOutput = await op(input);
-
-			set({ loading: false });
-			return response;
-		},
-	};
-}
-
-/** Simplify postgrest response, assuming collection. */
-function translatePostgrestResponse<T>(response: PostgrestResponse<T>): {
-	error: any;
-	result: T[];
-} {
-	let error: string = "Unknown result.";
-	let result: T[] = [];
-
-	if (response.error != null) {
-		error = response.error.message;
-		result = null;
-	} else if (response.data != null) {
-		error = null;
-		result = response.data;
+	let response: T;
+	try {
+		response = await operation();
+	} catch (error) {
+		console.debug(error);
+	} finally {
+		store.set({ loading: false });
 	}
 
-	return {
-		error,
-		result,
-	};
+	return response;
 }
 
-/** Simplify postgrest response, assuming single item. */
-function translatePostgrestResponseItem<T>(response: PostgrestResponse<T>): {
-	error: any;
-	result: T;
-} {
-	let error: string = "Unknown result.";
+/** Simplify postgrest response, assuming single item. (use throwOnError) */
+export function single<T>(response: PostgrestResponse<T>): T {
 	let result: T = null;
 
-	if (response.error != null) {
-		error = response.error.message;
-		result = null;
-	} else if (response.data != null && response.data.length === 1) {
-		error = null;
+	if (response.data != null && response.data.length === 1) {
 		result = response.data[0];
 	}
 
-	return {
-		error,
-		result,
-	};
+	return result;
 }

@@ -1,43 +1,39 @@
 <script lang="ts">
 	import Inputs from "./Inputs.svelte";
-	import type { MealCreate } from "./_meals";
 	import { createMeal } from "./_meals";
+	import { getCommandStore } from "../lib/operations";
 	import { replace } from "svelte-spa-router";
+	import type { MealEdit, TagEdit } from "./_types";
 
-	let inputs: MealCreate = {
-		meal: {
-			name: "",
-			notes: "",
-		},
-		tags: [],
+	let meal: MealEdit = {
+		name: "",
+		notes: "",
 	};
 
-	const mealCreate = createMeal();
+	let tags: TagEdit[] = [];
+
+	const commandStore = getCommandStore();
 
 	function onAddTag() {
-		inputs.tags = [...inputs.tags, { name: "test" }];
+		tags = [...tags, { name: "test" }];
 	}
 
 	async function onSubmit() {
-		const response = await mealCreate.execute(inputs);
-		if (response.error) {
-			console.error(response.error);
-		} else {
-			replace("/meals/");
-		}
+		await createMeal(commandStore, meal, tags);
+		replace("/meals/");
 	}
 </script>
 
 <p>Create Meal</p>
 
 <form on:submit|preventDefault="{onSubmit}">
-	<Inputs bind:inputs="{inputs.meal}" />
-	<button type="submit" disabled="{$mealCreate.loading}">SAVE</button>
+	<Inputs bind:inputs="{meal}" />
+	<button type="submit" disabled="{$commandStore.loading}">SAVE</button>
 </form>
 
 <p>Set Tags</p>
 
-{#each inputs.tags as tag}
+{#each tags as tag}
 	<div>
 		<p>{tag.name}</p>
 	</div>

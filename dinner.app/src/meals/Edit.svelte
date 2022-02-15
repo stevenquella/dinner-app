@@ -1,53 +1,44 @@
 <script lang="ts">
 	import { onDestroy } from "svelte";
-	import { deleteMeal, MealEdit, retrieveMeal, updateMeal } from "./_meals";
+	import type { Meal, MealEdit, TagEdit } from "./_types";
+	import { deleteMeal, retrieveMeal, updateMeal } from "./_meals";
 	import QueryStatus from "../components/QueryStatus.svelte";
 	import { replace } from "svelte-spa-router";
 	import Inputs from "./Inputs.svelte";
+	import { getCommandStore, getQueryStore } from "../lib/operations";
 
 	export let params: { id: string };
 
-	let inputs: MealEdit = {
-		meal: {
-			id: params.id,
-			name: "",
-			notes: "",
-		},
-		tags: [],
+	let meal: MealEdit = {
+		name: "",
+		notes: "",
 	};
-	const meal = retrieveMeal();
-	const mealUpdate = updateMeal();
-	const mealDelete = deleteMeal();
 
-	const unsubscribe = meal.subscribe((query) => {
+	let tags: TagEdit[] = [];
+
+	const mealStore = getQueryStore<Meal>();
+	const commandStore = getCommandStore();
+
+	const unsubscribe = mealStore.subscribe((query) => {
 		if (query.result != null) {
-			inputs.meal = {
-				id: query.result.id,
+			meal = {
 				name: query.result.name,
 				notes: query.result.notes,
 			};
+			tags = query.result.tags;
 		}
 	});
 
-	$: meal.execute(params.id);
+	$: retrieveMeal(mealStore, params.id);
 
 	async function onSubmit() {
-		const response = await mealUpdate.execute(inputs);
-
-		if (response.error) {
-			console.error(response.error);
-		} else {
-			replace("/meals/");
-		}
+		await updateMeal(commandStore, params.id, meal, tags);
+		replace("/meals/");
 	}
 
 	async function onDelete() {
-		const response = await mealDelete.execute(params.id);
-		if (response.error) {
-			console.error(response.error);
-		} else {
-			replace("/meals/");
-		}
+		await deleteMeal(commandStore, params.id);
+		replace("/meals/");
 	}
 
 	onDestroy(unsubscribe);
@@ -55,23 +46,20 @@
 
 <p>{params.id}</p>
 
-<QueryStatus query="{meal}" />
+<QueryStatus query="{mealStore}" />
 
-{#if $meal.result}
-	<p>{$meal.result.name}</p>
+{#if $mealStore.result}
+	<p>{$mealStore.result.name}</p>
 
 	<form on:submit|preventDefault="{onSubmit}">
-		<Inputs bind:inputs="{inputs.meal}" />
-		<button
-			type="submit"
-			disabled="{$mealUpdate.loading || $mealDelete.loading}"
-			>SAVE</button>
+		<Inputs bind:inputs="{meal}" />
+		<button type="submit" disabled="{$commandStore.loading}">SAVE</button>
 	</form>
 
 	<button
 		on:click="{onDelete}"
 		type="input"
-		disabled="{$mealUpdate.loading || $mealDelete.loading}">
+		disabled="{$commandStore.loading}">
 		DELETE
 	</button>
 {/if}
