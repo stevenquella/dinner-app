@@ -1,4 +1,4 @@
-import type { CommandStore } from "../lib/operations";
+import type { CommandStore } from "../lib/types";
 import { client } from "../lib/client";
 import { command } from "../lib/operations";
 import type { SignUpInput, SignInInput } from "./_types";

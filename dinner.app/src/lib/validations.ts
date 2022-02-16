@@ -1,5 +1,8 @@
 // inspired by https://github.com/AlexJPotter/fluentvalidation-ts
 
+import { ValidationError } from "./errors";
+import type { ValidationResult } from "./types";
+
 export class Validator<T> {
 	private readonly rules: RuleFor<T>[];
 
@@ -7,16 +10,44 @@ export class Validator<T> {
 		this.rules = rules;
 	}
 
-	validate(input: T): { valid: boolean; errors: string[]; message: string } {
-		const errors: string[] = this.rules.flatMap((r) =>
-			r.performChecks(input)
-		);
+	/** throws validationerror if invalid */
+	ensureValid(input: T): void {
+		const result = this.validate(input);
+		if (!result.valid) {
+			throw new ValidationError(result);
+		}
+	}
+
+	/** throw validationerror if invalid */
+	ensureValidCollection(inputs: T[]): void {
+		const result = this.validateCollection(inputs);
+		if (!result.valid) {
+			throw new ValidationError(result);
+		}
+	}
+
+	validate(input: T): ValidationResult {
+		const errors: string[] = this.getErrors(input);
 
 		return {
 			valid: errors.length === 0,
 			errors: errors,
 			message: errors.join(" "),
 		};
+	}
+
+	validateCollection(inputs: T[]): ValidationResult {
+		const errors: string[] = inputs.flatMap((i) => this.getErrors(i));
+
+		return {
+			valid: errors.length === 0,
+			errors: errors,
+			message: errors.join(" "),
+		};
+	}
+
+	private getErrors(input: T): string[] {
+		return this.rules.flatMap((r) => r.performChecks(input));
 	}
 }
 

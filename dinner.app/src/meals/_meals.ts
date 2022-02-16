@@ -1,7 +1,8 @@
 import type { Meal, MealEdit, Tag, TagEdit } from "./_types";
-import type { CommandStore, QueryStore } from "../lib/operations";
+import type { CommandStore, QueryStore } from "../lib/types";
 import { command, query, single } from "../lib/operations";
 import { client, getUser } from "../lib/client";
+import { DataError } from "../lib/errors";
 import { v4 as uuidv4 } from "uuid";
 import { Validator, RuleFor } from "../lib/validations";
 
@@ -29,7 +30,12 @@ const _meal_validator = new Validator<MealEdit>(
 		.maxLength(500, "Name must be no greater than 500 characters.")
 );
 
-// TODO add validator for tags
+const _tag_validator = new Validator<TagEdit>(
+	new RuleFor<TagEdit>("name")
+		.required("Tag name is required.")
+		.notEmpty("Tag name must not be empty.")
+		.maxLength(100, "Tag name must be not greater than 100 characters.")
+);
 
 export async function retrieveMeals(store: QueryStore<Meal[]>) {
 	await query(store, async () => {
@@ -79,7 +85,7 @@ export async function deleteMeal(store: CommandStore, id: string) {
 			.eq("id", id);
 
 		if (deletedMeal.error) {
-			throw new Error(deletedMeal.error.message);
+			throw new DataError(deletedMeal.error);
 		}
 	});
 }
@@ -87,12 +93,11 @@ export async function deleteMeal(store: CommandStore, id: string) {
 async function upsertMeal(id: string, meal: MealEdit, tags: TagEdit[]) {
 	const user = getUser();
 
-	// TODO return something
-	const validation = _meal_validator.validate(meal);
-	if (!validation.valid) {
-		throw Error(validation.message);
-	}
+	// validate
+	_meal_validator.ensureValid(meal);
+	_tag_validator.ensureValidCollection(tags || []);
 
+	// update meal
 	const updatedMeal = await client
 		.from<Meal>(_meal_table)
 		.upsert({
@@ -103,9 +108,10 @@ async function upsertMeal(id: string, meal: MealEdit, tags: TagEdit[]) {
 		.eq("id", id);
 
 	if (updatedMeal.error) {
-		throw Error(updatedMeal.error.message);
+		throw new DataError(updatedMeal.error);
 	}
 
+	// update tags
 	const updatedTags = await client.from<Tag>(_tags_table).upsert(
 		tags.map((i) => ({
 			user_id: user.id,
@@ -115,6 +121,6 @@ async function upsertMeal(id: string, meal: MealEdit, tags: TagEdit[]) {
 	);
 
 	if (updatedTags.error) {
-		throw Error(updatedMeal.error.message);
+		throw new DataError(updatedTags.error);
 	}
 }

@@ -6,10 +6,13 @@
 	import { replace } from "svelte-spa-router";
 	import Inputs from "./Inputs.svelte";
 	import { getCommandStore, getQueryStore } from "../lib/operations";
+	import type { AppError } from "../lib/errors";
+	import { isAppError } from "../lib/errors";
+	import Error from "../components/Error.svelte";
 
 	export let params: { id: string };
 
-	let message: string = "";
+	let error: AppError;
 
 	let meal: MealEdit = {
 		name: "",
@@ -35,8 +38,8 @@
 
 	async function onSubmit() {
 		const response = await updateMeal(commandStore, params.id, meal, tags);
-		if (response instanceof Error) {
-			message = response.message;
+		if (isAppError(response)) {
+			error = response;
 		} else {
 			replace("/meals/");
 		}
@@ -44,8 +47,8 @@
 
 	async function onDelete() {
 		const response = await deleteMeal(commandStore, params.id);
-		if (response instanceof Error) {
-			message = response.message;
+		if (isAppError(response)) {
+			error = response;
 		} else {
 			replace("/meals/");
 		}
@@ -58,7 +61,7 @@
 
 <QueryStatus query="{mealStore}" />
 
-<p>{message}</p>
+<Error error="{error}" />
 
 {#if $mealStore.result}
 	<p>{$mealStore.result.name}</p>

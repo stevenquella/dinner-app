@@ -1,21 +1,6 @@
+import type { QueryStore, QueryOp, CommandStore, CommandOp } from "./types";
 import type { PostgrestResponse } from "@supabase/supabase-js";
-import type { Writable } from "svelte/store";
 import { writable } from "svelte/store";
-
-// TODO - pull these into a types file
-export type QueryOp<TOut> = {
-	loading: boolean;
-	error?: Error;
-	result?: TOut;
-};
-
-export type QueryStore<TOut> = Writable<QueryOp<TOut>>;
-
-export type CommandOp = {
-	loading: boolean;
-};
-
-export type CommandStore = Writable<CommandOp>;
 
 export function getQueryStore<T>(): QueryStore<T> {
 	return writable<QueryOp<T>>({ loading: true });

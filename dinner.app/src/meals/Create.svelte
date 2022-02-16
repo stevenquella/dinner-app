@@ -4,8 +4,11 @@
 	import { getCommandStore } from "../lib/operations";
 	import { replace } from "svelte-spa-router";
 	import type { MealEdit, TagEdit } from "./_types";
+	import Error from "../components/Error.svelte";
+	import type { AppError } from "../lib/errors";
+	import { isAppError } from "../lib/errors";
 
-	let message: string = "";
+	let error: AppError;
 
 	let meal: MealEdit = {
 		name: "",
@@ -22,8 +25,8 @@
 
 	async function onSubmit() {
 		const response = await createMeal(commandStore, meal, tags);
-		if (response instanceof Error) {
-			message = response.message;
+		if (isAppError(response)) {
+			error = response;
 		} else {
 			replace("/meals/");
 		}
@@ -32,7 +35,7 @@
 
 <p>Create Meal</p>
 
-<p>{message}</p>
+<Error error="{error}" />
 
 <form on:submit|preventDefault="{onSubmit}">
 	<Inputs bind:inputs="{meal}" />
