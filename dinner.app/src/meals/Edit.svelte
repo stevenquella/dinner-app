@@ -9,6 +9,8 @@
 
 	export let params: { id: string };
 
+	let message: string = "";
+
 	let meal: MealEdit = {
 		name: "",
 		notes: "",
@@ -32,13 +34,21 @@
 	$: retrieveMeal(mealStore, params.id);
 
 	async function onSubmit() {
-		await updateMeal(commandStore, params.id, meal, tags);
-		replace("/meals/");
+		const response = await updateMeal(commandStore, params.id, meal, tags);
+		if (response instanceof Error) {
+			message = response.message;
+		} else {
+			replace("/meals/");
+		}
 	}
 
 	async function onDelete() {
-		await deleteMeal(commandStore, params.id);
-		replace("/meals/");
+		const response = await deleteMeal(commandStore, params.id);
+		if (response instanceof Error) {
+			message = response.message;
+		} else {
+			replace("/meals/");
+		}
 	}
 
 	onDestroy(unsubscribe);
@@ -47,6 +57,8 @@
 <p>{params.id}</p>
 
 <QueryStatus query="{mealStore}" />
+
+<p>{message}</p>
 
 {#if $mealStore.result}
 	<p>{$mealStore.result.name}</p>

@@ -5,7 +5,7 @@ import { writable } from "svelte/store";
 // TODO - pull these into a types file
 export type QueryOp<TOut> = {
 	loading: boolean;
-	error?: any;
+	error?: Error;
 	result?: TOut;
 };
 
@@ -31,7 +31,7 @@ export async function query<T>(
 		const result: T = await operation();
 		store.set({ loading: false, result });
 	} catch (error) {
-		store.set({ loading: false, error });
+		store.set({ loading: false, error: error as Error });
 	}
 }
 
@@ -42,14 +42,15 @@ export function getCommandStore() {
 export async function command<T>(
 	store: CommandStore,
 	operation: () => Promise<T>
-) {
+): Promise<T | Error> {
 	store.set({ loading: true });
 
-	let response: T;
+	let response: T | Error;
 	try {
 		response = await operation();
 	} catch (error) {
 		console.debug(error);
+		response = error as Error;
 	} finally {
 		store.set({ loading: false });
 	}

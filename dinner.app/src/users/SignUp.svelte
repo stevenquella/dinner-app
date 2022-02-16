@@ -18,15 +18,11 @@
 	async function onSubmit() {
 		const response = await signUp(commandStore, input);
 
-		// TODO - this should probably be in _users.ts
-		// will return the user, but does not change the auth state, requires email confirmation
-		if (response.error) {
-			message = response.error.message;
-		} else if (response.user) {
-			message = `Sign up submitted successfully. Please confirm at ${response.user.email}.`;
+		if (response instanceof Error) {
+			message = response.message;
 		} else {
-			console.debug(response);
-			message = "Unknown result. Please try again.";
+			// will return the user, but does not change the auth state, requires email confirmation
+			message = `Sign up submitted successfully. Please confirm at ${response.email}.`;
 		}
 	}
 </script>

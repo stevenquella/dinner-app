@@ -1,3 +1,5 @@
+// inspired by https://github.com/AlexJPotter/fluentvalidation-ts
+
 export class Validator<T> {
 	private readonly rules: RuleFor<T>[];
 
@@ -6,69 +8,106 @@ export class Validator<T> {
 	}
 
 	validate(input: T): { valid: boolean; errors: string[]; message: string } {
-		const errors: string[] = this.rules
-			.flatMap((rules) => {
-				return rules.checks.map((check) => check(input));
-			})
-			.filter((error) => error != null);
+		const errors: string[] = this.rules.flatMap((r) =>
+			r.performChecks(input)
+		);
 
 		return {
 			valid: errors.length === 0,
 			errors: errors,
-			message: errors.join(", "),
+			message: errors.join(" "),
 		};
 	}
 }
 
-abstract class RuleFor<T> {
-	protected readonly name: keyof T;
-	public readonly checks: ((input: T) => string)[];
+export class RuleFor<T> {
+	private readonly name: keyof T;
+	private readonly checks: ((input: T) => string)[];
 
 	constructor(name: keyof T) {
 		this.name = name;
 		this.checks = [];
 	}
 
-	must(check: (input: T) => string) {
-		this.checks.push(check);
-		return this;
+	performChecks(input: T): string[] {
+		return this.checks.map((c) => c(input)).filter((e) => !!e);
 	}
+
+	// Shared
 
 	required(message: string) {
-		this.must((i) => requiredCheck(i, message));
+		return this.must((i) => RuleFor.requiredCheck(i), message);
+	}
+
+	must(check: (input: T) => boolean, message: string) {
+		this.checks.push((i) => (check(i) ? null : message));
 		return this;
 	}
-}
 
-export class RuleForString<T> extends RuleFor<T> {
-	constructor(name: keyof T) {
-		super(name);
-
-		this.must(isStringCheck);
-	}
+	// Strings
 
 	notEmpty(message: string) {
-		this.must((i) => notEmptyCheck(this.getString(i), message));
-		return this;
+		return this.must(
+			(i) => RuleFor.notEmptyCheck(this.getString(i)),
+			message
+		);
 	}
+
+	minLength(length: number, message: string) {
+		return this.must(
+			(i) => RuleFor.minLengthCheck(this.getString(i), length),
+			message
+		);
+	}
+
+	maxLength(length: number, message: string) {
+		return this.must(
+			(i) => RuleFor.maxLengthCheck(this.getString(i), length),
+			message
+		);
+	}
+
+	email(message: string) {
+		return this.must((i) => RuleFor.emailCheck(this.getString(i)), message);
+	}
+
+	// Helpers
 
 	private getString(input: T): string {
-		return input[this.name as string] as string;
+		const value = input[this.name];
+
+		if (!value) {
+			return "";
+		} else if (typeof value === "string") {
+			return value;
+		} else {
+			console.debug(input, value);
+			throw new Error("Expected string but got something else.");
+		}
+	}
+
+	// Checks
+
+	private static requiredCheck(value: any): boolean {
+		return !!value;
+	}
+
+	private static notEmptyCheck(value: string): boolean {
+		return !!value && value?.trim().length > 0;
+	}
+
+	private static minLengthCheck(value: string, length: number): boolean {
+		return value?.length >= length;
+	}
+
+	private static maxLengthCheck(value: string, length: number): boolean {
+		return value?.length <= length;
+	}
+
+	private static emailCheck(value: string): boolean {
+		const emailAddressPattern =
+			/^[a-zA-Z0-9.!#$%&’"*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
+
+		return emailAddressPattern.test(value);
 	}
 }
-
-function isString(value: any): boolean {
-	return typeof value === "string";
-}
-
-function isStringCheck(value: any) {
-	return isString(value) ? null : "Value is not a string.";
-}
-
-const requiredCheck = function (value: any, message: string) {
-	return value ? null : message;
-};
-
-const notEmptyCheck = function (value: string, message: string) {
-	return isString(value) && value && value.length > 0 ? null : message;
-};

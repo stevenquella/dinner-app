@@ -5,6 +5,8 @@
 	import { replace } from "svelte-spa-router";
 	import type { MealEdit, TagEdit } from "./_types";
 
+	let message: string = "";
+
 	let meal: MealEdit = {
 		name: "",
 		notes: "",
@@ -19,12 +21,18 @@
 	}
 
 	async function onSubmit() {
-		await createMeal(commandStore, meal, tags);
-		replace("/meals/");
+		const response = await createMeal(commandStore, meal, tags);
+		if (response instanceof Error) {
+			message = response.message;
+		} else {
+			replace("/meals/");
+		}
 	}
 </script>
 
 <p>Create Meal</p>
+
+<p>{message}</p>
 
 <form on:submit|preventDefault="{onSubmit}">
 	<Inputs bind:inputs="{meal}" />

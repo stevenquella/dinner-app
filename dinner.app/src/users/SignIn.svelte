@@ -17,7 +17,9 @@
 
 	async function onSubmit(): Promise<void> {
 		const response = await signIn(commandStore, input);
-		error = response.error?.message;
+		if (response instanceof Error) {
+			error = response.message;
+		}
 	}
 </script>
 

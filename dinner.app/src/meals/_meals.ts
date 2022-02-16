@@ -3,7 +3,7 @@ import type { CommandStore, QueryStore } from "../lib/operations";
 import { command, query, single } from "../lib/operations";
 import { client, getUser } from "../lib/client";
 import { v4 as uuidv4 } from "uuid";
-import { Validator, RuleForString } from "../lib/validations";
+import { Validator, RuleFor } from "../lib/validations";
 
 const _tags_table = "tags";
 const _meal_table = "meals";
@@ -22,8 +22,14 @@ const _meal_select = `
 `;
 
 const _meal_validator = new Validator<MealEdit>(
-	new RuleForString<MealEdit>("name").notEmpty("Name is required.")
+	new RuleFor<MealEdit>("name")
+		.required("Name is required.")
+		.notEmpty("Name must not be empty.")
+		.minLength(3, "Name must be at least 3 characters.")
+		.maxLength(500, "Name must be no greater than 500 characters.")
 );
+
+// TODO add validator for tags
 
 export async function retrieveMeals(store: QueryStore<Meal[]>) {
 	await query(store, async () => {
@@ -66,20 +72,26 @@ export async function createMeal(
 }
 
 export async function deleteMeal(store: CommandStore, id: string) {
-	return command(
-		store,
-		async () => await client.from<Meal>(_meal_table).delete().eq("id", id)
-	);
+	return command(store, async () => {
+		const deletedMeal = await client
+			.from<Meal>(_meal_table)
+			.delete()
+			.eq("id", id);
+
+		if (deletedMeal.error) {
+			throw new Error(deletedMeal.error.message);
+		}
+	});
 }
 
 async function upsertMeal(id: string, meal: MealEdit, tags: TagEdit[]) {
 	const user = getUser();
 
-	// TODO validation
 	// TODO return something
 	const validation = _meal_validator.validate(meal);
-	console.log(validation);
-	throw new Error();
+	if (!validation.valid) {
+		throw Error(validation.message);
+	}
 
 	const updatedMeal = await client
 		.from<Meal>(_meal_table)
