@@ -6,11 +6,9 @@
 	name="email"
 	type="email"
 	placeholder="email"
-	required
 	bind:value="{input.email}" />
 <input
 	name="password"
 	type="password"
 	placeholder="password"
-	required
 	bind:value="{input.password}" />

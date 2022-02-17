@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { onDestroy } from "svelte";
-	import type { Meal, MealEdit, TagEdit } from "./_types";
-	import { deleteMeal, retrieveMeal, updateMeal } from "./_meals";
-	import QueryStatus from "../components/QueryStatus.svelte";
 	import { replace } from "svelte-spa-router";
-	import Inputs from "./Inputs.svelte";
-	import { getCommandStore, getQueryStore } from "../lib/operations";
+	import Error from "../components/Error.svelte";
+	import QueryStatus from "../components/QueryStatus.svelte";
 	import type { AppError } from "../lib/errors";
 	import { isAppError } from "../lib/errors";
-	import Error from "../components/Error.svelte";
+	import { getCommandStore, getQueryStore } from "../lib/operations";
+	import Inputs from "./Inputs.svelte";
+	import { deleteMeal, retrieveMeal, updateMeal } from "./_meals";
+	import type { Meal, MealEdit, TagEdit } from "./_types";
 
 	export let params: { id: string };
 

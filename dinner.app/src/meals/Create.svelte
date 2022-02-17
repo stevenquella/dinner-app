@@ -1,12 +1,11 @@
 <script lang="ts">
+	import { replace } from "svelte-spa-router";
+	import Error from "../components/Error.svelte";
+	import type { AppError } from "../lib";
+	import { getCommandStore, isAppError } from "../lib";
 	import Inputs from "./Inputs.svelte";
 	import { createMeal } from "./_meals";
-	import { getCommandStore } from "../lib/operations";
-	import { replace } from "svelte-spa-router";
 	import type { MealEdit, TagEdit } from "./_types";
-	import Error from "../components/Error.svelte";
-	import type { AppError } from "../lib/errors";
-	import { isAppError } from "../lib/errors";
 
 	let error: AppError;
 
