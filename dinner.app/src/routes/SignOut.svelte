@@ -9,4 +9,4 @@
 	}
 </script>
 
-<button type="input" disabled="{$commandStore.loading}" on:click="{onSignOut}"> SIGN OUT </button>
+<button type="button" disabled="{$commandStore.loading}" on:click="{onSignOut}"> SIGN OUT </button>
