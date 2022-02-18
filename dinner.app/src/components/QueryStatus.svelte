@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { QueryStore } from "../lib/operations";
-	export let query: QueryStore<any, any>;
+	import type { QueryStore } from "$utilities/_types";
+	export let query: QueryStore<any>;
 </script>
 
 {#if $query.loading}

@@ -1,6 +1,7 @@
 {
 	"prettier.useTabs": true,
 	"prettier.tabWidth": 4,
+	"prettier.printWidth": 100,
 	"svelte.enable-ts-plugin": true,
 	"svelte.plugin.svelte.defaultScriptLanguage": "ts",
 	"svelte.plugin.svelte.format.config.svelteAllowShorthand": false,
@@ -8,5 +9,9 @@
 	"svelte.plugin.svelte.useNewTransformation": true,
 	"editor.formatOnSave": true,
 	"editor.formatOnPaste": true,
-	"svelte.plugin.svelte.format.config.svelteBracketNewLine": false
+	"svelte.plugin.svelte.format.config.svelteBracketNewLine": false,
+	"editor.codeActionsOnSave": {
+		"source.organizeImports": true
+	},
+	"editor.foldingImportsByDefault": true
 }

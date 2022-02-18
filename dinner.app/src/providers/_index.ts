@@ -17,8 +17,9 @@ client.auth.onAuthStateChange(function (event, session) {
 	user.set(session?.user);
 });
 
+export * from "./meals";
+export * from "./users";
 export {
-	/** supabase client */
 	client,
 	/** user store */
 	user,
