@@ -3,14 +3,14 @@ import { command, RuleFor, Validator } from "$utilities/_index";
 import type { CommandStore } from "$utilities/_types";
 import type { SignInInput, SignUpInput } from "./_types";
 
-const _signin_validator = new Validator<SignInInput>(
+export const _signin_validator = new Validator<SignInInput>(
 	new RuleFor<SignInInput>("email")
 		.required("Email is required.")
 		.email("Email expects a valid email address."),
 	new RuleFor<SignInInput>("password").required("Password is required.")
 );
 
-const _signup_validator = new Validator<SignUpInput>(
+export const _signup_validator = new Validator<SignUpInput>(
 	new RuleFor<SignUpInput>("email")
 		.required("Email is required.")
 		.email("Email expects a valid email address."),
