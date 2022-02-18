@@ -1,21 +1,10 @@
-import { assert, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
+import { _signin_validator } from "../src/providers/users";
 
-test("Email is required.", () => {});
+describe("User validation tests.", () => {
+	test("Email is required.", () => {
+		const validation = _signin_validator.validate({ email: null, password: "asdofmasoiemf" });
 
-test("Math.sqrt()", () => {
-	expect(Math.sqrt(4)).toBe(2);
-	expect(Math.sqrt(144)).toBe(12);
-	expect(Math.sqrt(2)).toBe(Math.SQRT2);
-});
-
-test("JSON", () => {
-	const input = {
-		foo: "hello",
-		bar: "world",
-	};
-
-	const output = JSON.stringify(input);
-
-	expect(output).eq('{"foo":"hello","bar":"world"}');
-	assert.deepEqual(JSON.parse(output), input, "matches original");
+		expect(validation.errors).to.include("Email is required.");
+	});
 });

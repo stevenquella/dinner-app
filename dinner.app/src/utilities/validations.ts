@@ -67,7 +67,7 @@ export class RuleFor<T> {
 	// Shared
 
 	required(message: string) {
-		return this.must((i) => RuleFor.requiredCheck(i), message);
+		return this.must((i) => RuleFor.requiredCheck(i[this.name]), message);
 	}
 
 	must(check: (input: T) => boolean, message: string) {
@@ -127,7 +127,8 @@ export class RuleFor<T> {
 	}
 
 	private static emailCheck(value: string): boolean {
-		const emailAddressPattern = /^[a-zA-Z0-9.!#$%&’"*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
+		const emailAddressPattern =
+			/^[a-zA-Z0-9.!#$%&’"*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
 
 		return emailAddressPattern.test(value);
 	}
