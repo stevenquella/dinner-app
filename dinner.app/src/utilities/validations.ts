@@ -119,17 +119,16 @@ export class RuleFor<T> {
 	}
 
 	private static minLengthCheck(value: string, length: number): boolean {
-		return value?.length >= length;
+		return value?.trim().length >= length;
 	}
 
 	private static maxLengthCheck(value: string, length: number): boolean {
-		return value?.length <= length;
+		return value?.trim().length <= length;
 	}
 
 	private static emailCheck(value: string): boolean {
-		const emailAddressPattern =
-			/^[a-zA-Z0-9.!#$%&’"*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
+		const emailAddressPattern = /^.+@.+\..+$/;
 
-		return emailAddressPattern.test(value);
+		return emailAddressPattern.test(value?.trim());
 	}
 }
