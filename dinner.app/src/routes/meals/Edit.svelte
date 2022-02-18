@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Error from "$components/Error.svelte";
+	import MealForm from "$components/meals/Form.svelte";
 	import QueryStatus from "$components/QueryStatus.svelte";
 	import { deleteMeal, retrieveMeal, updateMeal } from "$providers/_index";
 	import type { Meal, MealEdit, TagEdit } from "$providers/_types";
@@ -28,13 +29,15 @@
 				name: query.result.name,
 				notes: query.result.notes,
 			};
-			tags = query.result.tags;
+			tags = query.result.tags.map((t) => ({
+				name: t.name,
+			}));
 		}
 	});
 
 	$: retrieveMeal(mealStore, params.id);
 
-	async function onSubmit() {
+	async function onSave() {
 		const response = await updateMeal(commandStore, params.id, meal, tags);
 		if (isAppError(response)) {
 			error = response;
@@ -64,17 +67,11 @@
 {#if $mealStore.result}
 	<p>{$mealStore.result.name}</p>
 
-	<form on:submit|preventDefault="{onSubmit}">
-		<div>
-			<label for="name">Name: </label>
-			<input name="name" type="text" bind:value="{meal.name}" />
-		</div>
-		<div>
-			<label for="notes">Notes: </label>
-			<input name="notes" type="text" bind:value="{meal.notes}" />
-		</div>
-		<button type="submit" disabled="{$commandStore.loading}">SAVE</button>
-	</form>
-
-	<button on:click="{onDelete}" type="input" disabled="{$commandStore.loading}"> DELETE </button>
+	<MealForm
+		bind:meal
+		bind:tags
+		isBusy="{$commandStore.loading}"
+		on:save="{onSave}"
+		hasDelete="{true}"
+		on:delete="{onDelete}" />
 {/if}

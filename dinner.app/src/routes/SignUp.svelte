@@ -12,7 +12,7 @@
 	let input: SignUpInput = {
 		email: "",
 		password: "",
-		confirm_password: "", // TODO
+		confirm_password: "",
 	};
 
 	const commandStore = getCommandStore();

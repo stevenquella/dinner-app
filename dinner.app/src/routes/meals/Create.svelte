@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Error from "$components/Error.svelte";
+	import MealForm from "$components/meals/Form.svelte";
 	import { createMeal } from "$providers/_index";
 	import type { MealEdit, TagEdit } from "$providers/_types";
 	import { getCommandStore, isAppError } from "$utilities/_index";
@@ -17,42 +18,18 @@
 
 	const commandStore = getCommandStore();
 
-	function onAddTag() {
-		tags = [...tags, { name: "test" }];
-	}
-
-	async function onSubmit() {
+	async function onSave() {
 		const response = await createMeal(commandStore, meal, tags);
 		if (isAppError(response)) {
 			error = response;
 		} else {
-			replace("/meals/");
+			replace(`/meals/${response}`);
 		}
 	}
 </script>
 
-<p>Create Meal</p>
+<h3>Create Meal</h3>
 
 <Error error="{error}" />
 
-<form on:submit|preventDefault="{onSubmit}">
-	<div>
-		<label for="name">Name: </label>
-		<input name="name" type="text" bind:value="{meal.name}" />
-	</div>
-	<div>
-		<label for="notes">Notes: </label>
-		<input name="notes" type="text" bind:value="{meal.notes}" />
-	</div>
-	<button type="submit" disabled="{$commandStore.loading}">SAVE</button>
-</form>
-
-<p>Set Tags</p>
-
-{#each tags as tag}
-	<div>
-		<p>{tag.name}</p>
-	</div>
-{/each}
-
-<button type="input" on:click="{onAddTag}">ADD TAG</button>
+<MealForm bind:meal bind:tags isBusy="{$commandStore.loading}" on:save="{onSave}" />

@@ -65,8 +65,12 @@ export async function createMeal(store: CommandStore, meal: MealEdit, tags: TagE
 
 export async function deleteMeal(store: CommandStore, id: string) {
 	return command(store, async () => {
-		const deletedMeal = await client.from<Meal>(_meal_table).delete().eq("id", id);
+		const deletedTags = await client.from<Tag>(_tags_table).delete().eq("meal_id", id);
+		if (deletedTags.error) {
+			throw new DataError(deletedTags.error);
+		}
 
+		const deletedMeal = await client.from<Meal>(_meal_table).delete().eq("id", id);
 		if (deletedMeal.error) {
 			throw new DataError(deletedMeal.error);
 		}
@@ -106,4 +110,6 @@ async function upsertMeal(id: string, meal: MealEdit, tags: TagEdit[]) {
 	if (updatedTags.error) {
 		throw new DataError(updatedTags.error);
 	}
+
+	return id;
 }
