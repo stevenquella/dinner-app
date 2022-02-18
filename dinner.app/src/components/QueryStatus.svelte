@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { QueryStore } from "../lib/types";
+	import type { QueryStore } from "$utilities/_types";
 	export let query: QueryStore<any>;
 </script>
 

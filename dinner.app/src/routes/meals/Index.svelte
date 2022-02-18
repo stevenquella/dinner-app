@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { getQueryStore } from "../lib/operations";
-	import type { Meal } from "./_types";
-	import { retrieveMeals } from "./_meals";
-	import SignOut from "../users/SignOut.svelte";
-	import QueryStatus from "../components/QueryStatus.svelte";
+	import QueryStatus from "$components/QueryStatus.svelte";
+	import { retrieveMeals } from "$providers/_index";
+	import type { Meal } from "$providers/_types";
+	import SignOut from "$routes/SignOut.svelte";
+	import { getQueryStore } from "$utilities/_index";
 
 	const mealsStore = getQueryStore<Meal[]>();
 

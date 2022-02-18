@@ -1,15 +1,12 @@
-import type { QueryStore, QueryOp, CommandStore, CommandOp } from "./types";
 import type { PostgrestResponse } from "@supabase/supabase-js";
 import { writable } from "svelte/store";
+import type { CommandOp, CommandStore, QueryOp, QueryStore } from "./_types";
 
 export function getQueryStore<T>(): QueryStore<T> {
 	return writable<QueryOp<T>>({ loading: true });
 }
 
-export async function query<T>(
-	store: QueryStore<T>,
-	operation: () => Promise<T>
-) {
+export async function query<T>(store: QueryStore<T>, operation: () => Promise<T>) {
 	store.set({ loading: true });
 
 	try {
@@ -24,10 +21,7 @@ export function getCommandStore() {
 	return writable<CommandOp>({ loading: false });
 }
 
-export async function command<T>(
-	store: CommandStore,
-	operation: () => Promise<T>
-): Promise<T | Error> {
+export async function command<T>(store: CommandStore, operation: () => Promise<T>): Promise<T | Error> {
 	store.set({ loading: true });
 
 	let response: T | Error;

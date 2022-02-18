@@ -1,11 +1,10 @@
 <script lang="ts">
+	import Error from "$components/Error.svelte";
+	import { createMeal } from "$providers/_index";
+	import type { MealEdit, TagEdit } from "$providers/_types";
+	import { getCommandStore, isAppError } from "$utilities/_index";
+	import type { AppError } from "$utilities/_types";
 	import { replace } from "svelte-spa-router";
-	import Error from "../components/Error.svelte";
-	import type { AppError } from "../lib";
-	import { getCommandStore, isAppError } from "../lib";
-	import Inputs from "./Inputs.svelte";
-	import { createMeal } from "./_meals";
-	import type { MealEdit, TagEdit } from "./_types";
 
 	let error: AppError;
 
@@ -37,7 +36,14 @@
 <Error error="{error}" />
 
 <form on:submit|preventDefault="{onSubmit}">
-	<Inputs bind:inputs="{meal}" />
+	<div>
+		<label for="name">Name: </label>
+		<input name="name" type="text" bind:value="{meal.name}" />
+	</div>
+	<div>
+		<label for="notes">Notes: </label>
+		<input name="notes" type="text" bind:value="{meal.notes}" />
+	</div>
 	<button type="submit" disabled="{$commandStore.loading}">SAVE</button>
 </form>
 

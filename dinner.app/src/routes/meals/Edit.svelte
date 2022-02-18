@@ -1,14 +1,12 @@
 <script lang="ts">
+	import Error from "$components/Error.svelte";
+	import QueryStatus from "$components/QueryStatus.svelte";
+	import { deleteMeal, retrieveMeal, updateMeal } from "$providers/_index";
+	import type { Meal, MealEdit, TagEdit } from "$providers/_types";
+	import { getCommandStore, getQueryStore, isAppError } from "$utilities/_index";
+	import type { AppError } from "$utilities/_types";
 	import { onDestroy } from "svelte";
 	import { replace } from "svelte-spa-router";
-	import Error from "../components/Error.svelte";
-	import QueryStatus from "../components/QueryStatus.svelte";
-	import type { AppError } from "../lib/errors";
-	import { isAppError } from "../lib/errors";
-	import { getCommandStore, getQueryStore } from "../lib/operations";
-	import Inputs from "./Inputs.svelte";
-	import { deleteMeal, retrieveMeal, updateMeal } from "./_meals";
-	import type { Meal, MealEdit, TagEdit } from "./_types";
 
 	export let params: { id: string };
 
@@ -67,14 +65,16 @@
 	<p>{$mealStore.result.name}</p>
 
 	<form on:submit|preventDefault="{onSubmit}">
-		<Inputs bind:inputs="{meal}" />
+		<div>
+			<label for="name">Name: </label>
+			<input name="name" type="text" bind:value="{meal.name}" />
+		</div>
+		<div>
+			<label for="notes">Notes: </label>
+			<input name="notes" type="text" bind:value="{meal.notes}" />
+		</div>
 		<button type="submit" disabled="{$commandStore.loading}">SAVE</button>
 	</form>
 
-	<button
-		on:click="{onDelete}"
-		type="input"
-		disabled="{$commandStore.loading}">
-		DELETE
-	</button>
+	<button on:click="{onDelete}" type="input" disabled="{$commandStore.loading}"> DELETE </button>
 {/if}

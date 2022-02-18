@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { user } from "./lib/client";
-	import { authRoutes, noAuthRoutes } from "./lib/routes";
+	import { user } from "$providers/_index";
+	import { authRoutes, noAuthRoutes } from "$routes/_index";
 	import Router from "svelte-spa-router";
 </script>
 

@@ -1,9 +1,7 @@
+import { command, DataError, query, RuleFor, single, Validator } from "$utilities/_index";
+import type { CommandStore, QueryStore } from "$utilities/_types";
 import { v4 as uuidv4 } from "uuid";
-import { client, getUser } from "../lib/client";
-import { DataError } from "../lib/errors";
-import { command, query, single } from "../lib/operations";
-import type { CommandStore, QueryStore } from "../lib/types";
-import { RuleFor, Validator } from "../lib/validations";
+import { client, getUser } from "./_index";
 import type { Meal, MealEdit, Tag, TagEdit } from "./_types";
 
 const _tags_table = "tags";
@@ -39,10 +37,7 @@ const _tag_validator = new Validator<TagEdit>(
 
 export async function retrieveMeals(store: QueryStore<Meal[]>) {
 	await query(store, async () => {
-		const response = await client
-			.from<Meal>(_meal_table)
-			.select(_meal_select)
-			.throwOnError();
+		const response = await client.from<Meal>(_meal_table).select(_meal_select).throwOnError();
 
 		return response.data;
 	});
@@ -60,29 +55,17 @@ export async function retrieveMeal(store: QueryStore<Meal>, id: string) {
 	});
 }
 
-export async function updateMeal(
-	store: CommandStore,
-	id: string,
-	meal: MealEdit,
-	tags: TagEdit[]
-) {
+export async function updateMeal(store: CommandStore, id: string, meal: MealEdit, tags: TagEdit[]) {
 	return command(store, async () => await upsertMeal(id, meal, tags));
 }
 
-export async function createMeal(
-	store: CommandStore,
-	meal: MealEdit,
-	tags: TagEdit[]
-) {
+export async function createMeal(store: CommandStore, meal: MealEdit, tags: TagEdit[]) {
 	return command(store, async () => await upsertMeal(uuidv4(), meal, tags));
 }
 
 export async function deleteMeal(store: CommandStore, id: string) {
 	return command(store, async () => {
-		const deletedMeal = await client
-			.from<Meal>(_meal_table)
-			.delete()
-			.eq("id", id);
+		const deletedMeal = await client.from<Meal>(_meal_table).delete().eq("id", id);
 
 		if (deletedMeal.error) {
 			throw new DataError(deletedMeal.error);

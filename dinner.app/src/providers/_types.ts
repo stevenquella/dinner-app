@@ -1,3 +1,5 @@
+// MEALS
+
 export type Tag = {
 	name: string;
 	meal_id: string;
@@ -17,3 +19,16 @@ export type Meal = {
 };
 
 export type MealEdit = Pick<Meal, "name" | "notes">;
+
+// USERS
+
+export type SignUpInput = {
+	email: string;
+	password: string;
+	confirm_password: string;
+};
+
+export type SignInInput = {
+	email: string;
+	password: string;
+};

@@ -1,11 +1,10 @@
 <script lang="ts">
-	import Error from "../components/Error.svelte";
-	import type { AppError } from "../lib";
-	import { getCommandStore, isAppError, user } from "../lib";
-	import Credentials from "./Credentials.svelte";
-	import SignedIn from "./SignedIn.svelte";
-	import type { SignUpInput } from "./_types";
-	import { signUp } from "./_users";
+	import Error from "$components/Error.svelte";
+	import SignedIn from "$components/users/SignedIn.svelte";
+	import { signUp, user } from "$providers/_index";
+	import type { SignUpInput } from "$providers/_types";
+	import { getCommandStore, isAppError } from "$utilities/_index";
+	import type { AppError } from "$utilities/_types";
 
 	let error: AppError;
 	let message: string;
@@ -36,14 +35,18 @@
 	<Error error="{error}" />
 
 	<form on:submit|preventDefault="{onSubmit}">
-		<Credentials bind:input />
+		<input name="email" type="email" placeholder="email" bind:value="{input.email}" />
+		<input
+			name="password"
+			type="password"
+			placeholder="password"
+			bind:value="{input.password}" />
 		<input
 			name="confirm_password"
 			type="password"
 			placeholder="confirm password"
 			bind:value="{input.confirm_password}" />
-		<button type="submit" disabled="{$commandStore.loading}"
-			>SIGN UP</button>
+		<button type="submit" disabled="{$commandStore.loading}">SIGN UP</button>
 	</form>
 
 	{#if message}

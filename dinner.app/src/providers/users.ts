@@ -1,8 +1,7 @@
-import type { CommandStore } from "../lib/types";
-import { client } from "../lib/client";
-import { command } from "../lib/operations";
-import type { SignUpInput, SignInInput } from "./_types";
-import { Validator, RuleFor } from "../lib/validations";
+import { client } from "$providers/_index";
+import { command, RuleFor, Validator } from "$utilities/_index";
+import type { CommandStore } from "$utilities/_types";
+import type { SignInInput, SignUpInput } from "./_types";
 
 const _signin_validator = new Validator<SignInInput>(
 	new RuleFor<SignInInput>("email")

@@ -1,4 +1,5 @@
 import type { Writable } from "svelte/store";
+import type { DataError, ValidationError } from "./errors";
 
 export type QueryOp<TOut> = {
 	loading: boolean;
@@ -19,3 +20,5 @@ export type ValidationResult = {
 	errors: string[];
 	message: string;
 };
+
+export type AppError = ValidationError | DataError | Error;

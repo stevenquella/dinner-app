@@ -1,7 +1,7 @@
 // inspired by https://github.com/AlexJPotter/fluentvalidation-ts
 
 import { ValidationError } from "./errors";
-import type { ValidationResult } from "./types";
+import type { ValidationResult } from "./_types";
 
 export class Validator<T> {
 	private readonly rules: RuleFor<T>[];
@@ -78,24 +78,15 @@ export class RuleFor<T> {
 	// Strings
 
 	notEmpty(message: string) {
-		return this.must(
-			(i) => RuleFor.notEmptyCheck(this.getString(i)),
-			message
-		);
+		return this.must((i) => RuleFor.notEmptyCheck(this.getString(i)), message);
 	}
 
 	minLength(length: number, message: string) {
-		return this.must(
-			(i) => RuleFor.minLengthCheck(this.getString(i), length),
-			message
-		);
+		return this.must((i) => RuleFor.minLengthCheck(this.getString(i), length), message);
 	}
 
 	maxLength(length: number, message: string) {
-		return this.must(
-			(i) => RuleFor.maxLengthCheck(this.getString(i), length),
-			message
-		);
+		return this.must((i) => RuleFor.maxLengthCheck(this.getString(i), length), message);
 	}
 
 	email(message: string) {
@@ -136,8 +127,7 @@ export class RuleFor<T> {
 	}
 
 	private static emailCheck(value: string): boolean {
-		const emailAddressPattern =
-			/^[a-zA-Z0-9.!#$%&’"*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
+		const emailAddressPattern = /^[a-zA-Z0-9.!#$%&’"*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
 
 		return emailAddressPattern.test(value);
 	}

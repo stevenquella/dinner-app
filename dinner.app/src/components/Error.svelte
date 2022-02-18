@@ -1,5 +1,6 @@
 <script lang="ts">
-	import type { ValidationError, AppError } from "../lib/errors";
+	import type { ValidationError } from "$utilities/_index";
+	import type { AppError } from "$utilities/_types";
 
 	export let error: AppError;
 

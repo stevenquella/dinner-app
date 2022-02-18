@@ -1,13 +1,8 @@
 import type { PostgrestError } from "@supabase/supabase-js";
-import type { ValidationResult } from "./types";
-
-export type AppError = ValidationError | DataError | Error;
+import type { AppError, ValidationResult } from "./_types";
 
 export function isAppError(error: any): error is AppError {
-	return (
-		error &&
-		(error instanceof ValidationError || error instanceof DataError)
-	);
+	return error && (error instanceof ValidationError || error instanceof DataError);
 }
 
 export class ValidationError extends Error {
