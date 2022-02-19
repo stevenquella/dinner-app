@@ -1,5 +1,5 @@
+import { _signin_validator } from "$providers/users";
 import { describe, expect, test } from "vitest";
-import { _signin_validator } from "../src/providers/users";
 
 describe("User validation tests.", () => {
 	test("Email is required.", () => {

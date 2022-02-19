@@ -1,7 +1,7 @@
 import { RuleFor, Validator } from "$utilities/validations";
 import { describe, expect, it, test } from "vitest";
 
-describe("Shared validation tests.", () => {
+describe("validations - shared validation checks", () => {
 	type A = { value: any };
 	const message_required = "Value is required.";
 	const validator_required = new Validator<A>(new RuleFor<A>("value").required(message_required));
@@ -35,7 +35,7 @@ describe("Shared validation tests.", () => {
 	});
 });
 
-describe("String validation tests.", () => {
+describe("validations - string validation checks", () => {
 	type A = { value: string };
 
 	// NOT EMPTY
@@ -133,8 +133,59 @@ describe("String validation tests.", () => {
 	});
 });
 
-// TODO ensure valid
+describe("validations - collection validation", () => {
+	type A = { value: string };
+	const message = "Value is required.";
+	const validator = new Validator<A>(new RuleFor<A>("value").required(message));
 
-// TODO ensure valid collection
+	test("Validate collection when all invalid.", () => {
+		const validation = validator.validateCollection([{ value: "" }, { value: null }]);
+		expect(validation.errors).length(2);
+	});
 
-// TODO validate collection
+	test("Validate collection when some invalid.", () => {
+		const validation = validator.validateCollection([{ value: "test" }, { value: null }]);
+		expect(validation.errors).length(1);
+	});
+
+	test("Validate collection when some invalid.", () => {
+		const validation = validator.validateCollection([{ value: "test" }, { value: "mock" }]);
+		expect(validation.errors).length(0);
+	});
+});
+
+describe("validations - ensure valid", () => {
+	type A = { value: string };
+	const message = "Value is required.";
+	const validator = new Validator<A>(new RuleFor<A>("value").required(message));
+
+	test("Ensure valid throws on invalid.", () => {
+		expect(() => validator.ensureValid({ value: null })).to.throw(message);
+	});
+
+	test("Ensure valid does not throw on valid.", () => {
+		expect(() => validator.ensureValid({ value: "test" })).to.not.throw();
+	});
+});
+
+describe("validations - ensure valid collection", () => {
+	type A = { value: string };
+	const message = "Value is required.";
+	const validator = new Validator<A>(new RuleFor<A>("value").required(message));
+
+	test("Ensure valid collection throws when all invalid.", () => {
+		expect(() => validator.ensureValidCollection([{ value: "" }, { value: null }])).to.throw();
+	});
+
+	test("Ensure valid collection throws when some invalid.", () => {
+		expect(() =>
+			validator.ensureValidCollection([{ value: "test" }, { value: null }])
+		).to.throw();
+	});
+
+	test("Ensure valid collection does not throw when all valid.", () => {
+		expect(() =>
+			validator.validateCollection([{ value: "test" }, { value: "mock" }])
+		).to.not.throw();
+	});
+});

@@ -13,7 +13,6 @@ const getUser = () => client.auth.user();
 
 // update the user on auth state change
 client.auth.onAuthStateChange(function (event, session) {
-	console.debug(event, session);
 	user.set(session?.user);
 });
 

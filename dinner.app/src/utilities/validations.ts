@@ -103,7 +103,6 @@ export class RuleFor<T> {
 		} else if (typeof value === "string") {
 			return value;
 		} else {
-			console.debug(input, value);
 			throw new Error("Expected string but got something else.");
 		}
 	}
