@@ -21,7 +21,10 @@ export function getCommandStore() {
 	return writable<CommandOp>({ loading: false });
 }
 
-export async function command<T>(store: CommandStore, operation: () => Promise<T>): Promise<T | Error> {
+export async function command<T>(
+	store: CommandStore,
+	operation: () => Promise<T>
+): Promise<T | Error> {
 	store.set({ loading: true });
 
 	let response: T | Error;
@@ -41,7 +44,7 @@ export async function command<T>(store: CommandStore, operation: () => Promise<T
 export function single<T>(response: PostgrestResponse<T>): T {
 	let result: T = null;
 
-	if (response.data != null && response.data.length === 1) {
+	if (response.data && response.data.length === 1) {
 		result = response.data[0];
 	}
 
