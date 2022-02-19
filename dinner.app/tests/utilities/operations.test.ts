@@ -1,19 +1,160 @@
-// TODO - get query store
+import { command, getCommandStore, getQueryStore, query, single } from "$utilities/operations";
+import { get } from "svelte/store";
+import { describe, expect, it, vi } from "vitest";
 
-import { describe } from "vitest";
+describe("operations - get query store", () => {
+	it("should default to loading true", () => {
+		const store = getQueryStore();
+		const state = get(store);
 
-describe("operations - get query store", () => {});
+		expect(state.loading).toBe(true);
+		expect(state.error).toBeFalsy();
+		expect(state.result).toBeFalsy();
+	});
+});
 
-// TODO - query, on error
+describe("operations - query", () => {
+	it("should set error on rejection", async () => {
+		const message = "error message";
+		const store = getQueryStore();
+		const spy = vi.spyOn(store, "set");
 
-// TODO - query, on result
+		await query(store, async () => {
+			await Promise.resolve("huh?");
+			throw new Error(message);
+		});
 
-// TODO - get command store
+		expect(spy).toBeCalledTimes(2);
+		expect(spy).toHaveBeenNthCalledWith(1, { loading: true });
 
-// TODO - comamnd, on error
+		const state = get(store);
+		expect(state.loading).toBe(false);
+		expect(state.error).toBeTruthy();
+		expect(state.error.message).toBe(message);
+		expect(state.result).toBeFalsy();
+	});
 
-// TODO - command, on result
+	it("should set the result on completion", async () => {
+		const result = { value: "1234" };
+		const store = getQueryStore();
+		const spy = vi.spyOn(store, "set");
 
-// TODO - single, on null
+		await query(store, () => {
+			return Promise.resolve(result);
+		});
 
-// TODO - single, on multiple
+		expect(spy).toBeCalledTimes(2);
+		expect(spy).toHaveBeenNthCalledWith(1, { loading: true });
+
+		const state = get(store);
+		expect(state.loading).toBe(false);
+		expect(state.error).toBeFalsy();
+		expect(state.result).toBe(result);
+	});
+});
+
+describe("operations - get command store", () => {
+	it("should default to loading false", () => {
+		const store = getCommandStore();
+		const state = get(store);
+
+		expect(state.loading).toBe(false);
+	});
+});
+
+describe("operations - command", () => {
+	it("should return error on rejection", async () => {
+		const message = "error message";
+		const store = getCommandStore();
+		const spy = vi.spyOn(store, "set");
+
+		const response = await command(store, async () => {
+			await Promise.resolve("huh?");
+			throw new Error(message);
+			return { value: "foo" };
+		});
+
+		expect(response).toBeTruthy();
+		expect(response).toBeInstanceOf(Error);
+
+		expect(spy).toBeCalledTimes(2);
+		expect(spy).toHaveBeenNthCalledWith(1, { loading: true });
+
+		const state = get(store);
+		expect(state.loading).toBe(false);
+	});
+
+	it("should return result on completion", async () => {
+		const result = { value: "1234" };
+		const store = getCommandStore();
+		const spy = vi.spyOn(store, "set");
+
+		const response = await command(store, () => {
+			return Promise.resolve(result);
+		});
+
+		expect(response).toBeTruthy();
+		expect(response).toBe(result);
+
+		expect(spy).toBeCalledTimes(2);
+		expect(spy).toHaveBeenNthCalledWith(1, { loading: true });
+
+		const state = get(store);
+		expect(state.loading).toBe(false);
+	});
+});
+
+describe("operations - single", () => {
+	it("should return null if data is null", () => {
+		const item = single({
+			body: null,
+			count: 0,
+			data: null,
+			error: null,
+			status: 200,
+			statusText: "OK",
+		});
+
+		expect(item).toBeNull();
+	});
+
+	it("should return null if data is empty", () => {
+		const item = single({
+			body: null,
+			count: 0,
+			data: [],
+			error: null,
+			status: 200,
+			statusText: "OK",
+		});
+
+		expect(item).toBeNull();
+	});
+
+	it("should return null if more than one item", () => {
+		const item = single({
+			body: null,
+			count: 4,
+			data: [{ value: "1" }, { value: "2" }],
+			error: null,
+			status: 200,
+			statusText: "OK",
+		});
+
+		expect(item).toBeNull();
+	});
+
+	it("should return single item if single item", () => {
+		const expected = { value: "1" };
+		const item = single({
+			body: null,
+			count: 4,
+			data: [expected],
+			error: null,
+			status: 200,
+			statusText: "OK",
+		});
+
+		expect(item).toBe(expected);
+	});
+});

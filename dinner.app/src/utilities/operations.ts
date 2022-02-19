@@ -6,7 +6,7 @@ export function getQueryStore<T>(): QueryStore<T> {
 	return writable<QueryOp<T>>({ loading: true });
 }
 
-export async function query<T>(store: QueryStore<T>, operation: () => Promise<T>) {
+export async function query<T>(store: QueryStore<T>, operation: () => Promise<T>): Promise<void> {
 	store.set({ loading: true });
 
 	try {
@@ -31,7 +31,6 @@ export async function command<T>(
 	try {
 		response = await operation();
 	} catch (error) {
-		console.debug(error);
 		response = error as Error;
 	} finally {
 		store.set({ loading: false });
