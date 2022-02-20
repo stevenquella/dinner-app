@@ -1,5 +1,6 @@
 // inspired by https://github.com/AlexJPotter/fluentvalidation-ts
 
+import { validate as uuidValidate } from "uuid";
 import { ValidationError } from "./errors";
 import type { ValidationResult } from "./_types";
 
@@ -93,6 +94,11 @@ export class RuleFor<T> {
 		return this.must((i) => RuleFor.emailCheck(this.getString(i)), message);
 	}
 
+	// TODO - unit tests
+	uuid(message: string) {
+		return this.must((i) => RuleFor.uuidCheck(this.getString(i)), message);
+	}
+
 	// Helpers
 
 	private getString(input: T): string {
@@ -129,5 +135,9 @@ export class RuleFor<T> {
 		const emailAddressPattern = /^.+@.+\..+$/;
 
 		return emailAddressPattern.test(value?.trim());
+	}
+
+	private static uuidCheck(value: string): boolean {
+		return uuidValidate(value);
 	}
 }

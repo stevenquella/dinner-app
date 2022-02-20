@@ -2,7 +2,7 @@
 	import Error from "$components/Error.svelte";
 	import MealForm from "$components/meals/Form.svelte";
 	import QueryStatus from "$components/QueryStatus.svelte";
-	import { deleteMeal, retrieveMeal, updateMeal } from "$providers/_index";
+	import { deleteMeal, retrieveMeal, upsertMeal } from "$providers/_index";
 	import type { Meal, MealEdit, TagEdit } from "$providers/_types";
 	import { getCommandStore, getQueryStore, isAppError } from "$utilities/_index";
 	import type { AppError } from "$utilities/_types";
@@ -38,7 +38,7 @@
 	$: retrieveMeal(mealStore, params.id);
 
 	async function onSave() {
-		const response = await updateMeal(commandStore, params.id, meal, tags);
+		const response = await upsertMeal(commandStore, params.id, meal, tags);
 		if (isAppError(response)) {
 			error = response;
 		} else {
