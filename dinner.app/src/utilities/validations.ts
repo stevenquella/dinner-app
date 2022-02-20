@@ -94,7 +94,6 @@ export class RuleFor<T> {
 		return this.must((i) => RuleFor.emailCheck(this.getString(i)), message);
 	}
 
-	// TODO - unit tests
 	uuid(message: string) {
 		return this.must((i) => RuleFor.uuidCheck(this.getString(i)), message);
 	}

@@ -177,6 +177,38 @@ describe("validations - email check", () => {
 	});
 });
 
+describe("validations - uuid check", () => {
+	type A = { value: string };
+
+	// UUID
+	const message_uuid = "Value must be a unique identifier.";
+	const validator_uuid = new Validator<A>(new RuleFor<A>("value").uuid(message_uuid));
+
+	const invalid_uuids = [undefined, null, "", "1234", "ZZ067208-25d2-4784-9957-4412fe95db26"];
+
+	it.each(invalid_uuids)("should return invalid when not a uuid", (x) => {
+		const validation = validator_uuid.validate({ value: x });
+
+		expect(validation.valid).toBe(false);
+		expect(validation.message).to.not.be.empty;
+		expect(validation.errors).to.include(message_uuid);
+	});
+
+	const valid_uuids = [
+		"36067208-25d2-4784-9957-4412fe95db26",
+		"c429f330-cea3-4fd3-bfbb-159f59f07c0c",
+		"7e3d4690-76dd-4450-a107-731006b5ad34",
+	];
+
+	it.each(valid_uuids)("should return valid when an email", (x) => {
+		const validation = validator_uuid.validate({ value: x });
+
+		expect(validation.valid).toBe(true);
+		expect(validation.message).to.be.empty;
+		expect(validation.errors).to.be.empty;
+	});
+});
+
 describe("validations - is string function", () => {
 	type A = { value: string };
 	const validator = new Validator<A>(new RuleFor<A>("value").notEmpty("Value should be ."));
