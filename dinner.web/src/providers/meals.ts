@@ -1,8 +1,10 @@
 import { command, DataError, query, RuleFor, single, Validator } from "$utilities/_index";
 import type { CommandStore, QueryStore } from "$utilities/_types";
 import { client, getUser } from "./_index";
-import type { Meal, MealEdit, Tag, TagEdit } from "./_types";
+import type { GroceryEdit, Meal, MealEdit, Tag, TagEdit } from "./_types";
+import { GroceryCategory } from "./_types";
 
+const _groceries_table = "groceries";
 const _tags_table = "tags";
 const _meal_table = "meals";
 const _meal_select = `
@@ -12,6 +14,13 @@ const _meal_select = `
 	name,
 	notes,
 	tags (
+		name,
+		meal_id,
+		user_id,
+		updated_on
+	),
+	groceries (
+		category,
 		name,
 		meal_id,
 		user_id,
@@ -36,6 +45,20 @@ const _tag_validator = new Validator<TagEdit>(
 		.required("Tag name is required.")
 		.notEmpty("Tag name must not be empty.")
 		.maxLength(100, "Tag name must be not greater than 100 characters.")
+);
+
+const _grocery_validator = new Validator<GroceryEdit>(
+	new RuleFor<GroceryEdit>("category")
+		.required("Grocery category is required.")
+		.notEmpty("Grocery category must not be empty.")
+		.must(
+			(i) => Object.values(GroceryCategory).includes(i.category),
+			"Grocery category must be an expected category value."
+		),
+	new RuleFor<GroceryEdit>("name")
+		.required("Grocery name is required.")
+		.notEmpty("Grocery name must not be empty.")
+		.maxLength(100, "Grocery name must not be greater than 100 characters.")
 );
 
 export async function retrieveMeals(store: QueryStore<Meal[]>) {
