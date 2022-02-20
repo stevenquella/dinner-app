@@ -1,4 +1,4 @@
-import { client, signIn } from "$providers/_index";
+import { client, signIn, signOut } from "$providers/_index";
 import type { SignInInput } from "$providers/_types";
 import { DataError, ValidationError } from "$utilities/errors";
 import { getCommandStore } from "$utilities/operations";
@@ -6,7 +6,7 @@ import { describe, expect, it, spyOn } from "vitest";
 
 // TODO - sign up tests
 
-describe("providers - user sign in", () => {
+describe("users - sign in", () => {
 	const invalid_inputs: SignInInput[] = [
 		{
 			// email is required
@@ -90,6 +90,37 @@ describe("providers - user sign in", () => {
 	});
 });
 
-// TODO - sign out test
+describe("users - sign out", () => {
+	it("should throw data error on client error", async () => {
+		const spy = spyOn(client.auth, "signOut").mockImplementation(() => {
+			return Promise.resolve({
+				error: {
+					message: "error",
+					status: 500,
+				},
+			});
+		});
+
+		const commandStore = getCommandStore();
+		const response = await signOut(commandStore);
+
+		expect(spy).toBeCalledTimes(1);
+		expect(response).toBeInstanceOf(DataError);
+	});
+
+	it("should return undefined on success", async () => {
+		const spy = spyOn(client.auth, "signOut").mockImplementation(() => {
+			return Promise.resolve({
+				error: undefined,
+			});
+		});
+
+		const commandStore = getCommandStore();
+		const response = await signOut(commandStore);
+
+		expect(spy).toBeCalledTimes(1);
+		expect(response).toBeUndefined();
+	});
+});
 
 export {};
