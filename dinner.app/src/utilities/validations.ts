@@ -1,5 +1,6 @@
 // inspired by https://github.com/AlexJPotter/fluentvalidation-ts
 
+import { validate as uuidValidate } from "uuid";
 import { ValidationError } from "./errors";
 import type { ValidationResult } from "./_types";
 
@@ -67,7 +68,7 @@ export class RuleFor<T> {
 	// Shared
 
 	required(message: string) {
-		return this.must((i) => RuleFor.requiredCheck(i), message);
+		return this.must((i) => RuleFor.requiredCheck(i[this.name]), message);
 	}
 
 	must(check: (input: T) => boolean, message: string) {
@@ -93,6 +94,10 @@ export class RuleFor<T> {
 		return this.must((i) => RuleFor.emailCheck(this.getString(i)), message);
 	}
 
+	uuid(message: string) {
+		return this.must((i) => RuleFor.uuidCheck(this.getString(i)), message);
+	}
+
 	// Helpers
 
 	private getString(input: T): string {
@@ -103,7 +108,6 @@ export class RuleFor<T> {
 		} else if (typeof value === "string") {
 			return value;
 		} else {
-			console.debug(input, value);
 			throw new Error("Expected string but got something else.");
 		}
 	}
@@ -119,16 +123,20 @@ export class RuleFor<T> {
 	}
 
 	private static minLengthCheck(value: string, length: number): boolean {
-		return value?.length >= length;
+		return value?.trim().length >= length;
 	}
 
 	private static maxLengthCheck(value: string, length: number): boolean {
-		return value?.length <= length;
+		return value?.trim().length <= length;
 	}
 
 	private static emailCheck(value: string): boolean {
-		const emailAddressPattern = /^[a-zA-Z0-9.!#$%&’"*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
+		const emailAddressPattern = /^.+@.+\..+$/;
 
-		return emailAddressPattern.test(value);
+		return emailAddressPattern.test(value?.trim());
+	}
+
+	private static uuidCheck(value: string): boolean {
+		return uuidValidate(value);
 	}
 }

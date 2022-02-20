@@ -1,11 +1,12 @@
 <script lang="ts">
 	import Error from "$components/Error.svelte";
 	import MealForm from "$components/meals/Form.svelte";
-	import { createMeal } from "$providers/_index";
+	import { upsertMeal } from "$providers/_index";
 	import type { MealEdit, TagEdit } from "$providers/_types";
 	import { getCommandStore, isAppError } from "$utilities/_index";
 	import type { AppError } from "$utilities/_types";
 	import { replace } from "svelte-spa-router";
+	import { v4 as uuidv4 } from "uuid";
 
 	let error: AppError;
 
@@ -19,7 +20,7 @@
 	const commandStore = getCommandStore();
 
 	async function onSave() {
-		const response = await createMeal(commandStore, meal, tags);
+		const response = await upsertMeal(commandStore, uuidv4(), meal, tags);
 		if (isAppError(response)) {
 			error = response;
 		} else {

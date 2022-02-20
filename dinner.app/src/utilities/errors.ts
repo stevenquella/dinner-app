@@ -1,8 +1,10 @@
-import type { PostgrestError } from "@supabase/supabase-js";
 import type { AppError, ValidationResult } from "./_types";
 
 export function isAppError(error: any): error is AppError {
-	return error && (error instanceof ValidationError || error instanceof DataError);
+	return (
+		error &&
+		(error instanceof ValidationError || error instanceof DataError || error instanceof Error)
+	);
 }
 
 export class ValidationError extends Error {
@@ -15,10 +17,18 @@ export class ValidationError extends Error {
 	}
 }
 
-export class DataError extends Error {
-	readonly error: PostgrestError;
+type DataErrorType = {
+	message: string;
+	details?: string;
+	hint?: string;
+	code?: string;
+	status?: number;
+};
 
-	constructor(error: PostgrestError) {
+export class DataError extends Error {
+	readonly error: DataErrorType;
+
+	constructor(error: DataErrorType) {
 		super("An error occurred.");
 		this.error = error;
 	}
