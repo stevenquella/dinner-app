@@ -71,7 +71,6 @@ describe("operations - command", () => {
 		const response = await command(store, async () => {
 			await Promise.resolve("huh?");
 			throw new Error(message);
-			return { value: "foo" };
 		});
 
 		expect(response).toBeTruthy();

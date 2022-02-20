@@ -4,14 +4,14 @@ import { command, RuleFor, Validator } from "$utilities/_index";
 import type { CommandStore } from "$utilities/_types";
 import type { SignInInput, SignUpInput } from "./_types";
 
-export const _signin_validator = new Validator<SignInInput>(
+const _signin_validator = new Validator<SignInInput>(
 	new RuleFor<SignInInput>("email")
 		.required("Email is required.")
 		.email("Email expects a valid email address."),
 	new RuleFor<SignInInput>("password").required("Password is required.")
 );
 
-export const _signup_validator = new Validator<SignUpInput>(
+const _signup_validator = new Validator<SignUpInput>(
 	new RuleFor<SignUpInput>("email")
 		.required("Email is required.")
 		.email("Email expects a valid email address."),
@@ -30,11 +30,7 @@ export async function signUp(store: CommandStore, input: SignUpInput) {
 		const response = await client.auth.signUp(input);
 
 		if (response.error) {
-			throw new Error(response.error.message);
-		}
-
-		if (!response.user) {
-			throw new Error("Failed to complete sign up.");
+			throw new DataError(response.error);
 		}
 
 		// will return the user, but does not change the auth state, requires email confirmation

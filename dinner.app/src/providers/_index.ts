@@ -12,7 +12,7 @@ const user = writable<User>(client.auth.user());
 const getUser = () => client.auth.user();
 
 // update the user on auth state change
-client.auth.onAuthStateChange(function (event, session) {
+client.auth.onAuthStateChange(function (_, session) {
 	user.set(session?.user);
 });
 
