@@ -6,6 +6,7 @@
 
 	async function onSignOut() {
 		await signOut(commandStore);
+		// TODO - do something if an error occurs.
 	}
 </script>
 

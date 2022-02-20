@@ -1,6 +1,6 @@
 import { command, getCommandStore, getQueryStore, query, single } from "$utilities/operations";
 import { get } from "svelte/store";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, spyOn } from "vitest";
 
 describe("operations - get query store", () => {
 	it("should default to loading true", () => {
@@ -17,7 +17,7 @@ describe("operations - query", () => {
 	it("should set error on rejection", async () => {
 		const message = "error message";
 		const store = getQueryStore();
-		const spy = vi.spyOn(store, "set");
+		const spy = spyOn(store, "set");
 
 		await query(store, async () => {
 			await Promise.resolve("huh?");
@@ -37,7 +37,7 @@ describe("operations - query", () => {
 	it("should set the result on completion", async () => {
 		const result = { value: "1234" };
 		const store = getQueryStore();
-		const spy = vi.spyOn(store, "set");
+		const spy = spyOn(store, "set");
 
 		await query(store, () => {
 			return Promise.resolve(result);
@@ -66,7 +66,7 @@ describe("operations - command", () => {
 	it("should return error on rejection", async () => {
 		const message = "error message";
 		const store = getCommandStore();
-		const spy = vi.spyOn(store, "set");
+		const spy = spyOn(store, "set");
 
 		const response = await command(store, async () => {
 			await Promise.resolve("huh?");
@@ -86,7 +86,7 @@ describe("operations - command", () => {
 	it("should return result on completion", async () => {
 		const result = { value: "1234" };
 		const store = getCommandStore();
-		const spy = vi.spyOn(store, "set");
+		const spy = spyOn(store, "set");
 
 		const response = await command(store, () => {
 			return Promise.resolve(result);
