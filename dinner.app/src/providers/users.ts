@@ -1,4 +1,5 @@
 import { client } from "$providers/_index";
+import { DataError } from "$utilities/errors";
 import { command, RuleFor, Validator } from "$utilities/_index";
 import type { CommandStore } from "$utilities/_types";
 import type { SignInInput, SignUpInput } from "./_types";
@@ -48,11 +49,19 @@ export async function signIn(store: CommandStore, input: SignInInput) {
 		const response = await client.auth.signIn(input);
 
 		if (response.error) {
-			throw new Error(response.error.message);
+			throw new DataError(response.error);
 		}
+
+		return response.user;
 	});
 }
 
 export async function signOut(store: CommandStore) {
-	return command(store, async () => await client.auth.signOut());
+	return command(store, async () => {
+		const response = await client.auth.signOut();
+
+		if (response.error) {
+			throw new DataError(response.error);
+		}
+	});
 }
