@@ -34,30 +34,24 @@ const _id_validator = new Validator<{ id: string }>(
 
 const _meal_validator = new Validator<MealEdit>(
 	new RuleFor<MealEdit>("name")
-		.required("Name is required.")
-		.notEmpty("Name must not be empty.")
+		.notEmpty("Name is required.")
 		.minLength(3, "Name must be at least 3 characters.")
 		.maxLength(500, "Name must be no greater than 500 characters.")
 );
 
 const _tag_validator = new Validator<TagEdit>(
 	new RuleFor<TagEdit>("name")
-		.required("Tag name is required.")
-		.notEmpty("Tag name must not be empty.")
+		.notEmpty("Tag name is required.")
 		.maxLength(100, "Tag name must be not greater than 100 characters.")
 );
 
 const _grocery_validator = new Validator<GroceryEdit>(
-	new RuleFor<GroceryEdit>("category")
-		.required("Grocery category is required.")
-		.notEmpty("Grocery category must not be empty.")
-		.must(
-			(i) => Object.values(GroceryCategory).includes(i.category),
-			"Grocery category must be an expected category value."
-		),
+	new RuleFor<GroceryEdit>("category").must(
+		(i) => Object.values(GroceryCategory).includes(i.category),
+		"Grocery category must be an expected category value."
+	),
 	new RuleFor<GroceryEdit>("name")
-		.required("Grocery name is required.")
-		.notEmpty("Grocery name must not be empty.")
+		.notEmpty("Grocery name is required.")
 		.maxLength(100, "Grocery name must not be greater than 100 characters.")
 );
 
