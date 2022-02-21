@@ -3,7 +3,7 @@
 	import MealForm from "$components/meals/Form.svelte";
 	import QueryStatus from "$components/QueryStatus.svelte";
 	import { deleteMeal, retrieveMeal, upsertMeal } from "$providers/_index";
-	import type { Meal, MealEdit, TagEdit } from "$providers/_types";
+	import type { GroceryEdit, Meal, MealEdit, TagEdit } from "$providers/_types";
 	import { getCommandStore, getQueryStore, isAppError } from "$utilities/_index";
 	import type { AppError } from "$utilities/_types";
 	import { onDestroy } from "svelte";
@@ -20,6 +20,8 @@
 
 	let tags: TagEdit[] = [];
 
+	let groceries: GroceryEdit[] = [];
+
 	const mealStore = getQueryStore<Meal>();
 	const commandStore = getCommandStore();
 
@@ -32,13 +34,17 @@
 			tags = query.result.tags.map((t) => ({
 				name: t.name,
 			}));
+			groceries = query.result.groceries.map((g) => ({
+				category: g.category,
+				name: g.name,
+			}));
 		}
 	});
 
 	$: retrieveMeal(mealStore, params.id);
 
 	async function onSave() {
-		const response = await upsertMeal(commandStore, params.id, meal, tags);
+		const response = await upsertMeal(commandStore, params.id, meal, tags, groceries);
 		if (isAppError(response)) {
 			error = response;
 		} else {
@@ -70,6 +76,7 @@
 	<MealForm
 		bind:meal
 		bind:tags
+		bind:groceries
 		isBusy="{$commandStore.loading}"
 		on:save="{onSave}"
 		hasDelete="{true}"

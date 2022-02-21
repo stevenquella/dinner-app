@@ -1,7 +1,7 @@
 import { command, DataError, query, RuleFor, single, Validator } from "$utilities/_index";
 import type { CommandStore, QueryStore } from "$utilities/_types";
 import { client, getUser } from "./_index";
-import type { GroceryEdit, Meal, MealEdit, Tag, TagEdit } from "./_types";
+import type { Grocery, GroceryEdit, Meal, MealEdit, Tag, TagEdit } from "./_types";
 import { GroceryCategory } from "./_types";
 
 const _groceries_table = "groceries";
@@ -81,12 +81,19 @@ export async function retrieveMeal(store: QueryStore<Meal>, id: string) {
 	});
 }
 
-export async function upsertMeal(store: CommandStore, id: string, meal: MealEdit, tags: TagEdit[]) {
+export async function upsertMeal(
+	store: CommandStore,
+	id: string,
+	meal: MealEdit,
+	tags: TagEdit[],
+	groceries: GroceryEdit[]
+) {
 	return command(store, async () => {
 		// validate
 		_id_validator.ensureValid({ id });
 		_meal_validator.ensureValid(meal);
 		_tag_validator.ensureValidCollection(tags || []);
+		_grocery_validator.ensureValidCollection(groceries || []);
 
 		// user
 		const user = getUser();
@@ -118,6 +125,19 @@ export async function upsertMeal(store: CommandStore, id: string, meal: MealEdit
 			throw new DataError(updatedTags.error);
 		}
 
+		// update groceries
+		const updatedGroceries = await client.from<Grocery>(_groceries_table).upsert(
+			groceries.map((g) => ({
+				user_id: user.id,
+				meal_id: id,
+				...g,
+			}))
+		);
+
+		if (updatedGroceries.error) {
+			throw new DataError(updatedGroceries.error);
+		}
+
 		return id;
 	});
 }
@@ -126,6 +146,14 @@ export async function deleteMeal(store: CommandStore, id: string) {
 	return command(store, async () => {
 		// validate
 		_id_validator.ensureValid({ id });
+
+		const deletedGroceries = await client
+			.from<Grocery>(_groceries_table)
+			.delete()
+			.eq("meal_id", id);
+		if (deletedGroceries.error) {
+			throw new DataError(deletedGroceries.error);
+		}
 
 		const deletedTags = await client.from<Tag>(_tags_table).delete().eq("meal_id", id);
 		if (deletedTags.error) {
