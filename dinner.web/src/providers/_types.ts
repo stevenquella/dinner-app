@@ -1,4 +1,24 @@
-// MEALS
+// GROCERIES
+export enum GroceryCategory {
+	Produce = "Produce",
+	Protein = "Protein",
+	Dairy = "Dairy",
+	Pantry = "Pantry",
+	Frozen = "Frozen",
+	Other = "Other",
+}
+
+export type Grocery = {
+	category: GroceryCategory;
+	name: string;
+	meal_id: string;
+	user_id: string;
+	updated_on: string;
+};
+
+export type GroceryEdit = Pick<Grocery, "category" | "name">;
+
+// TAGS
 
 export type Tag = {
 	name: string;
@@ -9,6 +29,8 @@ export type Tag = {
 
 export type TagEdit = Pick<Tag, "name">;
 
+// MEALS
+
 export type Meal = {
 	id: string;
 	user_id: string;
@@ -16,6 +38,7 @@ export type Meal = {
 	name: string;
 	notes: string;
 	tags: Tag[];
+	groceries: Grocery[];
 };
 
 export type MealEdit = Pick<Meal, "name" | "notes">;

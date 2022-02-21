@@ -1,13 +1,15 @@
 <script lang="ts">
-	import type { MealEdit, TagEdit } from "$providers/_types";
+	import type { GroceryEdit, MealEdit, TagEdit } from "$providers/_types";
+	import { GroceryCategory } from "$providers/_types";
 	import { createEventDispatcher } from "svelte";
+	import GroceryAdd from "./GroceryAdd.svelte";
+	import TagAdd from "./TagAdd.svelte";
 
 	export let meal: MealEdit;
-	export let tags: TagEdit[];
+	export let tags: TagEdit[] = [];
+	export let groceries: GroceryEdit[] = [];
 	export let hasDelete: boolean = false;
 	export let isBusy: boolean;
-
-	let newTag: string;
 
 	const dispatch = createEventDispatcher();
 
@@ -19,9 +21,12 @@
 		dispatch("delete");
 	}
 
-	function onAddTag() {
-		tags = [...tags, { name: newTag }];
-		newTag = "";
+	function onAddTag(e: CustomEvent<TagEdit>) {
+		tags = [...tags, e.detail];
+	}
+
+	function onAddGrocery(e: CustomEvent<GroceryEdit>) {
+		groceries = [...groceries, e.detail];
 	}
 </script>
 
@@ -41,13 +46,24 @@
 	<input name="notes" type="text" bind:value="{meal.notes}" />
 </div>
 
+<p>Tags</p>
+
 <ul>
 	{#each tags || [] as tag}
 		<li>{tag.name}</li>
 	{/each}
 </ul>
 
-<div>
-	<input name="tag" type="text" bind:value="{newTag}" />
-	<button type="button" on:click="{onAddTag}">ADD TAG</button>
-</div>
+<TagAdd on:addtag="{onAddTag}" />
+
+{#each Object.values(GroceryCategory) as category}
+	<p>{category}</p>
+
+	<ul title="{category}">
+		{#each groceries.filter((g) => g.category === category) as grocery}
+			<li>{grocery.name}</li>
+		{/each}
+	</ul>
+
+	<GroceryAdd category="{category}" on:addgrocery="{onAddGrocery}" />
+{/each}

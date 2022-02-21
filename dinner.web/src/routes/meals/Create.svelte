@@ -2,7 +2,7 @@
 	import Error from "$components/Error.svelte";
 	import MealForm from "$components/meals/Form.svelte";
 	import { upsertMeal } from "$providers/_index";
-	import type { MealEdit, TagEdit } from "$providers/_types";
+	import type { GroceryEdit, MealEdit, TagEdit } from "$providers/_types";
 	import { getCommandStore, isAppError } from "$utilities/_index";
 	import type { AppError } from "$utilities/_types";
 	import { replace } from "svelte-spa-router";
@@ -17,10 +17,12 @@
 
 	let tags: TagEdit[] = [];
 
+	let groceries: GroceryEdit[] = [];
+
 	const commandStore = getCommandStore();
 
 	async function onSave() {
-		const response = await upsertMeal(commandStore, uuidv4(), meal, tags);
+		const response = await upsertMeal(commandStore, uuidv4(), meal, tags, groceries);
 		if (isAppError(response)) {
 			error = response;
 		} else {
@@ -33,4 +35,4 @@
 
 <Error error="{error}" />
 
-<MealForm bind:meal bind:tags isBusy="{$commandStore.loading}" on:save="{onSave}" />
+<MealForm bind:meal bind:tags bind:groceries isBusy="{$commandStore.loading}" on:save="{onSave}" />

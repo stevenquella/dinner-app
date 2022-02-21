@@ -1,8 +1,10 @@
 import { command, DataError, query, RuleFor, single, Validator } from "$utilities/_index";
 import type { CommandStore, QueryStore } from "$utilities/_types";
 import { client, getUser } from "./_index";
-import type { Meal, MealEdit, Tag, TagEdit } from "./_types";
+import type { Grocery, GroceryEdit, Meal, MealEdit, Tag, TagEdit } from "./_types";
+import { GroceryCategory } from "./_types";
 
+const _groceries_table = "groceries";
 const _tags_table = "tags";
 const _meal_table = "meals";
 const _meal_select = `
@@ -16,6 +18,13 @@ const _meal_select = `
 		meal_id,
 		user_id,
 		updated_on
+	),
+	groceries (
+		category,
+		name,
+		meal_id,
+		user_id,
+		updated_on
 	)
 `;
 
@@ -25,17 +34,25 @@ const _id_validator = new Validator<{ id: string }>(
 
 const _meal_validator = new Validator<MealEdit>(
 	new RuleFor<MealEdit>("name")
-		.required("Name is required.")
-		.notEmpty("Name must not be empty.")
+		.notEmpty("Name is required.")
 		.minLength(3, "Name must be at least 3 characters.")
 		.maxLength(500, "Name must be no greater than 500 characters.")
 );
 
 const _tag_validator = new Validator<TagEdit>(
 	new RuleFor<TagEdit>("name")
-		.required("Tag name is required.")
-		.notEmpty("Tag name must not be empty.")
+		.notEmpty("Tag name is required.")
 		.maxLength(100, "Tag name must be not greater than 100 characters.")
+);
+
+const _grocery_validator = new Validator<GroceryEdit>(
+	new RuleFor<GroceryEdit>("category").must(
+		(i) => Object.values(GroceryCategory).includes(i.category),
+		"Grocery category must be an expected category value."
+	),
+	new RuleFor<GroceryEdit>("name")
+		.notEmpty("Grocery name is required.")
+		.maxLength(100, "Grocery name must not be greater than 100 characters.")
 );
 
 export async function retrieveMeals(store: QueryStore<Meal[]>) {
@@ -58,12 +75,19 @@ export async function retrieveMeal(store: QueryStore<Meal>, id: string) {
 	});
 }
 
-export async function upsertMeal(store: CommandStore, id: string, meal: MealEdit, tags: TagEdit[]) {
+export async function upsertMeal(
+	store: CommandStore,
+	id: string,
+	meal: MealEdit,
+	tags: TagEdit[],
+	groceries: GroceryEdit[]
+) {
 	return command(store, async () => {
 		// validate
 		_id_validator.ensureValid({ id });
 		_meal_validator.ensureValid(meal);
 		_tag_validator.ensureValidCollection(tags || []);
+		_grocery_validator.ensureValidCollection(groceries || []);
 
 		// user
 		const user = getUser();
@@ -95,6 +119,19 @@ export async function upsertMeal(store: CommandStore, id: string, meal: MealEdit
 			throw new DataError(updatedTags.error);
 		}
 
+		// update groceries
+		const updatedGroceries = await client.from<Grocery>(_groceries_table).upsert(
+			groceries.map((g) => ({
+				user_id: user.id,
+				meal_id: id,
+				...g,
+			}))
+		);
+
+		if (updatedGroceries.error) {
+			throw new DataError(updatedGroceries.error);
+		}
+
 		return id;
 	});
 }
@@ -103,6 +140,14 @@ export async function deleteMeal(store: CommandStore, id: string) {
 	return command(store, async () => {
 		// validate
 		_id_validator.ensureValid({ id });
+
+		const deletedGroceries = await client
+			.from<Grocery>(_groceries_table)
+			.delete()
+			.eq("meal_id", id);
+		if (deletedGroceries.error) {
+			throw new DataError(deletedGroceries.error);
+		}
 
 		const deletedTags = await client.from<Tag>(_tags_table).delete().eq("meal_id", id);
 		if (deletedTags.error) {
