@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Error from "$components/Error.svelte";
+	import StatusError from "$components/StatusError.svelte";
 	import { signOut } from "$providers/_index";
 	import { getCommandStore, isAppError } from "$utilities/_index";
 	import type { AppError } from "$utilities/_types";
@@ -16,6 +16,6 @@
 	}
 </script>
 
-<Error error="{error}" />
+<StatusError error="{error}" />
 
 <button type="button" disabled="{$commandStore.loading}" on:click="{onSignOut}"> SIGN OUT </button>

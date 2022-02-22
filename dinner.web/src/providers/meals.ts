@@ -4,22 +4,23 @@ import { client, getUser } from "./_index";
 import type { Grocery, GroceryEdit, Meal, MealEdit, Tag, TagEdit } from "./_types";
 import { GroceryCategory } from "./_types";
 
-const _groceries_table = "groceries";
-const _tags_table = "tags";
-const _meal_table = "meals";
+const _meals_table = "meals";
+const _groceries_table = "meals_groceries";
+const _tags_table = "meals_tags";
+
 const _meal_select = `
 	id,
 	user_id,
 	updated_on,
 	name,
 	notes,
-	tags (
+	tags:meals_tags (
 		name,
 		meal_id,
 		user_id,
 		updated_on
 	),
-	groceries (
+	groceries:meals_groceries (
 		category,
 		name,
 		meal_id,
@@ -57,7 +58,7 @@ const _grocery_validator = new Validator<GroceryEdit>(
 
 export async function retrieveMeals(store: QueryStore<Meal[]>) {
 	await query(store, async () => {
-		const response = await client.from<Meal>(_meal_table).select(_meal_select).throwOnError();
+		const response = await client.from<Meal>(_meals_table).select(_meal_select).throwOnError();
 
 		return response.data;
 	});
@@ -66,7 +67,7 @@ export async function retrieveMeals(store: QueryStore<Meal[]>) {
 export async function retrieveMeal(store: QueryStore<Meal>, id: string) {
 	await query(store, async () => {
 		const response = await client
-			.from<Meal>(_meal_table)
+			.from<Meal>(_meals_table)
 			.select(_meal_select)
 			.eq("id", id)
 			.throwOnError();
@@ -94,7 +95,7 @@ export async function upsertMeal(
 
 		// update meal
 		const updatedMeal = await client
-			.from<Meal>(_meal_table)
+			.from<Meal>(_meals_table)
 			.upsert({
 				user_id: user.id,
 				id,
@@ -154,7 +155,7 @@ export async function deleteMeal(store: CommandStore, id: string) {
 			throw new DataError(deletedTags.error);
 		}
 
-		const deletedMeal = await client.from<Meal>(_meal_table).delete().eq("id", id);
+		const deletedMeal = await client.from<Meal>(_meals_table).delete().eq("id", id);
 		if (deletedMeal.error) {
 			throw new DataError(deletedMeal.error);
 		}

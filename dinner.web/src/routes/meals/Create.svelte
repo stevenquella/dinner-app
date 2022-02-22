@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Error from "$components/Error.svelte";
-	import MealForm from "$components/meals/Form.svelte";
+	import MealForm from "$components/MealForm.svelte";
+	import StatusError from "$components/StatusError.svelte";
 	import { upsertMeal } from "$providers/_index";
 	import type { GroceryEdit, MealEdit, TagEdit } from "$providers/_types";
 	import { getCommandStore, isAppError } from "$utilities/_index";
@@ -33,6 +33,6 @@
 
 <h3>Create Meal</h3>
 
-<Error error="{error}" />
+<StatusError error="{error}" />
 
 <MealForm bind:meal bind:tags bind:groceries isBusy="{$commandStore.loading}" on:save="{onSave}" />

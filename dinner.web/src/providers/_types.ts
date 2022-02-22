@@ -1,3 +1,20 @@
+// PLANS
+
+export type Plan = {
+	id: string;
+	user_id: string;
+	updated_on: Date;
+	date: Date;
+	notes: string;
+	meals: Meal[];
+	groceries: Grocery[];
+};
+
+export type PlanEdit = {
+	date: Date;
+	notes: string;
+};
+
 // GROCERIES
 export enum GroceryCategory {
 	Produce = "Produce",
@@ -13,7 +30,7 @@ export type Grocery = {
 	name: string;
 	meal_id: string;
 	user_id: string;
-	updated_on: string;
+	updated_on: Date;
 };
 
 export type GroceryEdit = Pick<Grocery, "category" | "name">;

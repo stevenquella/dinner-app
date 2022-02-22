@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Error from "$components/Error.svelte";
-	import MealForm from "$components/meals/Form.svelte";
-	import QueryStatus from "$components/QueryStatus.svelte";
+	import MealForm from "$components/MealForm.svelte";
+	import StatusError from "$components/StatusError.svelte";
+	import StatusQuery from "$components/StatusQuery.svelte";
 	import { deleteMeal, retrieveMeal, upsertMeal } from "$providers/_index";
 	import type { GroceryEdit, Meal, MealEdit, TagEdit } from "$providers/_types";
 	import { getCommandStore, getQueryStore, isAppError } from "$utilities/_index";
@@ -66,9 +66,9 @@
 
 <p>{params.id}</p>
 
-<QueryStatus query="{mealStore}" />
+<StatusQuery query="{mealStore}" />
 
-<Error error="{error}" />
+<StatusError error="{error}" />
 
 {#if $mealStore.result}
 	<p>{$mealStore.result.name}</p>
