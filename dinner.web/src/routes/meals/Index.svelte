@@ -1,5 +1,5 @@
 <script lang="ts">
-	import QueryStatus from "$components/QueryStatus.svelte";
+	import StatusQuery from "$components/StatusQuery.svelte";
 	import { retrieveMeals } from "$providers/_index";
 	import type { Meal } from "$providers/_types";
 	import SignOut from "$routes/SignOut.svelte";
@@ -14,7 +14,7 @@
 
 <a href="#/meals/create">Create</a>
 
-<QueryStatus query="{mealsStore}" />
+<StatusQuery query="{mealsStore}" />
 
 {#each $mealsStore.result || [] as meal}
 	<p>
