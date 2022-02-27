@@ -1,10 +1,12 @@
 <script lang="ts">
-	import Error from "$components/StatusError.svelte";
+	import InputDate from "$components/InputDate.svelte";
+	import StatusError from "$components/StatusError.svelte";
 	import { upsertPlan } from "$providers/plans";
 	import type { PlanEdit } from "$providers/_types";
 	import { isAppError } from "$utilities/errors";
 	import { getCommandStore } from "$utilities/operations";
 	import type { AppError } from "$utilities/_types";
+	import { replace } from "svelte-spa-router";
 	import { v4 as uuidv4 } from "uuid";
 
 	const commandStore = getCommandStore();
@@ -21,13 +23,17 @@
 
 		if (isAppError(response)) {
 			error = response;
+		} else {
+			replace("/");
 		}
 	}
+
+	$: console.log(inputs);
 </script>
 
-<Error error="{error}" />
+<StatusError error="{error}" />
 
-<input name="date" type="date" bind:value="{inputs.date}" />
+<InputDate bind:date="{inputs.date}" />
 <input name="notes" type="text" bind:value="{inputs.notes}" />
 
-<button type="button" on:click="{onSave}"> SAVE </button>
+<button type="button" on:click="{onSave}" disabled="{$commandStore.loading}"> SAVE </button>

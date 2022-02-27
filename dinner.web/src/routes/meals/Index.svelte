@@ -13,6 +13,7 @@
 <h3>Meals</h3>
 
 <a href="#/meals/create">Create</a>
+<a href="#/plans/create">Create Plan</a>
 
 <StatusQuery query="{mealsStore}" />
 
