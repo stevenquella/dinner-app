@@ -17,6 +17,7 @@ client.auth.onAuthStateChange(function (_, session) {
 });
 
 export * from "./meals";
+export * from "./plans";
 export * from "./users";
 export {
 	client,
