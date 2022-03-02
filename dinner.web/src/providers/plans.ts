@@ -74,7 +74,7 @@ export async function upsertPlan(
 		const updatedGroceries = await client.from<Grocery>(_plans_groceries_table).upsert(
 			groceries.map((g) => ({
 				user_id: user.id,
-				meal_id: id,
+				plan_id: id,
 				...g,
 			}))
 		);

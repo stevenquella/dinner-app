@@ -1,6 +1,5 @@
 import { RuleFor, Validator } from "$utilities/validations";
-import {
-	GroceryCategory,
+import type {
 	GroceryEdit,
 	MealEdit,
 	PlanEdit,
@@ -9,6 +8,7 @@ import {
 	SignUpInput,
 	TagEdit,
 } from "./_types";
+import { GroceryCategory } from "./_types";
 
 export const _id_validator = new Validator<{ id: string }>(
 	new RuleFor("id").uuid("Id must be a unique identifier.")
