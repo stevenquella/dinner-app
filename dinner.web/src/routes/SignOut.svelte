@@ -18,4 +18,10 @@
 
 <StatusError error="{error}" />
 
-<button type="button" disabled="{$commandStore.loading}" on:click="{onSignOut}"> SIGN OUT </button>
+<button
+	class="btn btn-primary"
+	type="button"
+	disabled="{$commandStore.loading}"
+	on:click="{onSignOut}">
+	SIGN OUT
+</button>

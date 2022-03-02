@@ -11,3 +11,9 @@
 		<Router routes="{noAuthRoutes}" />
 	{/if}
 </main>
+
+<style global lang="postcss">
+	@tailwind utilities;
+	@tailwind components;
+	@tailwind base;
+</style>

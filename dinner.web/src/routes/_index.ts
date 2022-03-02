@@ -1,3 +1,4 @@
+import Index from "./Index.svelte";
 import MealCreate from "./meals/Create.svelte";
 import MealEdit from "./meals/Edit.svelte";
 import MealIndex from "./meals/Index.svelte";
@@ -18,7 +19,7 @@ export const authRoutes = {
 	"/signin": SignIn,
 	"/signup": SignUp,
 	// root
-	"/": MealIndex,
+	"/": Index,
 	"*": NotFound,
 };
 
