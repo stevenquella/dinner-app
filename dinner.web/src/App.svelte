@@ -4,16 +4,20 @@
 	import Router from "svelte-spa-router";
 </script>
 
-<main>
-	{#if $user != null}
-		<Router routes="{authRoutes}" />
-	{:else}
-		<Router routes="{noAuthRoutes}" />
-	{/if}
-</main>
+{#if $user != null}
+	<Router routes="{authRoutes}" />
+{:else}
+	<Router routes="{noAuthRoutes}" />
+{/if}
 
 <style global lang="postcss">
 	@tailwind utilities;
 	@tailwind components;
 	@tailwind base;
+
+	html,
+	body,
+	#app {
+		@apply h-full;
+	}
 </style>
