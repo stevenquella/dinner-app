@@ -8,6 +8,7 @@
 	import type { AppError } from "$utilities/_types";
 	import { onDestroy } from "svelte";
 	import { replace } from "svelte-spa-router";
+	import { slide } from "svelte/transition";
 
 	export let params: { id: string };
 
@@ -64,21 +65,23 @@
 	onDestroy(unsubscribe);
 </script>
 
-<p>{params.id}</p>
+<div transition:slide>
+	<p>{params.id}</p>
 
-<StatusQuery query="{mealStore}" />
+	<StatusQuery query="{mealStore}" />
 
-<StatusError error="{error}" />
+	<StatusError error="{error}" />
 
-{#if $mealStore.result}
-	<p>{$mealStore.result.name}</p>
+	{#if $mealStore.result}
+		<p>{$mealStore.result.name}</p>
 
-	<MealForm
-		bind:meal
-		bind:tags
-		bind:groceries
-		isBusy="{$commandStore.loading}"
-		on:save="{onSave}"
-		hasDelete="{true}"
-		on:delete="{onDelete}" />
-{/if}
+		<MealForm
+			bind:meal
+			bind:tags
+			bind:groceries
+			isBusy="{$commandStore.loading}"
+			on:save="{onSave}"
+			hasDelete="{true}"
+			on:delete="{onDelete}" />
+	{/if}
+</div>
