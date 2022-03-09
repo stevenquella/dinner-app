@@ -135,7 +135,7 @@
 
 						<button
 							class=" plan-item btn border-dotted"
-							on:click="{() => (toggle = true)}">Add Meal</button>
+							on:click="{() => (toggle = true)}">Edit Meals</button>
 					</div>
 				{/if}
 			</div>
@@ -144,21 +144,25 @@
 </div>
 
 {#if toggle}
-	<div
-		transition:fade
-		class="absolute top-0 w-full h-full backdrop-blur-sm bg-white bg-opacity-10 flex flex-col items-stretch">
-		<div
-			transition:fly="{{ y: 500, duration: 500 }}"
-			class="mt-16 mx-4 md:mx-16 rounded-t-md flex-grow bg-neutral flex flex-col items-stretch">
-			<div class="flex items-center">
-				<h3 class="flex-grow text-lg">Edit Meals</h3>
-				<button class="btn" on:click="{() => (toggle = false)}"><IconX /></button>
+	<div transition:fade class="overlay">
+		<div transition:fly="{{ y: 500, duration: 500 }}" class="overlay-content">
+			<button class="btn self-end" on:click="{() => (toggle = false)}"><IconX /></button>
+
+			<input class="input mx-2" placeholder="Search meals..." type="text" />
+
+			<div class="flex flex-col p-4 items-center">
+				<IconLoading />
 			</div>
 
-			<IconLoading />
-			{#each meals as meal}
-				<div class="plan-item">{meal.name}</div>
-			{/each}
+			<div class="flex flex-col gap-2 p-2">
+				{#each meals as meal}
+					<div class="plan-item">{meal.name}</div>
+				{/each}
+				<div></div>
+				{#each meals as meal}
+					<div class="default-item">{meal.name}</div>
+				{/each}
+			</div>
 		</div>
 	</div>
 {/if}
@@ -166,5 +170,17 @@
 <style lang="postcss">
 	.plan-item {
 		@apply border-2 border-accent rounded-md p-2;
+	}
+
+	.default-item {
+		@apply border-2 border-gray-500 rounded-md p-2;
+	}
+
+	.overlay {
+		@apply absolute top-0 w-full h-full backdrop-blur-sm bg-white bg-opacity-10 flex flex-col items-stretch;
+	}
+
+	.overlay-content {
+		@apply mt-16 mx-4 rounded-t-md flex-grow bg-neutral flex flex-col items-stretch;
 	}
 </style>
