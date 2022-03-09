@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { IconChevronRight, IconLoading, IconX } from "$components/_Index.svelte";
 	import type { Meal, Plan } from "$providers/_types";
-	import { fly, slide } from "svelte/transition";
+	import { fade, fly, slide } from "svelte/transition";
 	import { v4 } from "uuid";
 
 	let toggle: boolean = false;
@@ -145,11 +145,16 @@
 
 {#if toggle}
 	<div
-		transition:fly="{{ y: 500, duration: 500 }}"
-		class="absolute top-0 w-full h-full backdrop-blur-sm">
+		transition:fade
+		class="absolute top-0 w-full h-full backdrop-blur-sm bg-white bg-opacity-10 flex flex-col items-stretch">
 		<div
-			class="mt-16 border-t bg-neutral w-full h-full flex flex-col items-center p-2 shadow-md">
-			<button class="btn" on:click="{() => (toggle = false)}"><IconX /></button>
+			transition:fly="{{ y: 500, duration: 500 }}"
+			class="mt-16 mx-4 md:mx-16 rounded-t-md flex-grow bg-neutral flex flex-col items-stretch">
+			<div class="flex items-center">
+				<h3 class="flex-grow text-lg">Edit Meals</h3>
+				<button class="btn" on:click="{() => (toggle = false)}"><IconX /></button>
+			</div>
+
 			<IconLoading />
 			{#each meals as meal}
 				<div class="plan-item">{meal.name}</div>
