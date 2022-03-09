@@ -1,6 +1,6 @@
 <script lang="ts">
 	import StatusError from "$components/StatusError.svelte";
-	import UserSignedIn from "$components/UserSignedIn.svelte";
+	import UserSignedIn from "$components/users/UserSignedIn.svelte";
 	import { signIn, user } from "$providers/_index";
 	import type { SignInInput } from "$providers/_types";
 	import { getCommandStore, isAppError } from "$utilities/_index";

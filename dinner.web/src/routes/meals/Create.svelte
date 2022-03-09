@@ -1,6 +1,5 @@
 <script lang="ts">
-	import MealForm from "$components/MealForm.svelte";
-	import StatusError from "$components/StatusError.svelte";
+	import { MealForm, StatusError } from "$components/_Index.svelte";
 	import { upsertMeal } from "$providers/_index";
 	import type { GroceryEdit, MealEdit, TagEdit } from "$providers/_types";
 	import { getCommandStore, isAppError } from "$utilities/_index";

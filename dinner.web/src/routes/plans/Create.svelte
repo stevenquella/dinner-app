@@ -1,8 +1,5 @@
 <script lang="ts">
-	import GroceryAdd from "$components/GroceryAdd.svelte";
-	import InputDate from "$components/InputDate.svelte";
-	import StatusError from "$components/StatusError.svelte";
-	import StatusQuery from "$components/StatusQuery.svelte";
+	import { GroceryAdd, InputDate, StatusError, StatusQuery } from "$components/_Index.svelte";
 	import { retrieveMeals, upsertPlan } from "$providers/_index";
 	import type { GroceryEdit, Meal, PlanEdit, PlanMealEdit } from "$providers/_types";
 	import { GroceryCategory } from "$providers/_types";

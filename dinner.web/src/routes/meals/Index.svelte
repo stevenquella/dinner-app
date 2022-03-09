@@ -1,5 +1,5 @@
 <script lang="ts">
-	import StatusQuery from "$components/StatusQuery.svelte";
+	import { StatusQuery } from "$components/_Index.svelte";
 	import { retrieveMeals } from "$providers/_index";
 	import type { Meal } from "$providers/_types";
 	import SignOut from "$routes/SignOut.svelte";
