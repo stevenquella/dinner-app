@@ -18,6 +18,6 @@
 	html,
 	body,
 	#app {
-		@apply h-full;
+		@apply h-full overflow-auto;
 	}
 </style>

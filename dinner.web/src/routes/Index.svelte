@@ -1,11 +1,16 @@
 <script lang="ts">
-	import { IconChevronRight, IconLoading, IconX } from "$components/_Index.svelte";
+	import { IconCheck, IconChevronRight, IconLoading } from "$components/_Index.svelte";
 	import type { Meal, Plan } from "$providers/_types";
 	import { fade, fly, slide } from "svelte/transition";
 	import { v4 } from "uuid";
 
 	let toggle: boolean = false;
 	let itemToggle: boolean = false;
+	let filterSelectedToggle = false;
+
+	type MealSelect = Meal & {
+		selected: boolean;
+	};
 
 	const plans: Plan[] = [
 		{
@@ -83,7 +88,7 @@
 		},
 	];
 
-	const meals: Meal[] = [
+	const meals: MealSelect[] = [
 		{
 			id: v4(),
 			name: "test meal",
@@ -92,6 +97,7 @@
 			tags: [],
 			updated_on: new Date(),
 			user_id: v4(),
+			selected: true,
 		},
 		{
 			id: v4(),
@@ -101,6 +107,7 @@
 			tags: [],
 			updated_on: new Date(),
 			user_id: v4(),
+			selected: false,
 		},
 		{
 			id: v4(),
@@ -110,6 +117,187 @@
 			tags: [],
 			updated_on: new Date(),
 			user_id: v4(),
+			selected: true,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: true,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: true,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: true,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: true,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
+		},
+		{
+			id: v4(),
+			name: "test meal",
+			notes: "",
+			groceries: [],
+			tags: [],
+			updated_on: new Date(),
+			user_id: v4(),
+			selected: false,
 		},
 	];
 </script>
@@ -146,22 +334,45 @@
 {#if toggle}
 	<div transition:fade class="overlay">
 		<div transition:fly="{{ y: 500, duration: 500 }}" class="overlay-content">
-			<button class="btn self-end" on:click="{() => (toggle = false)}"><IconX /></button>
-
-			<input class="input mx-2" placeholder="Search meals..." type="text" />
-
-			<div class="flex flex-col p-4 items-center">
-				<IconLoading />
+			<div class="flex flex-col gap-2 p-2 shadow-">
+				<input class="input flex-grow" placeholder="Search meals..." type="text" />
+				<button
+					on:click="{() => (filterSelectedToggle = !filterSelectedToggle)}"
+					class="btn btn-sm btn-outline {filterSelectedToggle ? 'btn-accent' : ''}">
+					<IconCheck />
+					<span class="ml-2">
+						{#if filterSelectedToggle}
+							View All
+						{:else}
+							View Selected
+						{/if}
+					</span>
+				</button>
 			</div>
 
-			<div class="flex flex-col gap-2 p-2">
+			<div class="flex-grow overflow-scroll flex flex-col gap-2 p-2 border-y">
+				<div class="flex flex-col items-center my-3">
+					<IconLoading />
+				</div>
+
 				{#each meals as meal}
-					<div class="plan-item">{meal.name}</div>
+					{#if !filterSelectedToggle || meal.selected}
+						<div
+							transition:fade
+							class="{meal.selected ? 'plan-item text-accent' : 'default-item'}"
+							on:click="{() => (meal.selected = !meal.selected)}">
+							<span class="flex-grow">{meal.name}</span>
+							{#if meal.selected}
+								<IconCheck />
+							{/if}
+						</div>
+					{/if}
 				{/each}
-				<div></div>
-				{#each meals as meal}
-					<div class="default-item">{meal.name}</div>
-				{/each}
+			</div>
+
+			<div class="flex items-stretch m-2 gap-2">
+				<button class="flex-grow btn btn-outline">Close</button>
+				<button class="flex-grow btn btn-primary">Save</button>
 			</div>
 		</div>
 	</div>
@@ -169,11 +380,11 @@
 
 <style lang="postcss">
 	.plan-item {
-		@apply border-2 border-accent rounded-md p-2;
+		@apply border-2 border-accent rounded-md p-2 flex items-center;
 	}
 
 	.default-item {
-		@apply border-2 border-gray-500 rounded-md p-2;
+		@apply border-2 border-gray-500 rounded-md p-2 flex items-center;
 	}
 
 	.overlay {
@@ -181,6 +392,6 @@
 	}
 
 	.overlay-content {
-		@apply mt-16 mx-4 rounded-t-md flex-grow bg-neutral flex flex-col items-stretch;
+		@apply mt-16 mx-4 rounded-t-md flex-grow bg-neutral flex flex-col items-stretch overflow-auto;
 	}
 </style>
