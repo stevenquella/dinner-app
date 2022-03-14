@@ -7,6 +7,7 @@ import PlanCreate from "./plans/Create.svelte";
 import SignIn from "./SignIn.svelte";
 import SignUp from "./SignUp.svelte";
 import Unauthorized from "./Unauthorized.svelte";
+import UserIndex from "./user/Index.svelte";
 
 export const authRoutes = {
 	// plans
@@ -18,6 +19,8 @@ export const authRoutes = {
 	// auth
 	"/signin": SignIn,
 	"/signup": SignUp,
+	// user
+	"/user": UserIndex,
 	// root
 	"/": Index,
 	"*": NotFound,

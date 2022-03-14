@@ -1,7 +1,9 @@
 <script context="module">
 	export { default as IconCheck } from "./icons/IconCheck.svelte";
 	export { default as IconChevronRight } from "./icons/IconChevronRight.svelte";
+	export { default as IconCollection } from "./icons/IconCollection.svelte";
 	export { default as IconLoading } from "./icons/IconLoading.svelte";
+	export { default as IconUser } from "./icons/IconUser.svelte";
 	export { default as IconX } from "./icons/IconX.svelte";
 	export { default as InputDate } from "./InputDate.svelte";
 	export { default as GroceryAdd } from "./meals/GroceryAdd.svelte";

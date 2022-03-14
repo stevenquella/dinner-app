@@ -302,6 +302,9 @@
 	];
 </script>
 
+<!-- TODO Create Plan from date -->
+<!-- TODO Filter by date range -->
+
 <div transition:slide class="flex flex-col gap-2 p-2">
 	{#each plans as plan}
 		<div class="card card-compact bg-neutral shadow-xl cursor-pointer">
