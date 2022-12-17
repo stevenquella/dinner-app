@@ -1,3 +1,4 @@
+import { Button, Grid, TextField, Typography } from "@mui/material";
 import { Session } from "@supabase/supabase-js";
 import React, { useEffect, useState } from "react";
 import { supabase } from "./providers/client";
@@ -41,39 +42,69 @@ export default function App() {
   return (
     <div>
       {session != null ? (
-        <div>
-          <div>You are logged in.</div>
-          <div>{session.user.id}</div>
-          <button type="button" onClick={onLogout}>
-            LOG OUT
-          </button>
-        </div>
+        <Grid
+          container
+          direction="column"
+          alignItems="flex-start"
+          rowSpacing={1}
+          padding={1}
+        >
+          <Grid item>
+            <Typography variant="body1">
+              You are logged in, {session.user.id}.
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Button variant="outlined" type="button" onClick={onLogout}>
+              LOG OUT
+            </Button>
+          </Grid>
+        </Grid>
       ) : (
         <div>
-          <div>You are NOT logged in.</div>
-          <form onSubmit={onLogin}>
-            <div>
-              <label htmlFor="email">Email</label>
-              <input
-                id="email"
-                type="email"
-                placeholder="Email Address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password">Password</label>
-              <input
-                id="password"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+          <Typography variant="body1" padding={1}>
+            You are NOT logged in.
+          </Typography>
 
-            <button type="submit">LOG IN</button>
+          <form onSubmit={onLogin}>
+            <Grid
+              container
+              direction="column"
+              alignItems="stretch"
+              padding={1}
+              rowSpacing={1}
+            >
+              <Grid item>
+                <TextField
+                  id="email"
+                  label="Email"
+                  variant="outlined"
+                  type="email"
+                  autoComplete="email"
+                  fullWidth
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  id="password"
+                  label="Password"
+                  variant="outlined"
+                  type="password"
+                  autoComplete="current-password"
+                  fullWidth
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </Grid>
+
+              <Grid item>
+                <Button variant="contained" type="submit">
+                  LOG IN
+                </Button>
+              </Grid>
+            </Grid>
           </form>
         </div>
       )}
