@@ -1,11 +1,19 @@
 import { Container } from "@mui/material";
 import { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
+import { Outlet, useOutletContext } from "react-router-dom";
 import LogIn from "./components/auth/LogIn";
-import LogOut from "./components/auth/LogOut";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { supabase } from "./providers/client";
+
+export type AppContext = {
+  session: Session;
+};
+
+export function useAppContext() {
+  return useOutletContext<AppContext>();
+}
 
 export default function App() {
   const [session, setSession] = useState<Session | null>();
@@ -26,7 +34,9 @@ export default function App() {
   return (
     <div>
       <Header />
-      <Container fixed>{session != null ? <LogOut /> : <LogIn />}</Container>
+      <Container fixed sx={{ py: 2 }}>
+        {session != null ? <Outlet context={{ session }} /> : <LogIn />}
+      </Container>
       <Footer />
     </div>
   );

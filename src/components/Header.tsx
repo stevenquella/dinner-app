@@ -1,4 +1,5 @@
 import { Box, Grid, Link, Toolbar, Typography } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 
 export default function Header() {
   return (
@@ -9,7 +10,7 @@ export default function Header() {
         justifyContent: "center",
       }}
     >
-      <Link href="/" underline="none">
+      <Link component={RouterLink} to="/" underline="none">
         <Grid
           container
           alignItems="center"

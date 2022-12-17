@@ -1,6 +1,7 @@
 import { Flatware, ListAlt, Person } from "@mui/icons-material";
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
 import { useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 
 export default function Footer() {
   const [nav, setNav] = useState<string>("plans");
@@ -16,16 +17,22 @@ export default function Footer() {
         onChange={(_event, newValue) => setNav(newValue)}
       >
         <BottomNavigationAction
+          component={RouterLink}
+          to="plans"
           label="Meal Plans"
           value="plans"
           icon={<ListAlt />}
         />
         <BottomNavigationAction
+          component={RouterLink}
+          to="meals"
           label="Meals"
           value="meals"
           icon={<Flatware />}
         />
         <BottomNavigationAction
+          component={RouterLink}
+          to="profile"
           label="Profile"
           value="profile"
           icon={<Person />}
