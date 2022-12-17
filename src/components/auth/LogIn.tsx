@@ -1,5 +1,4 @@
 import { Button, Grid, TextField, Typography } from "@mui/material";
-import { Session } from "@supabase/supabase-js";
 import { useState } from "react";
 import { supabase } from "../../providers/client";
 
@@ -12,12 +11,10 @@ export default function LogIn(props: LoginProps) {
   const onLogin: React.FormEventHandler = async (e) => {
     e.preventDefault();
 
-    const response = await supabase.auth.signInWithPassword({
+    await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     });
-
-    //props.onSessionChanged(response.data.session);
   };
 
   return (
