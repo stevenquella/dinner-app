@@ -12,7 +12,7 @@ export const routes: RouteObject[] = [
     errorElement: <Error />,
     children: [
       {
-        path: "plans",
+        index: true,
         element: <PlanIndex />,
       },
       {
