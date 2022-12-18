@@ -1,68 +1,95 @@
-import { Button, Grid, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { Button, Card, CardContent, Grid, Typography } from "@mui/material";
+import { FormProvider, useForm } from "react-hook-form";
 import { supabase } from "../../providers/client";
+import TextInput, { InputValidation } from "../inputs/TextInput";
 
-export type LoginProps = {};
+type LogInInputs = {
+  email: string;
+  password: string;
+};
 
-export default function LogIn(props: LoginProps) {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+type LogInValidation = {
+  [prop in keyof LogInInputs]?: InputValidation;
+};
 
-  const onLogin: React.FormEventHandler = async (e) => {
-    e.preventDefault();
+export default function LogIn() {
+  const formMethods = useForm<LogInInputs>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+  const formValidation: LogInValidation = {
+    email: {
+      required: {
+        value: true,
+        message: "Email is required.",
+      },
+    },
+    password: {
+      required: {
+        value: true,
+        message: "Password is required.",
+      },
+    },
+  };
 
+  const onLogin = async (data: LogInInputs) => {
     await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
+      email: data.email,
+      password: data.password,
     });
   };
 
   return (
-    <div>
-      <Typography variant="body1" padding={1}>
-        You are NOT logged in.
-      </Typography>
+    <Card>
+      <CardContent>
+        <Typography variant="body1" padding={1}>
+          You are NOT logged in.
+        </Typography>
+        <FormProvider {...formMethods}>
+          <form onSubmit={formMethods.handleSubmit(onLogin)}>
+            <Grid
+              container
+              direction="column"
+              alignItems="stretch"
+              padding={1}
+              rowSpacing={2}
+            >
+              <Grid item>
+                <TextInput
+                  name="email"
+                  label="Email"
+                  type="email"
+                  autocomplete="email"
+                  rules={formValidation.email}
+                />
+              </Grid>
+              <Grid item>
+                <TextInput
+                  name="password"
+                  label="Password"
+                  type="password"
+                  autocomplete="current-password"
+                  rules={formValidation.password}
+                />
+              </Grid>
 
-      <form onSubmit={onLogin}>
-        <Grid
-          container
-          direction="column"
-          alignItems="stretch"
-          padding={1}
-          rowSpacing={1}
-        >
-          <Grid item>
-            <TextField
-              id="email"
-              label="Email"
-              variant="outlined"
-              type="email"
-              autoComplete="email"
-              fullWidth
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Grid>
-          <Grid item>
-            <TextField
-              id="password"
-              label="Password"
-              variant="outlined"
-              type="password"
-              autoComplete="current-password"
-              fullWidth
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Grid>
-
-          <Grid item>
-            <Button variant="contained" type="submit">
-              LOG IN
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
-    </div>
+              <Grid item>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  disabled={formMethods.formState.isSubmitting}
+                >
+                  {formMethods.formState.isSubmitting
+                    ? "Logging in..."
+                    : "LOG IN"}
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </FormProvider>
+      </CardContent>
+    </Card>
   );
 }

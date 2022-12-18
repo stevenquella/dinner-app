@@ -18,7 +18,7 @@ export default function Footer() {
       >
         <BottomNavigationAction
           component={RouterLink}
-          to="plans"
+          to="/"
           label="Meal Plans"
           value="plans"
           icon={<ListAlt />}

@@ -5,6 +5,7 @@ export default function Header() {
   return (
     <Toolbar
       sx={{
+        bgcolor: "background.paper",
         borderBottom: 1,
         borderColor: "divider",
         justifyContent: "center",
