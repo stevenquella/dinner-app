@@ -1,7 +1,8 @@
 import { Button, Card, CardContent, Grid, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { supabase } from "../../providers/client";
-import TextInput, { InputValidation } from "../inputs/TextInput";
+import TextInput from "../inputs/TextInput";
+import { InputValidation } from "../inputs/types";
 
 type LogInInputs = {
   email: string;

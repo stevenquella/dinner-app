@@ -1,6 +1,10 @@
-import { ThemeOptions } from "@mui/material";
+import { Shadows, ThemeOptions } from "@mui/material";
 
 export const themeOptions: ThemeOptions = {
+  shape: {
+    borderRadius: 0,
+  },
+  shadows: Array(25).fill("none") as Shadows,
   palette: {
     mode: "light",
     primary: {

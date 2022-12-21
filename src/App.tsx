@@ -34,7 +34,7 @@ export default function App() {
   return (
     <div>
       <Header />
-      <Container fixed sx={{ py: 2 }}>
+      <Container fixed sx={{ py: 2, mb: 8 }}>
         {session != null ? <Outlet context={{ session }} /> : <LogIn />}
       </Container>
       <Footer />
