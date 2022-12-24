@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import signIn from "../../providers/authProvider";
+import signIn, { signUp } from "../../providers/authProvider";
 import { getErrorMessage } from "../../providers/helpers";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
@@ -51,6 +51,16 @@ export default function LogIn() {
     }
   };
 
+  const onSignUp = async (data: LogInInputs) => {
+    setError(null);
+
+    try {
+      await signUp(data.email, data.password);
+    } catch (error) {
+      setError(getErrorMessage(error));
+    }
+  };
+
   return (
     <Page busy={formMethods.formState.isSubmitting} error={error}>
       <Card>
@@ -83,16 +93,32 @@ export default function LogIn() {
                   autocomplete="current-password"
                   rules={formValidation.password}
                 />
-                <Button
-                  variant="contained"
-                  type="submit"
-                  disabled={formMethods.formState.isSubmitting}
-                  sx={{ alignSelf: "start" }}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    columnGap: 1,
+                  }}
                 >
-                  {formMethods.formState.isSubmitting
-                    ? "Logging in..."
-                    : "LOG IN"}
-                </Button>
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    disabled={formMethods.formState.isSubmitting}
+                  >
+                    LOG IN
+                  </Button>
+                  <Typography variant="body1">OR</Typography>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    type="button"
+                    disabled={formMethods.formState.isSubmitting}
+                    onClick={formMethods.handleSubmit(onSignUp)}
+                  >
+                    SIGN UP
+                  </Button>
+                </Box>
               </Box>
             </form>
           </FormProvider>

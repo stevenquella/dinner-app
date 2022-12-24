@@ -16,6 +16,22 @@ export default async function signIn(
   }
 }
 
+export async function signUp(
+  email: string,
+  password: string
+): Promise<boolean> {
+  const response = await supabase.auth.signUp({
+    email: email,
+    password: password,
+  });
+
+  if (response.error != null) {
+    throw new Error(response.error.message);
+  } else {
+    return true;
+  }
+}
+
 export async function signOut(): Promise<boolean> {
   const response = await supabase.auth.signOut();
 
