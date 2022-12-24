@@ -1,8 +1,18 @@
-import { Button, Card, CardContent, Grid, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Grid,
+  Typography,
+} from "@mui/material";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAppContext } from "../../App";
-import { insertMeal } from "../../providers/mealProvider";
+import { getErrorMessage } from "../../providers/helpers";
+import { retrieveMeal, upsertMeal } from "../../providers/mealsProvider";
+import ErrorAlert from "../ErrorAlert";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 
@@ -18,8 +28,14 @@ type MealValidation = {
 export default function MealEdit() {
   const { id } = useParams();
   const { session } = useAppContext();
-
-  const formMethods = useForm<MealInputs>();
+  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  const formMethods = useForm<MealInputs>({
+    defaultValues: {
+      name: "",
+      notes: "",
+    },
+  });
   const formValidation: MealValidation = {
     name: {
       required: {
@@ -31,18 +47,46 @@ export default function MealEdit() {
 
   const isCreate: boolean = !(id != null);
 
-  const onCreate = async function (data: MealInputs) {
-    insertMeal({
-      user_id: session.user.id,
-      name: data.name,
-      notes: data.notes,
-    });
+  const onSubmit = async function (inputs: MealInputs) {
+    let meal;
+    try {
+      meal = await upsertMeal({
+        id: id,
+        user_id: session.user.id,
+        name: inputs.name,
+        notes: inputs.notes,
+      });
+    } catch (error) {
+      setError(getErrorMessage(error));
+    }
+
+    if (meal != null && isCreate) {
+      navigate(`/meals/edit/${meal.id}`, { replace: true });
+    }
   };
+
+  useEffect(() => {
+    (async () => {
+      if (id != null) {
+        try {
+          const meal = await retrieveMeal(id);
+          formMethods.reset({
+            name: meal.name,
+            notes: meal.notes ?? "",
+          });
+        } catch (error) {
+          setError(getErrorMessage(error));
+        }
+      }
+    })();
+  }, [formMethods, id]);
 
   return (
     <div>
+      <CircularProgress color="secondary" />
+      <ErrorAlert error={error} />
       <FormProvider {...formMethods}>
-        <form onSubmit={formMethods.handleSubmit(onCreate)}>
+        <form onSubmit={formMethods.handleSubmit(onSubmit)}>
           <Grid container direction="column" sx={{ p: 1 }} rowSpacing={2}>
             <Grid item>
               <Typography variant="h5">
@@ -53,7 +97,7 @@ export default function MealEdit() {
               <Button
                 variant="contained"
                 type="submit"
-                disabled={formMethods.formState.isSubmitting}
+                disabled={formMethods.formState.isSubmitting || error != null}
               >
                 {formMethods.formState.isSubmitting
                   ? "Processing..."

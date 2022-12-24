@@ -9,6 +9,8 @@ import { supabase } from "./providers/client";
 
 export type AppContext = {
   session: Session;
+  error: string | null;
+  onError: (e: string | null) => void;
 };
 
 export function useAppContext() {
@@ -16,7 +18,7 @@ export function useAppContext() {
 }
 
 export default function App() {
-  const [session, setSession] = useState<Session | null>();
+  const [session, setSession] = useState<Session | null>(null);
 
   const refreshSession = async () => {
     const latestSession = await supabase.auth.getSession();
@@ -35,7 +37,15 @@ export default function App() {
     <div>
       <Header />
       <Container fixed sx={{ py: 2, mb: 8 }}>
-        {session != null ? <Outlet context={{ session }} /> : <LogIn />}
+        {session != null ? (
+          <Outlet
+            context={{
+              session,
+            }}
+          />
+        ) : (
+          <LogIn />
+        )}
       </Container>
       <Footer />
     </div>
