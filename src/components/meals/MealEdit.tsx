@@ -1,18 +1,10 @@
-import {
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Button, Card, CardContent, Grid, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppContext } from "../../App";
 import { getErrorMessage } from "../../providers/helpers";
 import { retrieveMeal, upsertMeal } from "../../providers/mealsProvider";
-import ErrorAlert from "../ErrorAlert";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 
@@ -83,8 +75,6 @@ export default function MealEdit() {
 
   return (
     <div>
-      <CircularProgress color="secondary" />
-      <ErrorAlert error={error} />
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
           <Grid container direction="column" sx={{ p: 1 }} rowSpacing={2}>

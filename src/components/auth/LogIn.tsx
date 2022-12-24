@@ -1,6 +1,9 @@
-import { Button, Card, CardContent, Grid, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Typography } from "@mui/material";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { supabase } from "../../providers/client";
+import Page from "../../Page";
+import signIn from "../../providers/authProvider";
+import { getErrorMessage } from "../../providers/helpers";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 
@@ -13,51 +16,59 @@ type LogInValidation = {
   [prop in keyof LogInInputs]?: InputValidation;
 };
 
+const formValidation: LogInValidation = {
+  email: {
+    required: {
+      value: true,
+      message: "Email is required.",
+    },
+  },
+  password: {
+    required: {
+      value: true,
+      message: "Password is required.",
+    },
+  },
+};
+
 export default function LogIn() {
+  const [error, setError] = useState<string | null>(null);
+
   const formMethods = useForm<LogInInputs>({
     defaultValues: {
       email: "",
       password: "",
     },
   });
-  const formValidation: LogInValidation = {
-    email: {
-      required: {
-        value: true,
-        message: "Email is required.",
-      },
-    },
-    password: {
-      required: {
-        value: true,
-        message: "Password is required.",
-      },
-    },
-  };
 
   const onLogin = async (data: LogInInputs) => {
-    await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
+    setError(null);
+
+    try {
+      await signIn(data.email, data.password);
+    } catch (error) {
+      setError(getErrorMessage(error));
+    }
   };
 
   return (
-    <Card>
-      <CardContent>
-        <Typography variant="body1" padding={1}>
-          You are NOT logged in.
-        </Typography>
-        <FormProvider {...formMethods}>
-          <form onSubmit={formMethods.handleSubmit(onLogin)}>
-            <Grid
-              container
-              direction="column"
-              alignItems="stretch"
-              padding={1}
-              rowSpacing={2}
-            >
-              <Grid item>
+    <Page busy={formMethods.formState.isSubmitting} error={error}>
+      <Card>
+        <CardContent>
+          <Typography variant="body1" padding={1}>
+            Log In
+          </Typography>
+          <FormProvider {...formMethods}>
+            <form onSubmit={formMethods.handleSubmit(onLogin)}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "stretch",
+                  rowGap: 2,
+                  p: 1,
+                }}
+              >
                 <TextInput
                   name="email"
                   label="Email"
@@ -65,8 +76,6 @@ export default function LogIn() {
                   autocomplete="email"
                   rules={formValidation.email}
                 />
-              </Grid>
-              <Grid item>
                 <TextInput
                   name="password"
                   label="Password"
@@ -74,23 +83,21 @@ export default function LogIn() {
                   autocomplete="current-password"
                   rules={formValidation.password}
                 />
-              </Grid>
-
-              <Grid item>
                 <Button
                   variant="contained"
                   type="submit"
                   disabled={formMethods.formState.isSubmitting}
+                  sx={{ alignSelf: "start" }}
                 >
                   {formMethods.formState.isSubmitting
                     ? "Logging in..."
                     : "LOG IN"}
                 </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </FormProvider>
-      </CardContent>
-    </Card>
+              </Box>
+            </form>
+          </FormProvider>
+        </CardContent>
+      </Card>
+    </Page>
   );
 }

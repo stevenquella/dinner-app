@@ -1,17 +1,19 @@
-import { Container } from "@mui/material";
+import { Alert, Container } from "@mui/material";
 import { useRouteError } from "react-router-dom";
-import ErrorAlert from "./ErrorAlert";
 import Footer from "./Footer";
 import Header from "./Header";
 
 export default function Error() {
   const error: any = useRouteError();
+  const errorMessage = error.statusText || error.message;
 
   return (
     <div>
       <Header />
       <Container fixed sx={{ py: 2 }}>
-        <ErrorAlert error={error.statusText || error.message} />
+        {errorMessage != null ? (
+          <Alert severity="error">{errorMessage}</Alert>
+        ) : null}
       </Container>
       <Footer />
     </div>

@@ -1,4 +1,3 @@
-import { Container } from "@mui/material";
 import { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { Outlet, useOutletContext } from "react-router-dom";
@@ -36,7 +35,7 @@ export default function App() {
   return (
     <div>
       <Header />
-      <Container fixed sx={{ py: 2, mb: 8 }}>
+      <div>
         {session != null ? (
           <Outlet
             context={{
@@ -46,7 +45,7 @@ export default function App() {
         ) : (
           <LogIn />
         )}
-      </Container>
+      </div>
       <Footer />
     </div>
   );
