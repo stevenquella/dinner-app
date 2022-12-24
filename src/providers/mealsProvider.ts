@@ -1,4 +1,9 @@
-import { ensureSuccess, getSingleRow, supabase } from "./client";
+import {
+  ensureEmptySuccess,
+  ensureSuccess,
+  getSingleRow,
+  supabase,
+} from "./client";
 import { Database } from "./client.types";
 
 const meal_table = "meal";
@@ -21,4 +26,9 @@ export async function upsertMeal(meal: MealInsert): Promise<Meal> {
     .upsert<MealInsert>(meal)
     .select();
   return getSingleRow(response);
+}
+
+export async function deleteMeal(id: string): Promise<boolean> {
+  const response = await supabase.from(meal_table).delete().eq("id", id);
+  return ensureEmptySuccess(response);
 }

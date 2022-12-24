@@ -20,7 +20,7 @@ export const themeOptions: ThemeOptions = {
       main: "#AC1A2F",
     },
     info: {
-      main: "#EEE1C6",
+      main: "#00000099",
     },
     background: {
       default: "#f5f5f5",

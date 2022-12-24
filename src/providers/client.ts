@@ -26,3 +26,14 @@ export function ensureSuccess<T>(response: PostgrestResponse<T>): T[] {
     throw new Error(error?.message ?? "An unexpected error occurred.");
   }
 }
+
+export function ensureEmptySuccess(
+  response: PostgrestResponse<undefined>
+): boolean {
+  const { error } = response;
+  if (error == null) {
+    return true;
+  } else {
+    throw new Error(error.message);
+  }
+}

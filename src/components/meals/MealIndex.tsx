@@ -70,6 +70,11 @@ export default function MealIndex() {
           </Link>
         ))}
       </Box>
+      {meals.length === 0 ? (
+        <Typography variant="body1">No meals found.</Typography>
+      ) : (
+        <span></span>
+      )}
     </Page>
   );
 }

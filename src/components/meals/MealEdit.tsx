@@ -1,14 +1,26 @@
-import { Button, Card, CardContent, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardContent,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppContext } from "../../App";
 import { getErrorMessage } from "../../providers/helpers";
-import { retrieveMeal, upsertMeal } from "../../providers/mealsProvider";
+import {
+  deleteMeal,
+  retrieveMeal,
+  upsertMeal,
+} from "../../providers/mealsProvider";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
-import Page from "../Page";
+import Page, { PageContext } from "../Page";
 
 type MealInputs = {
   name: string;
@@ -32,7 +44,13 @@ export default function MealEdit() {
   const { id } = useParams();
   const { session } = useAppContext();
   const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
+
+  const isCreate: boolean = !(id != null);
+  const [context, setContext] = useState<PageContext>({
+    busy: true,
+    error: null,
+  });
+  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
   const formMethods = useForm<MealInputs>({
     defaultValues: {
       name: "",
@@ -40,10 +58,14 @@ export default function MealEdit() {
     },
   });
 
-  const isCreate: boolean = !(id != null);
-
   const onSubmit = async function (inputs: MealInputs) {
-    let meal;
+    setContext({
+      busy: true,
+      error: null,
+    });
+
+    let meal = null;
+    let error = null;
     try {
       meal = await upsertMeal({
         id: id,
@@ -51,17 +73,47 @@ export default function MealEdit() {
         name: inputs.name,
         notes: inputs.notes,
       });
-    } catch (error) {
-      setError(getErrorMessage(error));
+    } catch (err) {
+      error = getErrorMessage(err);
     }
 
     if (meal != null && isCreate) {
       navigate(`/meals/edit/${meal.id}`, { replace: true });
     }
+
+    setContext({
+      busy: false,
+      error: error,
+    });
+  };
+
+  const onDelete = async function () {
+    setContext({
+      busy: true,
+      error: null,
+    });
+
+    let deleted = false;
+    let error = null;
+    try {
+      deleted = await deleteMeal(id ?? "");
+    } catch (err) {
+      error = getErrorMessage(err);
+    }
+
+    if (deleted) {
+      navigate("/meals", { replace: true });
+    }
+
+    setContext({
+      busy: false,
+      error: error,
+    });
   };
 
   useEffect(() => {
     (async () => {
+      let error = null;
       if (id != null) {
         try {
           const meal = await retrieveMeal(id);
@@ -69,15 +121,19 @@ export default function MealEdit() {
             name: meal.name,
             notes: meal.notes ?? "",
           });
-        } catch (error) {
-          setError(getErrorMessage(error));
+        } catch (err) {
+          error = getErrorMessage(err);
         }
       }
+      setContext({
+        busy: false,
+        error: error,
+      });
     })();
   }, [formMethods, id]);
 
   return (
-    <Page busy={formMethods.formState.isSubmitting} error={error}>
+    <Page busy={context.busy} error={context.error}>
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
           <Box
@@ -95,13 +151,9 @@ export default function MealEdit() {
             <Button
               variant="contained"
               type="submit"
-              disabled={formMethods.formState.isSubmitting || error != null}
+              disabled={context.busy || context.error != null}
             >
-              {formMethods.formState.isSubmitting
-                ? "Processing..."
-                : isCreate
-                ? "Create"
-                : "Update"}
+              {isCreate ? "Create" : "Update"}
             </Button>
           </Box>
 
@@ -136,6 +188,32 @@ export default function MealEdit() {
           </Card>
         </form>
       </FormProvider>
+      {!isCreate ? (
+        <div>
+          <Button
+            variant="outlined"
+            color="error"
+            sx={{ mt: 2 }}
+            onClick={() => setConfirmDelete(true)}
+            disabled={context.busy || context.error != null}
+          >
+            DELETE
+          </Button>
+          <Dialog maxWidth="sm" fullWidth={true} open={confirmDelete}>
+            <DialogTitle>Delete meal?</DialogTitle>
+            <DialogActions>
+              <Button color="info" onClick={() => setConfirmDelete(false)}>
+                Cancel
+              </Button>
+              <Button color="error" onClick={onDelete}>
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </div>
+      ) : (
+        <div></div>
+      )}
     </Page>
   );
 }
