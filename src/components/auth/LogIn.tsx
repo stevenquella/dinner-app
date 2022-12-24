@@ -1,11 +1,11 @@
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import Page from "../../Page";
 import signIn from "../../providers/authProvider";
 import { getErrorMessage } from "../../providers/helpers";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
+import Page from "../Page";
 
 type LogInInputs = {
   email: string;

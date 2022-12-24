@@ -15,3 +15,13 @@ export default async function signIn(
     return true;
   }
 }
+
+export async function signOut(): Promise<boolean> {
+  const response = await supabase.auth.signOut();
+
+  if (response.error != null) {
+    throw new Error(response.error.message);
+  } else {
+    return true;
+  }
+}

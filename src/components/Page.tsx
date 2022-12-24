@@ -6,8 +6,8 @@ export type PageProps = PageContext & {
 };
 
 export type PageContext = {
-  busy: boolean;
-  error: string | null;
+  busy?: boolean;
+  error?: string | null;
 };
 
 const pageContext = createContext<PageContext | null>(null);
