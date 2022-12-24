@@ -85,8 +85,8 @@ export default function MealEdit() {
               display: "flex",
               flexDirection: "column",
               alignItems: "start",
-              rowGap: 2,
-              p: 1,
+              rowGap: 1,
+              pb: 2,
             }}
           >
             <Typography variant="h5">

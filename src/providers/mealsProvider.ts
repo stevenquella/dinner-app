@@ -6,7 +6,7 @@ export type MealInsert = Database["public"]["Tables"]["meal"]["Insert"];
 export type Meal = Database["public"]["Tables"]["meal"]["Row"];
 
 export async function retrieveMeals(): Promise<Meal[]> {
-  const response = await supabase.from(meal_table).select();
+  const response = await supabase.from(meal_table).select().order("name");
   return ensureSuccess(response);
 }
 

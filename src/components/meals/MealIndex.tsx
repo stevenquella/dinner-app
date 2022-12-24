@@ -1,4 +1,12 @@
-import { Link } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardActionArea,
+  CardContent,
+  Link,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { getErrorMessage } from "../../providers/helpers";
@@ -31,19 +39,37 @@ export default function MealIndex() {
 
   return (
     <Page {...context}>
-      <div>MEALS</div>
-      <Link component={RouterLink} to="/meals/edit">
-        CREATE MEAL
-      </Link>
-      <div>
-        {meals.map((x) => (
-          <div>
-            <Link component={RouterLink} to={`/meals/edit/${x.id}`}>
-              {x.name}
-            </Link>
-          </div>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "start",
+          rowGap: 1,
+          pb: 2,
+        }}
+      >
+        <Typography variant="h5">Meals</Typography>
+        <Link component={RouterLink} to="/meals/edit">
+          <Button variant="contained" size="small">
+            Create Meal
+          </Button>
+        </Link>
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: "column", rowGap: 1 }}>
+        {meals.map((meal) => (
+          <Link
+            component={RouterLink}
+            to={`/meals/edit/${meal.id}`}
+            underline="none"
+          >
+            <Card sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <CardActionArea>
+                <CardContent>{meal.name}</CardContent>
+              </CardActionArea>
+            </Card>
+          </Link>
         ))}
-      </div>
+      </Box>
     </Page>
   );
 }
