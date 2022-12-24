@@ -1,13 +1,14 @@
 import { Link } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
+import Page from "../Page";
 
 export default function MealIndex() {
   return (
-    <div>
-      MEALS
+    <Page>
+      <div>MEALS</div>
       <Link component={RouterLink} to="/meals/edit">
         CREATE MEAL
       </Link>
-    </div>
+    </Page>
   );
 }

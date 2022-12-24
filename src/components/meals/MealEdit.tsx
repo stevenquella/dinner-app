@@ -1,4 +1,5 @@
-import { Button, Card, CardContent, Grid, Typography } from "@mui/material";
+import { Button, Card, CardContent, Typography } from "@mui/material";
+import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -7,6 +8,7 @@ import { getErrorMessage } from "../../providers/helpers";
 import { retrieveMeal, upsertMeal } from "../../providers/mealsProvider";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
+import Page from "../Page";
 
 type MealInputs = {
   name: string;
@@ -15,6 +17,15 @@ type MealInputs = {
 
 type MealValidation = {
   [prop in keyof MealInputs]?: InputValidation;
+};
+
+const formValidation: MealValidation = {
+  name: {
+    required: {
+      value: true,
+      message: "Name is required.",
+    },
+  },
 };
 
 export default function MealEdit() {
@@ -28,14 +39,6 @@ export default function MealEdit() {
       notes: "",
     },
   });
-  const formValidation: MealValidation = {
-    name: {
-      required: {
-        value: true,
-        message: "Name is required.",
-      },
-    },
-  };
 
   const isCreate: boolean = !(id != null);
 
@@ -74,83 +77,65 @@ export default function MealEdit() {
   }, [formMethods, id]);
 
   return (
-    <div>
+    <Page busy={formMethods.formState.isSubmitting} error={error}>
       <FormProvider {...formMethods}>
         <form onSubmit={formMethods.handleSubmit(onSubmit)}>
-          <Grid container direction="column" sx={{ p: 1 }} rowSpacing={2}>
-            <Grid item>
-              <Typography variant="h5">
-                {isCreate ? "Create Meal" : "Edit Meal"}
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="contained"
-                type="submit"
-                disabled={formMethods.formState.isSubmitting || error != null}
-              >
-                {formMethods.formState.isSubmitting
-                  ? "Processing..."
-                  : isCreate
-                  ? "Create"
-                  : "Update"}
-              </Button>
-            </Grid>
-          </Grid>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "start",
+              rowGap: 2,
+              p: 1,
+            }}
+          >
+            <Typography variant="h5">
+              {isCreate ? "Create Meal" : "Edit Meal"}
+            </Typography>
+            <Button
+              variant="contained"
+              type="submit"
+              disabled={formMethods.formState.isSubmitting || error != null}
+            >
+              {formMethods.formState.isSubmitting
+                ? "Processing..."
+                : isCreate
+                ? "Create"
+                : "Update"}
+            </Button>
+          </Box>
+
           <Card>
             <CardContent>
-              <Grid
-                container
-                direction="column"
-                alignItems="stretch"
-                rowSpacing={1}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  rowGap: 1,
+                }}
               >
-                <Grid item>
-                  <Typography variant="body1">Summary</Typography>
-                </Grid>
-                <Grid item>
-                  <TextInput
-                    name="name"
-                    label="Name"
-                    rules={formValidation.name}
-                  />
-                </Grid>
-                <Grid item>
-                  <TextInput name="notes" label="Notes" multiline rows={10} />
-                </Grid>
-              </Grid>
+                <Typography variant="body1">Summary</Typography>
+                <TextInput
+                  name="name"
+                  label="Name"
+                  rules={formValidation.name}
+                />
+                <TextInput name="notes" label="Notes" multiline rows={10} />
+              </Box>
             </CardContent>
           </Card>
           <Card sx={{ mt: 1 }}>
             <CardContent>
-              <Grid
-                container
-                direction="column"
-                alignItems="stretch"
-                rowSpacing={1}
-              >
-                <Grid item>
-                  <Typography variant="body1">Groceries</Typography>
-                </Grid>
-              </Grid>
+              <Typography variant="body1">Groceries</Typography>
             </CardContent>
           </Card>
           <Card sx={{ mt: 1 }}>
             <CardContent>
-              <Grid
-                container
-                direction="column"
-                alignItems="stretch"
-                rowSpacing={1}
-              >
-                <Grid item>
-                  <Typography variant="body1">Tags</Typography>
-                </Grid>
-              </Grid>
+              <Typography variant="body1">Tags</Typography>
             </CardContent>
           </Card>
         </form>
       </FormProvider>
-    </div>
+    </Page>
   );
 }
