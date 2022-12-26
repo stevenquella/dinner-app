@@ -11,6 +11,8 @@ import { useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { getErrorMessage } from "../../providers/helpers";
 import { Meal, retrieveMeals } from "../../providers/mealsProvider";
+import SearchInput from "../inputs/SearchInput";
+import HighlightText from "../items/HighlightText";
 import Page, { PageContext } from "../Page";
 
 export default function MealIndex() {
@@ -19,12 +21,18 @@ export default function MealIndex() {
     error: null,
   });
   const [meals, setMeals] = useState<Meal[]>([]);
+  const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
     (async () => {
+      setContext({
+        busy: true,
+        error: null,
+      });
+
       let error: string | null = null;
       try {
-        const meals = await retrieveMeals();
+        const meals = await retrieveMeals(search);
         setMeals(meals);
       } catch (err) {
         error = getErrorMessage(err);
@@ -35,7 +43,7 @@ export default function MealIndex() {
         error: error,
       });
     })();
-  }, []);
+  }, [search]);
 
   return (
     <Page {...context}>
@@ -54,17 +62,27 @@ export default function MealIndex() {
             Create Meal
           </Button>
         </Link>
+        <SearchInput
+          name="search"
+          placeholder="Search meals..."
+          onChange={setSearch}
+        />
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 1 }}>
         {meals.map((meal) => (
           <Link
+            key={meal.id}
             component={RouterLink}
             to={`/meals/edit/${meal.id}`}
             underline="none"
           >
             <Card sx={{ borderBottom: 1, borderColor: "divider" }}>
               <CardActionArea>
-                <CardContent>{meal.name}</CardContent>
+                <CardContent>
+                  <Typography variant="body1">
+                    <HighlightText search={search} text={meal.name} />
+                  </Typography>
+                </CardContent>
               </CardActionArea>
             </Card>
           </Link>

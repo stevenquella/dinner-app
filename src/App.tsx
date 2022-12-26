@@ -4,6 +4,7 @@ import { Outlet, useOutletContext } from "react-router-dom";
 import LogIn from "./components/auth/LogIn";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
+import ScrollTop from "./components/ScrollTop";
 import { supabase } from "./providers/client";
 
 export type AppContext = {
@@ -34,6 +35,7 @@ export default function App() {
 
   return (
     <div>
+      <ScrollTop />
       <Header />
       <div>
         {session != null ? (

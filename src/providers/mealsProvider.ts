@@ -10,8 +10,13 @@ const meal_table = "meal";
 export type MealInsert = Database["public"]["Tables"]["meal"]["Insert"];
 export type Meal = Database["public"]["Tables"]["meal"]["Row"];
 
-export async function retrieveMeals(): Promise<Meal[]> {
-  const response = await supabase.from(meal_table).select().order("name");
+export async function retrieveMeals(search: string): Promise<Meal[]> {
+  let query = supabase.from(meal_table).select().order("name");
+  if (search) {
+    query = query.ilike("name", `%${search}%`);
+  }
+
+  const response = await query;
   return ensureSuccess(response);
 }
 
