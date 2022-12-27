@@ -72,26 +72,6 @@ export interface Database {
           order?: number | null
         }
       }
-      meal_tag: {
-        Row: {
-          id: string
-          user_id: string
-          meal_id: string
-          tag_id: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          meal_id: string
-          tag_id: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          meal_id?: string
-          tag_id?: string
-        }
-      }
       plan: {
         Row: {
           id: string
@@ -156,23 +136,6 @@ export interface Database {
           plan_id?: string
           meal_id?: string
           order?: number | null
-        }
-      }
-      tag: {
-        Row: {
-          id: string
-          user_id: string
-          name: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          name: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          name?: string
         }
       }
     }
