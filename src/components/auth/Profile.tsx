@@ -6,12 +6,13 @@ import {
   Typography,
 } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
+import { useAtom } from "jotai";
 import { signOut } from "../../providers/providerAuth";
-import useStore from "../../providers/store";
+import { sessionAtom } from "../../providers/store";
 import Page from "../Page";
 
 export default function Profile() {
-  const session = useStore((state) => state.session);
+  const [session] = useAtom(sessionAtom);
   const logOutMutation = useMutation({
     mutationFn: () => signOut(),
   });

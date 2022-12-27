@@ -1,33 +1,7 @@
 import { Session } from "@supabase/supabase-js";
-import produce from "immer";
-import create from "zustand";
+import { atom } from "jotai";
 
-export type StoreState = {
-  // state
-  session: Session | null;
-  mealSearch: string;
+export const sessionAtom = atom<Session | null>(null);
+export const useridAtom = atom((get) => get(sessionAtom)?.user.id ?? "");
 
-  // action
-  setSession: (session: Session | null) => void;
-  setMealSearch: (search: string | null) => void;
-};
-
-const useStore = create<StoreState>((set) => ({
-  session: null,
-  mealSearch: "",
-
-  setSession: (sesh) =>
-    set(
-      produce((draft) => {
-        draft.session = sesh;
-      })
-    ),
-  setMealSearch: (val) =>
-    set(
-      produce((draft) => {
-        draft.mealSearch = val;
-      })
-    ),
-}));
-
-export default useStore;
+export const mealSearchAtom = atom<string>("");

@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAtom } from "jotai";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -18,7 +19,7 @@ import {
   retrieveMeal,
   upsertMeal,
 } from "../../providers/providerMeal";
-import useStore from "../../providers/store";
+import { useridAtom } from "../../providers/store";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 import Page, { combineStates, PageState } from "../Page";
@@ -46,7 +47,7 @@ export default function MealEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const session = useStore((state) => state.session);
+  const [userid] = useAtom(useridAtom);
 
   const isCreate: boolean = !(id != null);
 
@@ -71,7 +72,7 @@ export default function MealEdit() {
     mutationFn: (meal: MealInputs) =>
       upsertMeal({
         id: id,
-        user_id: session?.user.id ?? "",
+        user_id: userid,
         ...meal,
       }),
     onSuccess: ({ id }) => {
