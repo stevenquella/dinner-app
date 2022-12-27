@@ -1,6 +1,16 @@
+import { Session } from "@supabase/supabase-js";
 import { supabase } from "./client";
 
-export default async function signIn(
+export const authQueryKeys = {
+  session: "session",
+};
+
+export async function getSession(): Promise<Session | null> {
+  const latestSession = await supabase.auth.getSession();
+  return latestSession.data.session;
+}
+
+export async function signIn(
   email: string,
   password: string
 ): Promise<boolean> {

@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";
-import signIn, { signUp } from "../../providers/authProvider";
+import { signIn, signUp } from "../../providers/providerAuth";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 import Page, { combineStates } from "../Page";

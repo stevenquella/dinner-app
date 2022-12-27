@@ -6,12 +6,12 @@ import {
   Typography,
 } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import { useAppContext } from "../../App";
-import { signOut } from "../../providers/authProvider";
+import { signOut } from "../../providers/providerAuth";
+import useStore from "../../providers/store";
 import Page from "../Page";
 
 export default function Profile() {
-  const { session } = useAppContext();
+  const session = useStore((state) => state.session);
   const logOutMutation = useMutation({
     mutationFn: () => signOut(),
   });
@@ -21,7 +21,7 @@ export default function Profile() {
       <Card sx={{ p: 1 }}>
         <CardContent>
           <Typography variant="body1">
-            You are logged in as {session.user.email || "Huh?"}.
+            You are logged in as {session?.user.email ?? "Huh?"}.
           </Typography>
         </CardContent>
         <CardActions>

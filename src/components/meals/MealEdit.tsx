@@ -12,16 +12,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAppContext } from "../../App";
 import {
   deleteMeal,
   mealQueryKeys,
   retrieveMeal,
   upsertMeal,
-} from "../../providers/mealsProvider";
+} from "../../providers/providerMeal";
+import useStore from "../../providers/store";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 import Page, { combineStates, PageState } from "../Page";
+import ScrollTop from "../ScrollTop";
 
 type MealInputs = {
   name: string;
@@ -43,9 +44,9 @@ const formValidation: MealValidation = {
 
 export default function MealEdit() {
   const { id } = useParams();
-  const { session } = useAppContext();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const session = useStore((state) => state.session);
 
   const isCreate: boolean = !(id != null);
 
@@ -70,7 +71,7 @@ export default function MealEdit() {
     mutationFn: (meal: MealInputs) =>
       upsertMeal({
         id: id,
-        user_id: session.user.id,
+        user_id: session?.user.id ?? "",
         ...meal,
       }),
     onSuccess: ({ id }) => {
@@ -99,6 +100,7 @@ export default function MealEdit() {
 
   return (
     <Page {...pageState}>
+      <ScrollTop />
       <FormProvider {...formMethods}>
         <form
           onSubmit={formMethods.handleSubmit((x) =>

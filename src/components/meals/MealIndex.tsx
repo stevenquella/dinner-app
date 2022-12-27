@@ -10,7 +10,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { mealQueryKeys, retrieveMeals } from "../../providers/mealsProvider";
+import { mealQueryKeys, retrieveMeals } from "../../providers/providerMeal";
 import SearchInput from "../inputs/SearchInput";
 import HighlightText from "../items/HighlightText";
 import Page from "../Page";
