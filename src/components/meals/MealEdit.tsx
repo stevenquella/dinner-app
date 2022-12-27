@@ -153,11 +153,6 @@ export default function MealEdit() {
               <Typography variant="body1">Groceries</Typography>
             </CardContent>
           </Card>
-          <Card sx={{ mt: 1 }}>
-            <CardContent>
-              <Typography variant="body1">Tags</Typography>
-            </CardContent>
-          </Card>
         </form>
       </FormProvider>
       {!isCreate ? (
