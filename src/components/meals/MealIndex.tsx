@@ -52,7 +52,7 @@ export default function MealIndex() {
           <Link
             key={meal.id}
             component={RouterLink}
-            to={`/meals/edit/${meal.id}`}
+            to={`/meals/read/${meal.id}`}
             underline="none"
           >
             <Card sx={{ borderBottom: 1, borderColor: "divider" }}>

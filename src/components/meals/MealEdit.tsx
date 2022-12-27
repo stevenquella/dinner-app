@@ -79,7 +79,11 @@ export default function MealEdit() {
       queryClient.invalidateQueries({
         queryKey: [mealQueryKeys.meals],
       });
-      navigate(`/meals/edit/${id}`, { replace: true });
+      if (isCreate) {
+        navigate(`/meals/view/${id}`, { replace: true });
+      } else {
+        navigate(-1);
+      }
     },
   });
   const mealDeleteMutation = useMutation({
@@ -144,7 +148,7 @@ export default function MealEdit() {
                   label="Name"
                   rules={formValidation.name}
                 />
-                <TextInput name="notes" label="Notes" multiline rows={10} />
+                <TextInput name="notes" label="Notes" multiline rows={20} />
               </Box>
             </CardContent>
           </Card>
