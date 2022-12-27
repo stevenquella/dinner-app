@@ -5,29 +5,32 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
-import { useAppContext } from "../../App";
-import { supabase } from "../../providers/client";
+import { useMutation } from "@tanstack/react-query";
+import { useAtom } from "jotai";
+import { signOut } from "../../providers/providerAuth";
+import { sessionAtom } from "../../providers/store";
+import Page from "../Page";
 
 export default function Profile() {
-  const { session } = useAppContext();
-
-  const onLogout: React.MouseEventHandler<HTMLButtonElement> = async (e) => {
-    e.preventDefault();
-    await supabase.auth.signOut();
-  };
+  const [session] = useAtom(sessionAtom);
+  const logOutMutation = useMutation({
+    mutationFn: () => signOut(),
+  });
 
   return (
-    <Card sx={{ p: 1 }}>
-      <CardContent>
-        <Typography variant="body1">
-          You are logged in as {session.user.email || "N/A"}.
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Button color="error" onClick={onLogout}>
-          LOG OUT
-        </Button>
-      </CardActions>
-    </Card>
+    <Page {...logOutMutation}>
+      <Card sx={{ p: 1 }}>
+        <CardContent>
+          <Typography variant="body1">
+            You are logged in as {session?.user.email ?? "Huh?"}.
+          </Typography>
+        </CardContent>
+        <CardActions>
+          <Button color="error" onClick={() => logOutMutation.mutate()}>
+            LOG OUT
+          </Button>
+        </CardActions>
+      </Card>
+    </Page>
   );
 }

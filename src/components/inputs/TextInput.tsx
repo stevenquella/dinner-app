@@ -1,19 +1,20 @@
-import { FormControl, FormHelperText, Input, InputLabel } from "@mui/material";
+import {
+  FilledInput,
+  FormControl,
+  FormHelperText,
+  InputLabel,
+} from "@mui/material";
 import { Controller } from "react-hook-form";
+import { InputValidation } from "./types";
 
 export type TextInputProps = {
   name: string;
   label: string;
-  type: string;
-  autocomplete: string;
+  multiline?: boolean;
+  rows?: number;
+  type?: string;
+  autocomplete?: string;
   rules?: InputValidation;
-};
-
-export type InputValidation = {
-  required?: {
-    value: boolean;
-    message: string;
-  };
 };
 
 export default function TextInput(props: TextInputProps) {
@@ -23,15 +24,17 @@ export default function TextInput(props: TextInputProps) {
       rules={props.rules}
       render={(item) => (
         <FormControl
-          variant="standard"
+          variant="filled"
           error={item.fieldState.error != null}
           fullWidth
         >
           <InputLabel htmlFor="component-error">{props.label}</InputLabel>
-          <Input
+          <FilledInput
             id={props.name}
             value={item.field.value}
-            type={props.type}
+            type={props.type ?? "text"}
+            multiline={props.multiline}
+            rows={props.rows}
             autoComplete={props.autocomplete}
             onChange={item.field.onChange}
             onBlur={item.field.onBlur}

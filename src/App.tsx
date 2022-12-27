@@ -1,43 +1,43 @@
-import { Container } from "@mui/material";
-import { Session } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
-import { Outlet, useOutletContext } from "react-router-dom";
+import { LinearProgress } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import { useAtom } from "jotai";
+import { useEffect } from "react";
+import { Outlet } from "react-router-dom";
 import LogIn from "./components/auth/LogIn";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { supabase } from "./providers/client";
-
-export type AppContext = {
-  session: Session;
-};
-
-export function useAppContext() {
-  return useOutletContext<AppContext>();
-}
+import { authQueryKeys, getSession } from "./providers/providerAuth";
+import { sessionAtom } from "./providers/store";
 
 export default function App() {
-  const [session, setSession] = useState<Session | null>();
-
-  const refreshSession = async () => {
-    const latestSession = await supabase.auth.getSession();
-    setSession(latestSession.data.session);
-  };
-
+  const [session, setSession] = useAtom(sessionAtom);
+  const sessionQuery = useQuery({
+    queryKey: [authQueryKeys.session],
+    queryFn: () => getSession(),
+    onSuccess: (sesh) => setSession(sesh),
+    cacheTime: 0,
+  });
   useEffect(() => {
-    refreshSession();
-
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
-  }, []);
+  }, [setSession]);
+
+  let app = null;
+  if (sessionQuery.isLoading) {
+    app = <LinearProgress color="secondary" />;
+  } else if (session != null) {
+    app = <Outlet />;
+  } else {
+    app = <LogIn />;
+  }
 
   return (
     <div>
       <Header />
-      <Container fixed sx={{ py: 2 }}>
-        {session != null ? <Outlet context={{ session }} /> : <LogIn />}
-      </Container>
-      <Footer />
+      {app}
+      {session != null ? <Footer /> : null}
     </div>
   );
 }

@@ -1,7 +1,10 @@
-import { Button, Card, CardContent, Grid, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Typography } from "@mui/material";
+import { useMutation } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";
-import { supabase } from "../../providers/client";
-import TextInput, { InputValidation } from "../inputs/TextInput";
+import { signIn, signUp } from "../../providers/providerAuth";
+import TextInput from "../inputs/TextInput";
+import { InputValidation } from "../inputs/types";
+import Page, { combineStates } from "../Page";
 
 type LogInInputs = {
   email: string;
@@ -12,6 +15,21 @@ type LogInValidation = {
   [prop in keyof LogInInputs]?: InputValidation;
 };
 
+const formValidation: LogInValidation = {
+  email: {
+    required: {
+      value: true,
+      message: "Email is required.",
+    },
+  },
+  password: {
+    required: {
+      value: true,
+      message: "Password is required.",
+    },
+  },
+};
+
 export default function LogIn() {
   const formMethods = useForm<LogInInputs>({
     defaultValues: {
@@ -19,44 +37,37 @@ export default function LogIn() {
       password: "",
     },
   });
-  const formValidation: LogInValidation = {
-    email: {
-      required: {
-        value: true,
-        message: "Email is required.",
-      },
-    },
-    password: {
-      required: {
-        value: true,
-        message: "Password is required.",
-      },
-    },
-  };
+  const loginMutation = useMutation({
+    mutationFn: (data: LogInInputs) => signIn(data.email, data.password),
+  });
+  const signupMutation = useMutation({
+    mutationFn: (data: LogInInputs) => signUp(data.email, data.password),
+  });
 
-  const onLogin = async (data: LogInInputs) => {
-    await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
-  };
+  const pageState = combineStates([loginMutation, signupMutation]);
 
   return (
-    <Card>
-      <CardContent>
-        <Typography variant="body1" padding={1}>
-          You are NOT logged in.
-        </Typography>
-        <FormProvider {...formMethods}>
-          <form onSubmit={formMethods.handleSubmit(onLogin)}>
-            <Grid
-              container
-              direction="column"
-              alignItems="stretch"
-              padding={1}
-              rowSpacing={2}
+    <Page {...pageState}>
+      <Card>
+        <CardContent>
+          <Typography variant="body1" padding={1}>
+            Log In
+          </Typography>
+          <FormProvider {...formMethods}>
+            <form
+              onSubmit={formMethods.handleSubmit((x) =>
+                loginMutation.mutate(x)
+              )}
             >
-              <Grid item>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "stretch",
+                  rowGap: 2,
+                  p: 1,
+                }}
+              >
                 <TextInput
                   name="email"
                   label="Email"
@@ -64,8 +75,6 @@ export default function LogIn() {
                   autocomplete="email"
                   rules={formValidation.email}
                 />
-              </Grid>
-              <Grid item>
                 <TextInput
                   name="password"
                   label="Password"
@@ -73,23 +82,39 @@ export default function LogIn() {
                   autocomplete="current-password"
                   rules={formValidation.password}
                 />
-              </Grid>
-
-              <Grid item>
-                <Button
-                  variant="contained"
-                  type="submit"
-                  disabled={formMethods.formState.isSubmitting}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    columnGap: 1,
+                  }}
                 >
-                  {formMethods.formState.isSubmitting
-                    ? "Logging in..."
-                    : "LOG IN"}
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </FormProvider>
-      </CardContent>
-    </Card>
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    disabled={pageState.isLoading}
+                  >
+                    LOG IN
+                  </Button>
+                  <Typography variant="body1">OR</Typography>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    type="button"
+                    disabled={pageState.isLoading}
+                    onClick={formMethods.handleSubmit((x) =>
+                      signupMutation.mutate(x)
+                    )}
+                  >
+                    SIGN UP
+                  </Button>
+                </Box>
+              </Box>
+            </form>
+          </FormProvider>
+        </CardContent>
+      </Card>
+    </Page>
   );
 }

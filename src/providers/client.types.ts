@@ -9,24 +9,133 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      meal: {
+      grocery: {
         Row: {
           id: string
-          created_on: string | null
-          name: string
           user_id: string
+          category: string
+          name: string
         }
         Insert: {
           id?: string
-          created_on?: string | null
-          name: string
           user_id: string
+          category: string
+          name: string
         }
         Update: {
           id?: string
-          created_on?: string | null
+          user_id?: string
+          category?: string
+          name?: string
+        }
+      }
+      meal: {
+        Row: {
+          id: string
+          name: string
+          user_id: string
+          notes: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          user_id: string
+          notes?: string | null
+        }
+        Update: {
+          id?: string
           name?: string
           user_id?: string
+          notes?: string | null
+        }
+      }
+      meal_grocery: {
+        Row: {
+          id: string
+          user_id: string
+          meal_id: string
+          grocery_id: string
+          order: number | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          meal_id: string
+          grocery_id: string
+          order?: number | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          meal_id?: string
+          grocery_id?: string
+          order?: number | null
+        }
+      }
+      plan: {
+        Row: {
+          id: string
+          user_id: string
+          date: string
+          notes: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          date: string
+          notes?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          date?: string
+          notes?: string | null
+        }
+      }
+      plan_grocery: {
+        Row: {
+          id: string
+          user_id: string
+          plan_id: string
+          grocery_id: string
+          count: number
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          plan_id: string
+          grocery_id: string
+          count?: number
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          plan_id?: string
+          grocery_id?: string
+          count?: number
+        }
+      }
+      plan_meal: {
+        Row: {
+          id: string
+          user_id: string
+          plan_id: string
+          meal_id: string
+          order: number | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          plan_id: string
+          meal_id: string
+          order?: number | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          plan_id?: string
+          meal_id?: string
+          order?: number | null
         }
       }
     }

@@ -13,8 +13,15 @@ export default function Footer() {
 
   return (
     <Paper
-      sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
-      elevation={3}
+      sx={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 99,
+        borderTop: 1,
+        borderColor: "divider",
+      }}
     >
       <BottomNavigation
         showLabels
