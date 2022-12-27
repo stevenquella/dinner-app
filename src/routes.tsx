@@ -5,6 +5,7 @@ import Error from "./components/Error";
 import MealEdit from "./components/meals/MealEdit";
 import MealIndex from "./components/meals/MealIndex";
 import MealRead from "./components/meals/MealRead";
+import PlanEdit from "./components/plans/PlanEdit";
 import PlanIndex from "./components/plans/PlanIndex";
 
 export const routes: RouteObject[] = [
@@ -18,6 +19,10 @@ export const routes: RouteObject[] = [
         element: <PlanIndex />,
       },
       {
+        path: "plans/edit/:id?",
+        element: <PlanEdit />,
+      },
+      {
         path: "meals",
         element: <MealIndex />,
       },
@@ -26,7 +31,7 @@ export const routes: RouteObject[] = [
         element: <MealEdit />,
       },
       {
-        path: "meals/read/:id?",
+        path: "meals/read/:id",
         element: <MealRead />,
       },
       {
