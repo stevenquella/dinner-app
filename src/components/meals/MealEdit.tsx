@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -20,7 +21,7 @@ import {
 } from "../../providers/mealsProvider";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
-import Page, { PageContext } from "../Page";
+import Page from "../Page";
 
 type MealInputs = {
   name: string;
@@ -46,16 +47,21 @@ export default function MealEdit() {
   const navigate = useNavigate();
 
   const isCreate: boolean = !(id != null);
-  const [context, setContext] = useState<PageContext>({
-    busy: true,
-    error: null,
-  });
+
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
   const formMethods = useForm<MealInputs>({
     defaultValues: {
       name: "",
       notes: "",
     },
+  });
+  const mealMutation = useMutation({
+    mutationFn: (meal: MealInputs) =>
+      upsertMeal({
+        id: id,
+        user_id: session.user.id,
+        ...meal,
+      }),
   });
 
   const onSubmit = async function (inputs: MealInputs) {

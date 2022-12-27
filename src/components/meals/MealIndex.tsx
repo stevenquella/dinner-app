@@ -7,46 +7,23 @@ import {
   Link,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { getErrorMessage } from "../../providers/helpers";
-import { Meal, retrieveMeals } from "../../providers/mealsProvider";
+import { mealQueries, retrieveMeals } from "../../providers/mealsProvider";
 import SearchInput from "../inputs/SearchInput";
 import HighlightText from "../items/HighlightText";
-import Page, { PageContext } from "../Page";
+import Page from "../Page";
 
 export default function MealIndex() {
-  const [context, setContext] = useState<PageContext>({
-    busy: true,
-    error: null,
-  });
-  const [meals, setMeals] = useState<Meal[]>([]);
   const [search, setSearch] = useState<string>("");
-
-  useEffect(() => {
-    (async () => {
-      setContext({
-        busy: true,
-        error: null,
-      });
-
-      let error: string | null = null;
-      try {
-        const meals = await retrieveMeals(search);
-        setMeals(meals);
-      } catch (err) {
-        error = getErrorMessage(err);
-      }
-
-      setContext({
-        busy: false,
-        error: error,
-      });
-    })();
-  }, [search]);
+  const meals = useQuery({
+    queryKey: [mealQueries.meals, search],
+    queryFn: () => retrieveMeals(search),
+  });
 
   return (
-    <Page {...context}>
+    <Page {...meals}>
       <Box
         sx={{
           display: "flex",
@@ -69,7 +46,7 @@ export default function MealIndex() {
         />
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 1 }}>
-        {meals.map((meal) => (
+        {meals.data?.map((meal) => (
           <Link
             key={meal.id}
             component={RouterLink}
@@ -88,7 +65,7 @@ export default function MealIndex() {
           </Link>
         ))}
       </Box>
-      {meals.length === 0 ? (
+      {meals.data?.length === 0 ? (
         <Typography variant="body1">No meals found.</Typography>
       ) : (
         <span></span>
