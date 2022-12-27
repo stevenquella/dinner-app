@@ -1,11 +1,10 @@
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";
 import signIn, { signUp } from "../../providers/authProvider";
-import { getErrorMessage } from "../../providers/helpers";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
-import Page from "../Page";
+import Page, { combineStates } from "../Page";
 
 type LogInInputs = {
   email: string;
@@ -32,44 +31,34 @@ const formValidation: LogInValidation = {
 };
 
 export default function LogIn() {
-  const [error, setError] = useState<string | null>(null);
-
   const formMethods = useForm<LogInInputs>({
     defaultValues: {
       email: "",
       password: "",
     },
   });
+  const loginMutation = useMutation({
+    mutationFn: (data: LogInInputs) => signIn(data.email, data.password),
+  });
+  const signupMutation = useMutation({
+    mutationFn: (data: LogInInputs) => signUp(data.email, data.password),
+  });
 
-  const onLogin = async (data: LogInInputs) => {
-    setError(null);
-
-    try {
-      await signIn(data.email, data.password);
-    } catch (error) {
-      setError(getErrorMessage(error));
-    }
-  };
-
-  const onSignUp = async (data: LogInInputs) => {
-    setError(null);
-
-    try {
-      await signUp(data.email, data.password);
-    } catch (error) {
-      setError(getErrorMessage(error));
-    }
-  };
+  const pageState = combineStates([loginMutation, signupMutation]);
 
   return (
-    <Page busy={formMethods.formState.isSubmitting} error={error}>
+    <Page {...pageState}>
       <Card>
         <CardContent>
           <Typography variant="body1" padding={1}>
             Log In
           </Typography>
           <FormProvider {...formMethods}>
-            <form onSubmit={formMethods.handleSubmit(onLogin)}>
+            <form
+              onSubmit={formMethods.handleSubmit((x) =>
+                loginMutation.mutate(x)
+              )}
+            >
               <Box
                 sx={{
                   display: "flex",
@@ -104,7 +93,7 @@ export default function LogIn() {
                   <Button
                     variant="contained"
                     type="submit"
-                    disabled={formMethods.formState.isSubmitting}
+                    disabled={pageState.isLoading}
                   >
                     LOG IN
                   </Button>
@@ -113,8 +102,10 @@ export default function LogIn() {
                     variant="contained"
                     color="secondary"
                     type="button"
-                    disabled={formMethods.formState.isSubmitting}
-                    onClick={formMethods.handleSubmit(onSignUp)}
+                    disabled={pageState.isLoading}
+                    onClick={formMethods.handleSubmit((x) =>
+                      signupMutation.mutate(x)
+                    )}
                   >
                     SIGN UP
                   </Button>

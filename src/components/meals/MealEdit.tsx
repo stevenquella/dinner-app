@@ -8,20 +8,20 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppContext } from "../../App";
-import { getErrorMessage } from "../../providers/helpers";
 import {
   deleteMeal,
+  mealQueryKeys,
   retrieveMeal,
   upsertMeal,
 } from "../../providers/mealsProvider";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
-import Page from "../Page";
+import Page, { combineStates, PageState } from "../Page";
 
 type MealInputs = {
   name: string;
@@ -44,6 +44,7 @@ const formValidation: MealValidation = {
 export default function MealEdit() {
   const { id } = useParams();
   const { session } = useAppContext();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const isCreate: boolean = !(id != null);
@@ -55,93 +56,55 @@ export default function MealEdit() {
       notes: "",
     },
   });
-  const mealMutation = useMutation({
+  const mealQuery = useQuery({
+    queryKey: [mealQueryKeys.meal, id],
+    queryFn: () => retrieveMeal(id ?? ""),
+    onSuccess: (meal) =>
+      formMethods.reset({
+        name: meal.name,
+        notes: meal.notes ?? "",
+      }),
+    enabled: !isCreate,
+  });
+  const mealUpsertMutation = useMutation({
     mutationFn: (meal: MealInputs) =>
       upsertMeal({
         id: id,
         user_id: session.user.id,
         ...meal,
       }),
+    onSuccess: ({ id }) => {
+      queryClient.invalidateQueries({
+        queryKey: [mealQueryKeys.meals],
+      });
+      navigate(`/meals/edit/${id}`, { replace: true });
+    },
+  });
+  const mealDeleteMutation = useMutation({
+    mutationFn: () => deleteMeal(id ?? ""),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [mealQueryKeys.meals],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [mealQueryKeys.meal, id],
+      });
+      navigate("/meals", { replace: true });
+    },
   });
 
-  const onSubmit = async function (inputs: MealInputs) {
-    setContext({
-      busy: true,
-      error: null,
-    });
-
-    let meal = null;
-    let error = null;
-    try {
-      meal = await upsertMeal({
-        id: id,
-        user_id: session.user.id,
-        name: inputs.name,
-        notes: inputs.notes,
-      });
-    } catch (err) {
-      error = getErrorMessage(err);
-    }
-
-    if (meal != null && isCreate) {
-      navigate(`/meals/edit/${meal.id}`, { replace: true });
-    }
-
-    setContext({
-      busy: false,
-      error: error,
-    });
-  };
-
-  const onDelete = async function () {
-    setContext({
-      busy: true,
-      error: null,
-    });
-
-    let deleted = false;
-    let error = null;
-    try {
-      deleted = await deleteMeal(id ?? "");
-    } catch (err) {
-      error = getErrorMessage(err);
-    }
-
-    if (deleted) {
-      navigate("/meals", { replace: true });
-    }
-
-    setContext({
-      busy: false,
-      error: error,
-    });
-  };
-
-  useEffect(() => {
-    (async () => {
-      let error = null;
-      if (id != null) {
-        try {
-          const meal = await retrieveMeal(id);
-          formMethods.reset({
-            name: meal.name,
-            notes: meal.notes ?? "",
-          });
-        } catch (err) {
-          error = getErrorMessage(err);
-        }
-      }
-      setContext({
-        busy: false,
-        error: error,
-      });
-    })();
-  }, [formMethods, id]);
+  const pageState: PageState = isCreate
+    ? combineStates([mealUpsertMutation])
+    : combineStates([mealQuery, mealUpsertMutation, mealDeleteMutation]);
 
   return (
-    <Page busy={context.busy} error={context.error}>
+    <Page {...pageState}>
       <FormProvider {...formMethods}>
-        <form onSubmit={formMethods.handleSubmit(onSubmit)}>
+        <form
+          onSubmit={formMethods.handleSubmit((x) =>
+            mealUpsertMutation.mutate(x)
+          )}
+        >
           <Box
             sx={{
               display: "flex",
@@ -157,7 +120,7 @@ export default function MealEdit() {
             <Button
               variant="contained"
               type="submit"
-              disabled={context.busy || context.error != null}
+              disabled={pageState.isLoading || mealQuery.isError}
             >
               {isCreate ? "Create" : "Update"}
             </Button>
@@ -201,7 +164,7 @@ export default function MealEdit() {
             color="error"
             sx={{ mt: 2 }}
             onClick={() => setConfirmDelete(true)}
-            disabled={context.busy || context.error != null}
+            disabled={pageState.isLoading || pageState.isError}
           >
             DELETE
           </Button>
@@ -211,7 +174,7 @@ export default function MealEdit() {
               <Button color="info" onClick={() => setConfirmDelete(false)}>
                 Cancel
               </Button>
-              <Button color="error" onClick={onDelete}>
+              <Button color="error" onClick={() => mealDeleteMutation.mutate()}>
                 Delete
               </Button>
             </DialogActions>

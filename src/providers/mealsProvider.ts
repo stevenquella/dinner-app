@@ -10,7 +10,7 @@ const meal_table = "meal";
 export type MealInsert = Database["public"]["Tables"]["meal"]["Insert"];
 export type Meal = Database["public"]["Tables"]["meal"]["Row"];
 
-export const mealQueries = {
+export const mealQueryKeys = {
   meals: "meals",
   meal: "meal",
 };

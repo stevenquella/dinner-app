@@ -5,42 +5,19 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useAppContext } from "../../App";
 import { signOut } from "../../providers/authProvider";
-import { getErrorMessage } from "../../providers/helpers";
-import Page, { PageContext } from "../Page";
+import Page from "../Page";
 
 export default function Profile() {
-  const [context, setContext] = useState<PageContext>({
-    busy: false,
-    error: null,
-  });
   const { session } = useAppContext();
-
-  const onLogout: React.MouseEventHandler<HTMLButtonElement> = async (e) => {
-    e.preventDefault();
-
-    setContext({
-      busy: true,
-      error: null,
-    });
-
-    let error: string | null = null;
-    try {
-      await signOut();
-    } catch (err) {
-      error = getErrorMessage(err);
-    }
-
-    setContext({
-      busy: false,
-      error: error,
-    });
-  };
+  const logOutMutation = useMutation({
+    mutationFn: () => signOut(),
+  });
 
   return (
-    <Page {...context}>
+    <Page {...logOutMutation}>
       <Card sx={{ p: 1 }}>
         <CardContent>
           <Typography variant="body1">
@@ -48,7 +25,7 @@ export default function Profile() {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button color="error" onClick={onLogout}>
+          <Button color="error" onClick={() => logOutMutation.mutate()}>
             LOG OUT
           </Button>
         </CardActions>

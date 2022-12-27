@@ -10,7 +10,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { mealQueries, retrieveMeals } from "../../providers/mealsProvider";
+import { mealQueryKeys, retrieveMeals } from "../../providers/mealsProvider";
 import SearchInput from "../inputs/SearchInput";
 import HighlightText from "../items/HighlightText";
 import Page from "../Page";
@@ -18,7 +18,7 @@ import Page from "../Page";
 export default function MealIndex() {
   const [search, setSearch] = useState<string>("");
   const meals = useQuery({
-    queryKey: [mealQueries.meals, search],
+    queryKey: [mealQueryKeys.meals, search],
     queryFn: () => retrieveMeals(search),
   });
 
