@@ -8,18 +8,21 @@ import {
   Typography,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { mealQueryKeys, retrieveMeals } from "../../providers/providerMeal";
+import useStore from "../../providers/store";
 import SearchInput from "../inputs/SearchInput";
 import HighlightText from "../items/HighlightText";
 import Page from "../Page";
 
 export default function MealIndex() {
-  const [search, setSearch] = useState<string>("");
+  const [mealSearch, setMealSearch] = useStore((state) => [
+    state.mealSearch,
+    state.setMealSearch,
+  ]);
   const meals = useQuery({
-    queryKey: [mealQueryKeys.meals, search],
-    queryFn: () => retrieveMeals(search),
+    queryKey: [mealQueryKeys.meals, mealSearch],
+    queryFn: () => retrieveMeals(mealSearch),
   });
 
   return (
@@ -42,7 +45,8 @@ export default function MealIndex() {
         <SearchInput
           name="search"
           placeholder="Search meals..."
-          onChange={setSearch}
+          defaultValue={mealSearch}
+          onChange={setMealSearch}
         />
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 1 }}>
@@ -57,7 +61,7 @@ export default function MealIndex() {
               <CardActionArea>
                 <CardContent>
                   <Typography variant="body1">
-                    <HighlightText search={search} text={meal.name} />
+                    <HighlightText search={mealSearch} text={meal.name} />
                   </Typography>
                 </CardContent>
               </CardActionArea>

@@ -5,6 +5,7 @@ import { useMemo } from "react";
 export type SearchInputProps = {
   name: string;
   placeholder: string;
+  defaultValue: string;
   onChange: (val: string) => void;
 };
 
@@ -23,7 +24,7 @@ export default function SearchInput(props: SearchInputProps) {
       size="small"
       type="search"
       placeholder="Search meals..."
-      defaultValue={""}
+      defaultValue={props.defaultValue}
       onChange={debouncedChangeHandler}
       fullWidth
       sx={{ bgcolor: "background.paper", mt: 2 }}
