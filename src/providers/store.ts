@@ -8,7 +8,7 @@ export type StoreState = {
 
 const useStore = create<StoreState>((set) => ({
   session: null,
-  setSession: (sesh) => set((state) => ({ session: sesh })),
+  setSession: (sesh) => set((_) => ({ session: sesh })),
 }));
 
 export default useStore;
