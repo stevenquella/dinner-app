@@ -9,6 +9,8 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { createTheme, CssBaseline } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Atom, Provider } from "jotai";
+import { queryClientAtom } from "jotai-tanstack-query";
 import { routes } from "./routes";
 import { themeOptions } from "./theme";
 
@@ -16,17 +18,22 @@ const theme = createTheme(themeOptions);
 
 const router = createBrowserRouter(routes);
 
-const query = new QueryClient();
+const queryClient = new QueryClient();
+const queryProviderValues: (readonly [Atom<unknown>, unknown])[] = [
+  [queryClientAtom, queryClient],
+];
 
 const root = createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(
   <StrictMode>
-    <QueryClientProvider client={query}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <RouterProvider router={router} />
-      </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <Provider initialValues={queryProviderValues}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <RouterProvider router={router} />
+        </ThemeProvider>
+      </Provider>
     </QueryClientProvider>
   </StrictMode>
 );

@@ -6,20 +6,32 @@ import {
   Link,
   Typography,
 } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
+import { atom, useAtom, useSetAtom } from "jotai";
+import { atomsWithQuery } from "jotai-tanstack-query";
+import { useEffect } from "react";
 import { Link as RouterLink, useParams } from "react-router-dom";
 import { mealQueryKeys, retrieveMeal } from "../../providers/providerMeal";
 import Page from "../Page";
 
+const idAtom = atom<string | undefined>(undefined);
+const [, mealQueryAtom] = atomsWithQuery((get) => ({
+  queryKey: [mealQueryKeys.meal, get(idAtom)],
+  queryFn: () => retrieveMeal(get(idAtom) ?? ""),
+  enabled: !!get(idAtom),
+  retry: false,
+}));
+
 export default function MealRead() {
   const { id } = useParams();
-  const mealQuery = useQuery({
-    queryKey: [mealQueryKeys.meal, id],
-    queryFn: () => retrieveMeal(id ?? ""),
-  });
+  const setId = useSetAtom(idAtom);
+  const [meal] = useAtom(mealQueryAtom);
+
+  useEffect(() => {
+    setId(id);
+  }, [id, setId]);
 
   return (
-    <Page {...mealQuery}>
+    <Page {...meal}>
       <Box
         sx={{
           display: "flex",
@@ -29,13 +41,10 @@ export default function MealRead() {
           pb: 2,
         }}
       >
-        <Typography variant="h5">{mealQuery.data?.name}</Typography>
+        <Typography variant="h5">{meal.data?.name}</Typography>
 
         <Link component={RouterLink} to={`/meals/edit/${id}`}>
-          <Button
-            variant="contained"
-            disabled={mealQuery.isLoading || mealQuery.isError}
-          >
+          <Button variant="contained" disabled={meal.isLoading || meal.isError}>
             Edit
           </Button>
         </Link>
@@ -51,7 +60,7 @@ export default function MealRead() {
             }}
           >
             <Typography variant="body1" whiteSpace="pre-wrap">
-              {mealQuery.data?.notes}
+              {meal.data?.notes}
             </Typography>
           </Box>
         </CardContent>

@@ -15,7 +15,7 @@ export const mealQueryKeys = {
   meal: "meal",
 };
 
-export async function retrieveMeals(search: string): Promise<Meal[]> {
+export async function retrieveMeals(search?: string): Promise<Meal[]> {
   let query = supabase.from(meal_table).select().order("name");
   if (search) {
     query = query.ilike("name", `%${search}%`);
