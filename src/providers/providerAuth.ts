@@ -1,11 +1,23 @@
 import { Session } from "@supabase/supabase-js";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "./client";
 
-export const authQueryKeys = {
+const authQueryKeys = {
   session: "session",
 };
 
-export async function getSession(): Promise<Session | null> {
+export const useSession = (options: {
+  onSuccess: (val: Session | null) => void;
+}) => {
+  return useQuery({
+    queryKey: [authQueryKeys.session],
+    queryFn: () => getSession(),
+    onSuccess: options.onSuccess,
+    cacheTime: 0,
+  });
+};
+
+async function getSession(): Promise<Session | null> {
   const latestSession = await supabase.auth.getSession();
   return latestSession.data.session;
 }
