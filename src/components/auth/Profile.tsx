@@ -5,16 +5,18 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { signOut } from "../../providers/providerAuth";
 import { sessionAtom } from "../../providers/store";
 import Page from "../Page";
 
 export default function Profile() {
+  const queryClient = useQueryClient();
   const [session] = useAtom(sessionAtom);
   const logOutMutation = useMutation({
     mutationFn: () => signOut(),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 
   return (

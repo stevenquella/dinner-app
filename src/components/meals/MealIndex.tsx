@@ -7,12 +7,19 @@ import {
   Link,
   Typography,
 } from "@mui/material";
-import { useAtom } from "jotai";
+import { atom, useAtom } from "jotai";
+import { atomsWithQuery } from "jotai-tanstack-query";
 import { Link as RouterLink } from "react-router-dom";
-import { mealsSearchAtom, mealsSearchQueryAtom } from "../../providers/store";
+import { mealQueryKeys, retrieveMeals } from "../../providers/providerMeal";
 import SearchInput from "../inputs/SearchInput";
 import HighlightText from "../items/HighlightText";
 import Page from "../Page";
+
+const mealsSearchAtom = atom<string>("");
+const [, mealsSearchQueryAtom] = atomsWithQuery((get) => ({
+  queryKey: [mealQueryKeys.meals, get(mealsSearchAtom)],
+  queryFn: () => retrieveMeals(get(mealsSearchAtom)),
+}));
 
 export default function MealIndex() {
   const [mealSearch, setMealSearch] = useAtom(mealsSearchAtom);

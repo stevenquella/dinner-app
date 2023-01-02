@@ -1,5 +1,5 @@
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";
 import { signIn, signUp } from "../../providers/providerAuth";
 import TextInput from "../inputs/TextInput";
@@ -31,6 +31,7 @@ const formValidation: LogInValidation = {
 };
 
 export default function LogIn() {
+  const queryClient = useQueryClient();
   const formMethods = useForm<LogInInputs>({
     defaultValues: {
       email: "",
@@ -39,9 +40,11 @@ export default function LogIn() {
   });
   const loginMutation = useMutation({
     mutationFn: (data: LogInInputs) => signIn(data.email, data.password),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
   const signupMutation = useMutation({
     mutationFn: (data: LogInInputs) => signUp(data.email, data.password),
+    onSuccess: () => queryClient.invalidateQueries(),
   });
 
   const pageState = combineStates([loginMutation, signupMutation]);
