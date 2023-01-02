@@ -1,10 +1,14 @@
 import { Session } from "@supabase/supabase-js";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { atom } from "jotai";
 import { supabase } from "./client";
 
 const authQueryKeys = {
   session: "session",
 };
+
+export const sessionAtom = atom<Session | null>(null);
+export const useridAtom = atom((get) => get(sessionAtom)?.user.id ?? "");
 
 export const useSession = (options: {
   onSuccess: (val: Session | null) => void;
@@ -17,15 +21,41 @@ export const useSession = (options: {
   });
 };
 
+export const useSignInMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { email: string; password: string }) =>
+      signIn(data.email, data.password),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useSignUpMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { email: string; password: string }) =>
+      signUp(data.email, data.password),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
+export const useSignOutMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => signOut(),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+};
+
 async function getSession(): Promise<Session | null> {
   const latestSession = await supabase.auth.getSession();
   return latestSession.data.session;
 }
 
-export async function signIn(
-  email: string,
-  password: string
-): Promise<boolean> {
+async function signIn(email: string, password: string): Promise<boolean> {
   const response = await supabase.auth.signInWithPassword({
     email: email,
     password: password,
@@ -38,10 +68,7 @@ export async function signIn(
   }
 }
 
-export async function signUp(
-  email: string,
-  password: string
-): Promise<boolean> {
+async function signUp(email: string, password: string): Promise<boolean> {
   const response = await supabase.auth.signUp({
     email: email,
     password: password,
@@ -54,7 +81,7 @@ export async function signUp(
   }
 }
 
-export async function signOut(): Promise<boolean> {
+async function signOut(): Promise<boolean> {
   const response = await supabase.auth.signOut();
 
   if (response.error != null) {

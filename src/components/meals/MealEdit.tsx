@@ -9,17 +9,17 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
+import { useridAtom } from "../../providers/providerAuth";
 import {
   deleteMeal,
   mealQueryKeys,
   retrieveMeal,
   upsertMeal,
 } from "../../providers/providerMeal";
-import { useridAtom } from "../../providers/store";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 import Page, { combineStates, PageState } from "../Page";
@@ -47,7 +47,7 @@ export default function MealEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [userid] = useAtom(useridAtom);
+  const userid = useAtomValue(useridAtom);
 
   const isCreate: boolean = !(id != null);
 

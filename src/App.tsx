@@ -6,8 +6,7 @@ import LogIn from "./components/auth/LogIn";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { supabase } from "./providers/client";
-import { useSession } from "./providers/providerAuth";
-import { sessionAtom } from "./providers/store";
+import { sessionAtom, useSession } from "./providers/providerAuth";
 
 export default function App() {
   const [session, setSession] = useAtom(sessionAtom);
