@@ -3,13 +3,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { atom } from "jotai";
 import { supabase } from "./client";
 
+// ATOMS
+export const sessionAtom = atom<Session | null>(null);
+export const useridAtom = atom((get) => get(sessionAtom)?.user.id ?? "");
+
 const authQueryKeys = {
   session: "session",
 };
 
-export const sessionAtom = atom<Session | null>(null);
-export const useridAtom = atom((get) => get(sessionAtom)?.user.id ?? "");
-
+// QUERIES
 export const useSession = (options: {
   onSuccess: (val: Session | null) => void;
 }) => {
@@ -21,6 +23,7 @@ export const useSession = (options: {
   });
 };
 
+// MUTATIONS
 export const useSignInMutation = () => {
   const queryClient = useQueryClient();
 
@@ -50,6 +53,7 @@ export const useSignOutMutation = () => {
   });
 };
 
+// FUNCTIONS
 async function getSession(): Promise<Session | null> {
   const latestSession = await supabase.auth.getSession();
   return latestSession.data.session;

@@ -8,17 +8,15 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
 import {
-  deleteMeal,
-  mealQueryKeys,
-  retrieveMeal,
-  upsertMeal,
+  useMeal,
+  useMealDeleteMutation,
+  useMealUpsertMutation,
 } from "../../providers/providerMeal";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
@@ -44,64 +42,44 @@ const formValidation: MealValidation = {
 };
 
 export default function MealEdit() {
-  const { id } = useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const userid = useAtomValue(useridAtom);
+  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
+  const { id } = useParams();
   const isCreate: boolean = !(id != null);
 
-  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
   const formMethods = useForm<MealInputs>({
     defaultValues: {
       name: "",
       notes: "",
     },
   });
-  const mealQuery = useQuery({
-    queryKey: [mealQueryKeys.meal, id],
-    queryFn: () => retrieveMeal(id ?? ""),
+
+  const meal = useMeal({
+    id: id ?? null,
     onSuccess: (meal) =>
       formMethods.reset({
         name: meal.name,
         notes: meal.notes ?? "",
       }),
-    enabled: !isCreate,
   });
-  const mealUpsertMutation = useMutation({
-    mutationFn: (meal: MealInputs) =>
-      upsertMeal({
-        id: id,
-        user_id: userid,
-        ...meal,
-      }),
-    onSuccess: ({ id }) => {
-      queryClient.invalidateQueries({
-        queryKey: [mealQueryKeys.meals],
-      });
+  const mealUpsert = useMealUpsertMutation({
+    onSuccess: (id) => {
       if (isCreate) {
-        navigate(`/meals/view/${id}`, { replace: true });
+        navigate(`/meals/read/${id}`, { replace: true });
       } else {
         navigate(-1);
       }
     },
   });
-  const mealDeleteMutation = useMutation({
-    mutationFn: () => deleteMeal(id ?? ""),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [mealQueryKeys.meals],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [mealQueryKeys.meal, id],
-      });
-      navigate("/meals", { replace: true });
-    },
+  const mealDelete = useMealDeleteMutation({
+    onSuccess: () => navigate("/meals", { replace: true }),
   });
 
   const pageState: PageState = isCreate
-    ? combineStates([mealUpsertMutation])
-    : combineStates([mealQuery, mealUpsertMutation, mealDeleteMutation]);
+    ? combineStates([mealUpsert])
+    : combineStates([meal, mealUpsert, mealDelete]);
 
   return (
     <Page {...pageState}>
@@ -109,7 +87,11 @@ export default function MealEdit() {
       <FormProvider {...formMethods}>
         <form
           onSubmit={formMethods.handleSubmit((x) =>
-            mealUpsertMutation.mutate(x)
+            mealUpsert.mutate({
+              id: id,
+              user_id: userid,
+              ...x,
+            })
           )}
         >
           <Box
@@ -127,7 +109,7 @@ export default function MealEdit() {
             <Button
               variant="contained"
               type="submit"
-              disabled={pageState.isLoading || mealQuery.isError}
+              disabled={pageState.isLoading || meal.isError}
             >
               {isCreate ? "Create" : "Update"}
             </Button>
@@ -176,7 +158,7 @@ export default function MealEdit() {
               <Button color="info" onClick={() => setConfirmDelete(false)}>
                 Cancel
               </Button>
-              <Button color="error" onClick={() => mealDeleteMutation.mutate()}>
+              <Button color="error" onClick={() => mealDelete.mutate(id ?? "")}>
                 Delete
               </Button>
             </DialogActions>

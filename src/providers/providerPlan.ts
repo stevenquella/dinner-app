@@ -5,6 +5,12 @@ const plan_table = "plan";
 export type PlanInsert = Database["public"]["Tables"]["plan"]["Insert"];
 export type Plan = Database["public"]["Tables"]["plan"]["Row"];
 
+// ATOMS
+
+// QUERIES
+
+// MUTATIONS
+
 export async function upsertPlan(
   plan: PlanInsert,
   meals: string[]
