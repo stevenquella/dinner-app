@@ -13,6 +13,12 @@ const meal_table = "meal";
 export type MealInsert = Database["public"]["Tables"]["meal"]["Insert"];
 export type Meal = Database["public"]["Tables"]["meal"]["Row"];
 
+const mealQueryKeys = {
+  meals: ["meals"],
+  mealsearch: (search: string) => ["meals", "search", search],
+  meal: (id: string) => ["meals", "id", id],
+};
+
 // ATOMS
 
 export const mealsSearchAtom = atom<string>("");
@@ -23,10 +29,9 @@ export const [, mealsSearchQueryAtom] = atomsWithQuery((get) => ({
 
 // QUERIES
 
-const mealQueryKeys = {
-  meals: ["meals"],
-  mealsearch: (search: string) => ["meals", "search", search],
-  meal: (id: string) => ["meals", "id", id],
+export const prefetchMeals = {
+  queryKey: mealQueryKeys.meals,
+  queryFn: () => retrieveMeals(),
 };
 
 export const useMeals = () => {

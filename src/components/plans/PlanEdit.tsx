@@ -9,16 +9,19 @@ import {
   DialogTitle,
   Typography,
 } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
-import { upsertPlan } from "../../providers/providerPlan";
+import {
+  usePlan,
+  usePlanDeleteMutation,
+  usePlanUpsertMutation,
+} from "../../providers/providerPlan";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
-import Page from "../Page";
+import Page, { combineStates, PageState } from "../Page";
 
 type PlanInputs = {
   date: string;
@@ -43,32 +46,48 @@ export default function PlanEdit() {
   const [userid] = useAtom(useridAtom);
   const [editMeals, setEditMeals] = useState<boolean>(false);
 
+  const isCreate = !(id != null);
+
   const formMethods = useForm<PlanInputs>({
     defaultValues: {
       date: "",
       notes: "",
     },
   });
-  const planUpsertMutation = useMutation({
-    mutationFn: (data: PlanInputs) =>
-      upsertPlan(
-        {
-          id: id,
-          user_id: userid,
-          ...data,
-        },
-        []
-      ),
+
+  const plan = usePlan({
+    id: id ?? null,
+    onSuccess: (plan) => {
+      formMethods.reset({
+        date: plan.date,
+        notes: plan.notes ?? "",
+      });
+    },
+  });
+  const planUpsert = usePlanUpsertMutation({
+    onSuccess: () => {},
+  });
+  const planDelete = usePlanDeleteMutation({
+    onSuccess: () => {},
   });
 
-  const isCreate = !(id != null);
+  const pageState: PageState = isCreate
+    ? combineStates([planUpsert])
+    : combineStates([plan, planUpsert, planDelete]);
 
   return (
-    <Page>
+    <Page {...pageState}>
       <FormProvider {...formMethods}>
         <form
           onSubmit={formMethods.handleSubmit((x) =>
-            planUpsertMutation.mutate(x)
+            planUpsert.mutate({
+              plan: {
+                id: id,
+                user_id: userid,
+                ...x,
+              },
+              meals: [],
+            })
           )}
         >
           <Box
@@ -83,7 +102,11 @@ export default function PlanEdit() {
             <Typography variant="h5">
               {isCreate ? "Create Plan" : "Edit Plan"}
             </Typography>
-            <Button variant="contained" type="submit">
+            <Button
+              variant="contained"
+              type="submit"
+              disabled={pageState.isLoading || plan.isError}
+            >
               {isCreate ? "Create" : "Update"}
             </Button>
           </Box>

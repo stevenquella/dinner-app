@@ -7,15 +7,18 @@ import {
   Typography,
 } from "@mui/material";
 import { Link as RouterLink, useParams } from "react-router-dom";
-import { useMeal } from "../../providers/providerMeal";
+import { usePlan } from "../../providers/providerPlan";
 import Page from "../Page";
 
-export default function MealRead() {
+export default function PlanRead() {
   const { id } = useParams();
-  const meal = useMeal({ id: id ?? null });
+
+  const plan = usePlan({
+    id: id ?? null,
+  });
 
   return (
-    <Page {...meal}>
+    <Page {...plan}>
       <Box
         sx={{
           display: "flex",
@@ -25,10 +28,10 @@ export default function MealRead() {
           pb: 2,
         }}
       >
-        <Typography variant="h5">{meal.data?.name}</Typography>
+        <Typography variant="h5">{plan.data?.date}</Typography>
 
-        <Link component={RouterLink} to={`/meals/edit/${id}`}>
-          <Button variant="contained" disabled={meal.isLoading || meal.isError}>
+        <Link component={RouterLink} to={`/plans/edit/${id}`}>
+          <Button variant="contained" disabled={plan.isLoading || plan.isError}>
             Edit
           </Button>
         </Link>
@@ -46,9 +49,14 @@ export default function MealRead() {
             <Typography variant="caption">Summary</Typography>
 
             <Typography variant="body1" whiteSpace="pre-wrap">
-              {meal.data?.notes}
+              {plan.data?.notes}
             </Typography>
           </Box>
+        </CardContent>
+      </Card>
+      <Card sx={{ mt: 1 }}>
+        <CardContent>
+          <Typography variant="caption">Meals</Typography>
         </CardContent>
       </Card>
       <Card sx={{ mt: 1 }}>

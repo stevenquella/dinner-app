@@ -124,7 +124,7 @@ export default function MealEdit() {
                   rowGap: 1,
                 }}
               >
-                <Typography variant="body1">Summary</Typography>
+                <Typography variant="caption">Summary</Typography>
                 <TextInput
                   name="name"
                   label="Name"
@@ -136,7 +136,7 @@ export default function MealEdit() {
           </Card>
           <Card sx={{ mt: 1 }}>
             <CardContent>
-              <Typography variant="body1">Groceries</Typography>
+              <Typography variant="caption">Groceries</Typography>
             </CardContent>
           </Card>
         </form>
