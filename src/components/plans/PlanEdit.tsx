@@ -1,19 +1,22 @@
+import { OpenInNew } from "@mui/icons-material";
 import {
   Box,
   Button,
   Card,
   CardActions,
   CardContent,
-  Dialog,
-  DialogActions,
-  DialogTitle,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
   Typography,
 } from "@mui/material";
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
+import { useMeals } from "../../providers/providerMeal";
 import {
   usePlan,
   usePlanDeleteMutation,
@@ -22,6 +25,7 @@ import {
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 import Page, { combineStates, PageState } from "../Page";
+import PlanMeals from "./PlanMeals";
 
 type PlanInputs = {
   date: string;
@@ -42,8 +46,10 @@ const planValidation: PlanValidation = {
 };
 
 export default function PlanEdit() {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [userid] = useAtom(useridAtom);
+  const [selectedMeals, setSelectedMeals] = useState<string[]>([]);
   const [editMeals, setEditMeals] = useState<boolean>(false);
 
   const isCreate = !(id != null);
@@ -55,6 +61,7 @@ export default function PlanEdit() {
     },
   });
 
+  const meals = useMeals();
   const plan = usePlan({
     id: id ?? null,
     onSuccess: (plan) => {
@@ -65,15 +72,21 @@ export default function PlanEdit() {
     },
   });
   const planUpsert = usePlanUpsertMutation({
-    onSuccess: () => {},
+    onSuccess: ({ id }) => {
+      if (isCreate) {
+        navigate(`/plans/edit/${id}`, { replace: true });
+      } else {
+        navigate(-1);
+      }
+    },
   });
   const planDelete = usePlanDeleteMutation({
-    onSuccess: () => {},
+    onSuccess: () => navigate(`/plans`, { replace: true }),
   });
 
   const pageState: PageState = isCreate
-    ? combineStates([planUpsert])
-    : combineStates([plan, planUpsert, planDelete]);
+    ? combineStates([meals, planUpsert])
+    : combineStates([meals, plan, planUpsert, planDelete]);
 
   return (
     <Page {...pageState}>
@@ -134,6 +147,33 @@ export default function PlanEdit() {
           <Card sx={{ mt: 1 }}>
             <CardContent>
               <Typography variant="body1">Meals</Typography>
+              <List>
+                {selectedMeals.map((mealid) => {
+                  const meal = meals.data?.find((x) => x.id === mealid);
+                  if (meal) {
+                    return (
+                      <ListItem
+                        key={mealid}
+                        sx={{
+                          p: 1.5,
+                          mb: 1,
+                          border: 1,
+                          borderColor: "divider",
+                        }}
+                        secondaryAction={
+                          <IconButton edge="end">
+                            <OpenInNew />
+                          </IconButton>
+                        }
+                      >
+                        <ListItemText primary={meal.name} />
+                      </ListItem>
+                    );
+                  } else {
+                    return null;
+                  }
+                })}
+              </List>
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
               <Button color="secondary" onClick={() => setEditMeals(true)}>
@@ -148,12 +188,12 @@ export default function PlanEdit() {
           </Card>
         </form>
       </FormProvider>
-      <Dialog maxWidth="md" fullWidth={true} open={editMeals}>
-        <DialogTitle>Select Meals</DialogTitle>
-        <DialogActions>
-          <Button onClick={() => setEditMeals(false)}>Done</Button>
-        </DialogActions>
-      </Dialog>
+      <PlanMeals
+        open={editMeals}
+        onDismiss={() => setEditMeals(false)}
+        selectedMeals={selectedMeals}
+        onChangeSelectedMeals={setSelectedMeals}
+      />
     </Page>
   );
 }
