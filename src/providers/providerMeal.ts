@@ -8,6 +8,7 @@ import {
   supabase,
 } from "./client";
 import { Database } from "./client.types";
+import { notEmpty } from "./helpers";
 
 const meal_table = "meal";
 export type MealInsert = Database["public"]["Tables"]["meal"]["Insert"];
@@ -66,6 +67,13 @@ export const useMeal = (options: {
     },
   });
 };
+
+export function getMealsById(meals: Meal[] | undefined, ids: string[]) {
+  return ids
+    .map((id) => meals?.find((m) => m.id === id))
+    .filter(notEmpty)
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
 
 // MUTATIONS
 

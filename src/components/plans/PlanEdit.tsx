@@ -6,6 +6,7 @@ import {
   CardActions,
   CardContent,
   IconButton,
+  Link,
   List,
   ListItem,
   ListItemText,
@@ -14,9 +15,9 @@ import {
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
-import { useMeals } from "../../providers/providerMeal";
+import { getMealsById, useMeals } from "../../providers/providerMeal";
 import {
   usePlan,
   usePlanDeleteMutation,
@@ -148,31 +149,30 @@ export default function PlanEdit() {
             <CardContent>
               <Typography variant="body1">Meals</Typography>
               <List>
-                {selectedMeals.map((mealid) => {
-                  const meal = meals.data?.find((x) => x.id === mealid);
-                  if (meal) {
-                    return (
-                      <ListItem
-                        key={mealid}
-                        sx={{
-                          p: 1.5,
-                          mb: 1,
-                          border: 1,
-                          borderColor: "divider",
-                        }}
-                        secondaryAction={
-                          <IconButton edge="end">
-                            <OpenInNew />
-                          </IconButton>
-                        }
+                {getMealsById(meals.data, selectedMeals).map((meal) => (
+                  <ListItem
+                    key={meal.id}
+                    sx={{
+                      p: 1.5,
+                      mb: 1,
+                      border: 1,
+                      borderColor: "divider",
+                    }}
+                    secondaryAction={
+                      <Link
+                        component={RouterLink}
+                        to={`/meals/read/${meal.id}`}
+                        target="_blank"
                       >
-                        <ListItemText primary={meal.name} />
-                      </ListItem>
-                    );
-                  } else {
-                    return null;
-                  }
-                })}
+                        <IconButton edge="end">
+                          <OpenInNew />
+                        </IconButton>
+                      </Link>
+                    }
+                  >
+                    <ListItemText primary={meal.name} />
+                  </ListItem>
+                ))}
               </List>
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>

@@ -12,7 +12,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import produce from "immer";
-import { useMeals } from "../../providers/providerMeal";
+import { getMealsById, useMeals } from "../../providers/providerMeal";
 
 export type PlanMealsProps = {
   open: boolean;
@@ -27,13 +27,16 @@ export default function PlanMeals(props: PlanMealsProps) {
 
   const handleSelect = (id: string) => {
     const index = props.selectedMeals.indexOf(id);
-    if (index === -1) {
-      props.onChangeSelectedMeals(
-        produce(props.selectedMeals, (draft) => {
+
+    props.onChangeSelectedMeals(
+      produce(props.selectedMeals, (draft) => {
+        if (index === -1) {
           draft.push(id);
-        })
-      );
-    }
+        } else {
+          draft.splice(index, 1);
+        }
+      })
+    );
   };
 
   const handleDelete = (id: string) => {
@@ -51,24 +54,17 @@ export default function PlanMeals(props: PlanMealsProps) {
     <Dialog open={props.open} fullScreen>
       <DialogTitle sx={{ borderBottom: 1, borderColor: "divider" }}>
         Select Meals
-        <Box sx={{ mt: 1 }}>
-          {props.selectedMeals.map((id) => {
-            const meal = meals.data?.find((x) => x.id === id);
-            if (meal) {
-              return (
-                <Chip
-                  key={id}
-                  label={meal.name}
-                  onDelete={() => handleDelete(id)}
-                />
-              );
-            } else {
-              return null;
-            }
-          })}
+        <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
+          {getMealsById(meals.data, props.selectedMeals).map((meal) => (
+            <Chip
+              key={meal.id}
+              label={meal.name}
+              onDelete={() => handleDelete(meal.id)}
+            />
+          ))}
         </Box>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent sx={{ p: 0 }}>
         {meals.isLoading || meals.isError ? (
           <CircularProgress />
         ) : (
@@ -76,7 +72,12 @@ export default function PlanMeals(props: PlanMealsProps) {
             {meals.data.map((x) => (
               <ListItemButton
                 key={x.id}
-                sx={{ padding: 2, borderBottom: 1, borderColor: "divider" }}
+                sx={{
+                  padding: 2,
+                  paddingLeft: 4,
+                  borderBottom: 1,
+                  borderColor: "divider",
+                }}
                 selected={props.selectedMeals.indexOf(x.id) !== -1}
                 onClick={() => handleSelect(x.id)}
               >
