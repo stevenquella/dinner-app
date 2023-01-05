@@ -9,16 +9,19 @@ import {
 } from "@mui/material";
 import { useAtom } from "jotai";
 import { Link as RouterLink } from "react-router-dom";
+import { useMeals } from "../../providers/providerMeal";
 import {
   plansSearchAtom,
   plansSearchQueryAtom,
 } from "../../providers/providerPlan";
 import SearchInput from "../inputs/SearchInput";
 import Page from "../Page";
+import { PlanMealsRead } from "./PlanMealsRead";
 
 export default function PlanIndex() {
   const [plansSearch, setPlansSearch] = useAtom(plansSearchAtom);
   const [plans] = useAtom(plansSearchQueryAtom);
+  const meals = useMeals();
 
   return (
     <Page {...plans}>
@@ -49,10 +52,14 @@ export default function PlanIndex() {
         {plans.data?.map((plan) => (
           <Card sx={{ borderBottom: 1, borderColor: "divider" }}>
             <CardContent>
-              <Typography variant="body1">
+              <Typography variant="body1" fontWeight="medium" marginBottom={1}>
                 {plan.date}
                 {plan.notes ? `, ${plan.notes}` : ""}
               </Typography>
+              <PlanMealsRead
+                meals={meals.data}
+                ids={plan.plan_meal.map((x) => x.meal_id)}
+              />
             </CardContent>
             <CardActions sx={{ flexDirection: "row-reverse" }}>
               <Link

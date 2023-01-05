@@ -7,8 +7,10 @@ import {
   Typography,
 } from "@mui/material";
 import { Link as RouterLink, useParams } from "react-router-dom";
+import { useMeals } from "../../providers/providerMeal";
 import { usePlan } from "../../providers/providerPlan";
 import Page from "../Page";
+import { PlanMealsRead } from "./PlanMealsRead";
 
 export default function PlanRead() {
   const { id } = useParams();
@@ -16,6 +18,7 @@ export default function PlanRead() {
   const plan = usePlan({
     id: id ?? null,
   });
+  const meals = useMeals();
 
   return (
     <Page {...plan}>
@@ -57,6 +60,10 @@ export default function PlanRead() {
       <Card sx={{ mt: 1 }}>
         <CardContent>
           <Typography variant="caption">Meals</Typography>
+          <PlanMealsRead
+            meals={meals.data}
+            ids={plan.data?.plan_meal.map((x) => x.meal_id)}
+          />
         </CardContent>
       </Card>
       <Card sx={{ mt: 1 }}>

@@ -22,7 +22,7 @@ export type PlanMealsProps = {
   onChangeSelectedMeals: (items: string[]) => void;
 };
 
-export default function PlanMeals(props: PlanMealsProps) {
+export default function PlanMealsEdit(props: PlanMealsProps) {
   const meals = useMeals();
 
   const handleSelect = (id: string) => {
@@ -88,6 +88,13 @@ export default function PlanMeals(props: PlanMealsProps) {
         )}
       </DialogContent>
       <DialogActions sx={{ borderTop: 1, borderColor: "divider" }}>
+        <Button
+          size="large"
+          color="warning"
+          onClick={() => props.onChangeSelectedMeals([])}
+        >
+          Clear
+        </Button>
         <Button size="large" onClick={() => props.onDismiss()}>
           Done
         </Button>

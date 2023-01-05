@@ -11,9 +11,14 @@ import {
 import { Database } from "./client.types";
 
 const plan_table = "plan";
+const plan_meal_table = "plan_meal";
+
+export type PlanMealInsert =
+  Database["public"]["Tables"]["plan_meal"]["Insert"];
+export type PlanMeal = Database["public"]["Tables"]["plan_meal"]["Row"];
 export type PlanInsert = Database["public"]["Tables"]["plan"]["Insert"];
 export type Plan = Database["public"]["Tables"]["plan"]["Row"] & {
-  plan_meal: { meal_id: string } | { meal_id: string }[] | null;
+  plan_meal: PlanMeal[];
 };
 
 const planQueryKeys = {
@@ -105,9 +110,7 @@ const columns = `
   user_id,
   date,
   notes,
-  plan_meal (
-    meal_id
-  )`;
+  plan_meal (*)`;
 
 async function retrievePlans(search?: string): Promise<Plan[]> {
   let query = supabase.from(plan_table).select(columns).order("date");
@@ -128,11 +131,44 @@ async function retrievePlan(id: string): Promise<Plan> {
 }
 
 async function upsertPlan(plan: PlanInsert, meals: string[]): Promise<Plan> {
-  const response = await supabase.from(plan_table).upsert(plan).select(columns);
-  return getSingleRow(response);
+  const upsertPlanResponse = await supabase
+    .from(plan_table)
+    .upsert(plan)
+    .select("id");
+  const updatedPlan = getSingleRow(upsertPlanResponse);
+
+  const deletePlanMealsResponse = await supabase
+    .from(plan_meal_table)
+    .delete()
+    .eq("plan_id", updatedPlan.id);
+
+  ensureSuccess(deletePlanMealsResponse);
+
+  const upsertPlanMealsResponse = await supabase.from(plan_meal_table).upsert(
+    meals.map((id) => ({
+      plan_id: updatedPlan.id,
+      meal_id: id,
+      user_id: plan.user_id,
+    }))
+  );
+
+  ensureSuccess(upsertPlanMealsResponse);
+
+  return retrievePlan(updatedPlan.id);
 }
 
 async function deletePlan(id: string): Promise<boolean> {
-  const response = await supabase.from(plan_table).delete().eq("id", id);
-  return ensureEmptySuccess(response);
+  const deletePlanMealsResponse = await supabase
+    .from(plan_meal_table)
+    .delete()
+    .eq("plan_id", id);
+
+  ensureSuccess(deletePlanMealsResponse);
+
+  const deletePlanResponse = await supabase
+    .from(plan_table)
+    .delete()
+    .eq("id", id);
+
+  return ensureEmptySuccess(deletePlanResponse);
 }

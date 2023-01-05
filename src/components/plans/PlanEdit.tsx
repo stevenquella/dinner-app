@@ -1,23 +1,21 @@
-import { OpenInNew } from "@mui/icons-material";
 import {
   Box,
   Button,
   Card,
   CardActions,
   CardContent,
-  IconButton,
-  Link,
-  List,
-  ListItem,
-  ListItemText,
+  Dialog,
+  DialogActions,
+  DialogTitle,
   Typography,
 } from "@mui/material";
+import dayjs from "dayjs";
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
-import { getMealsById, useMeals } from "../../providers/providerMeal";
+import { useMeals } from "../../providers/providerMeal";
 import {
   usePlan,
   usePlanDeleteMutation,
@@ -26,7 +24,8 @@ import {
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 import Page, { combineStates, PageState } from "../Page";
-import PlanMeals from "./PlanMeals";
+import PlanMealsEdit from "./PlanMealsEdit";
+import { PlanMealsRead } from "./PlanMealsRead";
 
 type PlanInputs = {
   date: string;
@@ -52,12 +51,13 @@ export default function PlanEdit() {
   const [userid] = useAtom(useridAtom);
   const [selectedMeals, setSelectedMeals] = useState<string[]>([]);
   const [editMeals, setEditMeals] = useState<boolean>(false);
+  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
   const isCreate = !(id != null);
 
   const formMethods = useForm<PlanInputs>({
     defaultValues: {
-      date: "",
+      date: dayjs().format("YYYY-MM-DD"),
       notes: "",
     },
   });
@@ -70,6 +70,8 @@ export default function PlanEdit() {
         date: plan.date,
         notes: plan.notes ?? "",
       });
+
+      setSelectedMeals(plan.plan_meal.map((x) => x.meal_id));
     },
   });
   const planUpsert = usePlanUpsertMutation({
@@ -82,7 +84,7 @@ export default function PlanEdit() {
     },
   });
   const planDelete = usePlanDeleteMutation({
-    onSuccess: () => navigate(`/plans`, { replace: true }),
+    onSuccess: () => navigate(`/`, { replace: true }),
   });
 
   const pageState: PageState = isCreate
@@ -100,7 +102,7 @@ export default function PlanEdit() {
                 user_id: userid,
                 ...x,
               },
-              meals: [],
+              meals: selectedMeals,
             })
           )}
         >
@@ -148,32 +150,7 @@ export default function PlanEdit() {
           <Card sx={{ mt: 1 }}>
             <CardContent>
               <Typography variant="body1">Meals</Typography>
-              <List>
-                {getMealsById(meals.data, selectedMeals).map((meal) => (
-                  <ListItem
-                    key={meal.id}
-                    sx={{
-                      p: 1.5,
-                      mb: 1,
-                      border: 1,
-                      borderColor: "divider",
-                    }}
-                    secondaryAction={
-                      <Link
-                        component={RouterLink}
-                        to={`/meals/read/${meal.id}`}
-                        target="_blank"
-                      >
-                        <IconButton edge="end">
-                          <OpenInNew />
-                        </IconButton>
-                      </Link>
-                    }
-                  >
-                    <ListItemText primary={meal.name} />
-                  </ListItem>
-                ))}
-              </List>
+              <PlanMealsRead meals={meals.data} ids={selectedMeals} />
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
               <Button color="secondary" onClick={() => setEditMeals(true)}>
@@ -188,12 +165,38 @@ export default function PlanEdit() {
           </Card>
         </form>
       </FormProvider>
-      <PlanMeals
+      <PlanMealsEdit
         open={editMeals}
         onDismiss={() => setEditMeals(false)}
         selectedMeals={selectedMeals}
         onChangeSelectedMeals={setSelectedMeals}
       />
+      {!isCreate ? (
+        <div>
+          <Button
+            variant="outlined"
+            color="error"
+            sx={{ mt: 2 }}
+            onClick={() => setConfirmDelete(true)}
+            disabled={pageState.isLoading || pageState.isError}
+          >
+            DELETE
+          </Button>
+          <Dialog maxWidth="sm" fullWidth={true} open={confirmDelete}>
+            <DialogTitle>Delete plan?</DialogTitle>
+            <DialogActions>
+              <Button color="info" onClick={() => setConfirmDelete(false)}>
+                Cancel
+              </Button>
+              <Button color="error" onClick={() => planDelete.mutate(id ?? "")}>
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </div>
+      ) : (
+        <div></div>
+      )}
     </Page>
   );
 }
