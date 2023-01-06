@@ -5,20 +5,16 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
-import { useAtom } from "jotai";
-import { signOut } from "../../providers/providerAuth";
-import { sessionAtom } from "../../providers/store";
+import { useAtomValue } from "jotai";
+import { sessionAtom, useSignOutMutation } from "../../providers/providerAuth";
 import Page from "../Page";
 
 export default function Profile() {
-  const [session] = useAtom(sessionAtom);
-  const logOutMutation = useMutation({
-    mutationFn: () => signOut(),
-  });
+  const session = useAtomValue(sessionAtom);
+  const signOut = useSignOutMutation();
 
   return (
-    <Page {...logOutMutation}>
+    <Page {...signOut}>
       <Card sx={{ p: 1 }}>
         <CardContent>
           <Typography variant="body1">
@@ -26,7 +22,7 @@ export default function Profile() {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button color="error" onClick={() => logOutMutation.mutate()}>
+          <Button color="error" onClick={() => signOut.mutate()}>
             LOG OUT
           </Button>
         </CardActions>

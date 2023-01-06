@@ -28,7 +28,12 @@ export default function TextInput(props: TextInputProps) {
           error={item.fieldState.error != null}
           fullWidth
         >
-          <InputLabel htmlFor="component-error">{props.label}</InputLabel>
+          <InputLabel
+            htmlFor="component-error"
+            shrink={props.type === "date" ? true : undefined}
+          >
+            {props.label}
+          </InputLabel>
           <FilledInput
             id={props.name}
             value={item.field.value}

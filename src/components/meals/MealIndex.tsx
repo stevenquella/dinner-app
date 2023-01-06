@@ -7,21 +7,19 @@ import {
   Link,
   Typography,
 } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { Link as RouterLink } from "react-router-dom";
-import { mealQueryKeys, retrieveMeals } from "../../providers/providerMeal";
-import { mealSearchAtom } from "../../providers/store";
+import {
+  mealsSearchAtom,
+  mealsSearchQueryAtom,
+} from "../../providers/providerMeal";
 import SearchInput from "../inputs/SearchInput";
 import HighlightText from "../items/HighlightText";
 import Page from "../Page";
 
 export default function MealIndex() {
-  const [mealSearch, setMealSearch] = useAtom(mealSearchAtom);
-  const meals = useQuery({
-    queryKey: [mealQueryKeys.meals, mealSearch],
-    queryFn: () => retrieveMeals(mealSearch),
-  });
+  const [mealSearch, setMealSearch] = useAtom(mealsSearchAtom);
+  const [meals] = useAtom(mealsSearchQueryAtom);
 
   return (
     <Page {...meals}>
@@ -52,7 +50,7 @@ export default function MealIndex() {
           <Link
             key={meal.id}
             component={RouterLink}
-            to={`/meals/edit/${meal.id}`}
+            to={`/meals/read/${meal.id}`}
             underline="none"
           >
             <Card sx={{ borderBottom: 1, borderColor: "divider" }}>

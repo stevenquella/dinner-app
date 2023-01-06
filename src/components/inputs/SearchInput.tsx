@@ -4,8 +4,10 @@ import { useMemo } from "react";
 
 export type SearchInputProps = {
   name: string;
-  placeholder: string;
+  placeholder?: string;
   defaultValue: string;
+  label?: string;
+  type?: string;
   onChange: (val: string) => void;
 };
 
@@ -22,12 +24,14 @@ export default function SearchInput(props: SearchInputProps) {
     <TextField
       variant="outlined"
       size="small"
-      type="search"
+      type={props.type ?? "search"}
+      label={props.label}
       placeholder="Search meals..."
       defaultValue={props.defaultValue}
       onChange={debouncedChangeHandler}
       fullWidth
       sx={{ bgcolor: "background.paper", mt: 2 }}
+      InputLabelProps={{ shrink: props.type === "date" ? true : undefined }}
     />
   );
 }

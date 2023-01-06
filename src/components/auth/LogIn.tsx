@@ -1,7 +1,9 @@
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
 import { FormProvider, useForm } from "react-hook-form";
-import { signIn, signUp } from "../../providers/providerAuth";
+import {
+  useSignInMutation,
+  useSignUpMutation,
+} from "../../providers/providerAuth";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 import Page, { combineStates } from "../Page";
@@ -37,14 +39,10 @@ export default function LogIn() {
       password: "",
     },
   });
-  const loginMutation = useMutation({
-    mutationFn: (data: LogInInputs) => signIn(data.email, data.password),
-  });
-  const signupMutation = useMutation({
-    mutationFn: (data: LogInInputs) => signUp(data.email, data.password),
-  });
+  const signIn = useSignInMutation();
+  const signUp = useSignUpMutation();
 
-  const pageState = combineStates([loginMutation, signupMutation]);
+  const pageState = combineStates([signIn, signUp]);
 
   return (
     <Page {...pageState}>
@@ -54,11 +52,7 @@ export default function LogIn() {
             Log In
           </Typography>
           <FormProvider {...formMethods}>
-            <form
-              onSubmit={formMethods.handleSubmit((x) =>
-                loginMutation.mutate(x)
-              )}
-            >
+            <form onSubmit={formMethods.handleSubmit((x) => signIn.mutate(x))}>
               <Box
                 sx={{
                   display: "flex",
@@ -103,9 +97,7 @@ export default function LogIn() {
                     color="secondary"
                     type="button"
                     disabled={pageState.isLoading}
-                    onClick={formMethods.handleSubmit((x) =>
-                      signupMutation.mutate(x)
-                    )}
+                    onClick={formMethods.handleSubmit((x) => signUp.mutate(x))}
                   >
                     SIGN UP
                   </Button>
