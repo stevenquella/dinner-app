@@ -30,11 +30,6 @@ export const [, mealsSearchQueryAtom] = atomsWithQuery((get) => ({
 
 // QUERIES
 
-export const prefetchMeals = {
-  queryKey: mealQueryKeys.meals,
-  queryFn: () => retrieveMeals(),
-};
-
 export const useMeals = () => {
   return useQuery({
     queryKey: mealQueryKeys.meals,

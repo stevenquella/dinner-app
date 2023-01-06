@@ -37,11 +37,6 @@ export const [, plansSearchQueryAtom] = atomsWithQuery((get) => ({
 
 // QUERIES
 
-export const prefetchPlans = {
-  queryKey: planQueryKeys.plans,
-  queryFn: () => retrievePlans(),
-};
-
 export const usePlans = () => {
   return useQuery({
     queryKey: planQueryKeys.plans,

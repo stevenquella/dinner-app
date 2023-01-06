@@ -8,8 +8,6 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { supabase } from "./providers/client";
 import { sessionAtom, useSession } from "./providers/providerAuth";
-import { prefetchMeals } from "./providers/providerMeal";
-import { prefetchPlans } from "./providers/providerPlan";
 
 export default function App() {
   const queryClient = useQueryClient();
@@ -18,13 +16,6 @@ export default function App() {
     onSuccess: (sesh) => setSession(sesh),
   });
   useEffect(() => {
-    (async () => {
-      if (session != null) {
-        await queryClient.prefetchQuery(prefetchPlans);
-        await queryClient.prefetchQuery(prefetchMeals);
-      }
-    })();
-
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
