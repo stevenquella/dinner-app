@@ -23,7 +23,9 @@ import {
 } from "../../providers/providerPlan";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
+import CardTitle from "../items/CardTitle";
 import Page, { combineStates, PageState } from "../Page";
+import ScrollTop from "../ScrollTop";
 import PlanMealsEdit from "./PlanMealsEdit";
 import { PlanMealsRead } from "./PlanMealsRead";
 
@@ -93,6 +95,7 @@ export default function PlanEdit() {
 
   return (
     <Page {...pageState}>
+      <ScrollTop />
       <FormProvider {...formMethods}>
         <form
           onSubmit={formMethods.handleSubmit((x) =>
@@ -136,7 +139,7 @@ export default function PlanEdit() {
                   rowGap: 1,
                 }}
               >
-                <Typography variant="body1">Summary</Typography>
+                <CardTitle text="Summary" />
                 <TextInput
                   name="date"
                   label="Date"
@@ -149,7 +152,7 @@ export default function PlanEdit() {
           </Card>
           <Card sx={{ mt: 1 }}>
             <CardContent>
-              <Typography variant="body1">Meals</Typography>
+              <CardTitle text="Meals" />
               <PlanMealsRead meals={meals.data} ids={selectedMeals} />
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
@@ -160,7 +163,7 @@ export default function PlanEdit() {
           </Card>
           <Card sx={{ mt: 1 }}>
             <CardContent>
-              <Typography variant="body1">Groceries</Typography>
+              <CardTitle text="Groceries" />
             </CardContent>
           </Card>
         </form>

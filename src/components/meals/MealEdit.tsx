@@ -20,6 +20,7 @@ import {
 } from "../../providers/providerMeal";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
+import CardTitle from "../items/CardTitle";
 import Page, { combineStates, PageState } from "../Page";
 import ScrollTop from "../ScrollTop";
 
@@ -124,7 +125,7 @@ export default function MealEdit() {
                   rowGap: 1,
                 }}
               >
-                <Typography variant="caption">Summary</Typography>
+                <CardTitle text="Summary" />
                 <TextInput
                   name="name"
                   label="Name"
@@ -136,7 +137,7 @@ export default function MealEdit() {
           </Card>
           <Card sx={{ mt: 1 }}>
             <CardContent>
-              <Typography variant="caption">Groceries</Typography>
+              <CardTitle text="Groceries" />
             </CardContent>
           </Card>
         </form>

@@ -9,6 +9,7 @@ import {
 import { Link as RouterLink, useParams } from "react-router-dom";
 import { useMeal } from "../../providers/providerMeal";
 import GroceriesRead from "../groceries/GroceriesRead";
+import CardTitle from "../items/CardTitle";
 import Page from "../Page";
 
 export default function MealRead() {
@@ -44,8 +45,7 @@ export default function MealRead() {
               rowGap: 1,
             }}
           >
-            <Typography variant="caption">Summary</Typography>
-
+            <CardTitle text="Summary" />
             <Typography variant="body1" whiteSpace="pre-wrap">
               {meal.data?.notes}
             </Typography>
@@ -54,12 +54,7 @@ export default function MealRead() {
       </Card>
       <Card sx={{ mt: 1 }}>
         <CardContent>
-          <Box sx={{ mb: 1 }}>
-            <Typography variant="body1" fontWeight="light">
-              Groceries
-            </Typography>
-          </Box>
-
+          <CardTitle text="Groceries" />
           <GroceriesRead />
         </CardContent>
       </Card>

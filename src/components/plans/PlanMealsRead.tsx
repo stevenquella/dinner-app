@@ -10,7 +10,7 @@ export type PlanMealsReadProps = {
 
 export function PlanMealsRead(props: PlanMealsReadProps) {
   return (
-    <List>
+    <List disablePadding>
       {getMealsById(props.meals, props.ids).map((meal) => (
         <ListItem
           key={meal.id}

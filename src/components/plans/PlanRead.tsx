@@ -9,6 +9,7 @@ import {
 import { Link as RouterLink, useParams } from "react-router-dom";
 import { useMeals } from "../../providers/providerMeal";
 import { usePlan } from "../../providers/providerPlan";
+import CardTitle from "../items/CardTitle";
 import Page from "../Page";
 import { PlanMealsRead } from "./PlanMealsRead";
 
@@ -49,8 +50,7 @@ export default function PlanRead() {
               rowGap: 1,
             }}
           >
-            <Typography variant="caption">Summary</Typography>
-
+            <CardTitle text="Summary" />
             <Typography variant="body1" whiteSpace="pre-wrap">
               {plan.data?.notes}
             </Typography>
@@ -59,7 +59,7 @@ export default function PlanRead() {
       </Card>
       <Card sx={{ mt: 1 }}>
         <CardContent>
-          <Typography variant="caption">Meals</Typography>
+          <CardTitle text="Meals" />
           <PlanMealsRead
             meals={meals.data}
             ids={plan.data?.plan_meal.map((x) => x.meal_id)}
@@ -68,7 +68,7 @@ export default function PlanRead() {
       </Card>
       <Card sx={{ mt: 1 }}>
         <CardContent>
-          <Typography variant="caption">Groceries</Typography>
+          <CardTitle text="Groceries" />
         </CardContent>
       </Card>
     </Page>
