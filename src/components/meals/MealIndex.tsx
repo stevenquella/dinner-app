@@ -40,7 +40,7 @@ export default function MealIndex() {
         </Link>
         <SearchInput
           name="search"
-          placeholder="Search meals..."
+          label="Search meals..."
           defaultValue={mealSearch}
           onChange={setMealSearch}
         />

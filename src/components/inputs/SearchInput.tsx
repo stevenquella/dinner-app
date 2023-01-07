@@ -4,7 +4,6 @@ import { useMemo } from "react";
 
 export type SearchInputProps = {
   name: string;
-  placeholder?: string;
   defaultValue: string;
   label?: string;
   type?: string;
@@ -22,11 +21,10 @@ export default function SearchInput(props: SearchInputProps) {
 
   return (
     <TextField
-      variant="outlined"
+      variant="filled"
       size="small"
       type={props.type ?? "search"}
       label={props.label}
-      placeholder="Search meals..."
       defaultValue={props.defaultValue}
       onChange={debouncedChangeHandler}
       fullWidth

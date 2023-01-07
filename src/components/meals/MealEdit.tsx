@@ -1,6 +1,7 @@
 import {
   Button,
   Card,
+  CardActions,
   CardContent,
   Dialog,
   DialogActions,
@@ -18,6 +19,7 @@ import {
   useMealDeleteMutation,
   useMealUpsertMutation,
 } from "../../providers/providerMeal";
+import GroceryEdit from "../groceries/GroceryEdit";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 import CardTitle from "../items/CardTitle";
@@ -45,6 +47,7 @@ const formValidation: MealValidation = {
 export default function MealEdit() {
   const navigate = useNavigate();
   const userid = useAtomValue(useridAtom);
+  const [addGrocery, setAddGrocery] = useState<boolean>(false);
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
   const { id } = useParams();
@@ -139,9 +142,15 @@ export default function MealEdit() {
             <CardContent>
               <CardTitle text="Groceries" />
             </CardContent>
+            <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
+              <Button color="secondary" onClick={() => setAddGrocery(true)}>
+                Add Grocery Item
+              </Button>
+            </CardActions>
           </Card>
         </form>
       </FormProvider>
+      <GroceryEdit open={addGrocery} onDismiss={() => setAddGrocery(false)} />
       {!isCreate ? (
         <div>
           <Button
