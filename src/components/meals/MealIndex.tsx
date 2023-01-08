@@ -1,3 +1,4 @@
+import { LocalGroceryStore } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -56,9 +57,14 @@ export default function MealIndex() {
             <Card sx={{ borderBottom: 1, borderColor: "divider" }}>
               <CardActionArea>
                 <CardContent>
-                  <Typography variant="body1">
-                    <HighlightText search={mealSearch} text={meal.name} />
-                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Typography variant="body1" flexGrow={1}>
+                      <HighlightText search={mealSearch} text={meal.name} />
+                    </Typography>
+                    {meal.meal_grocery.length > 0 ? (
+                      <LocalGroceryStore fontSize="small" color="info" />
+                    ) : null}
+                  </Box>
                 </CardContent>
               </CardActionArea>
             </Card>

@@ -1,5 +1,12 @@
-import { OpenInNew } from "@mui/icons-material";
-import { IconButton, Link, List, ListItem, ListItemText } from "@mui/material";
+import { LocalGroceryStore, OpenInNew } from "@mui/icons-material";
+import {
+  IconButton,
+  Link,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { getMealsById, Meal } from "../../providers/providerMeal";
 
@@ -33,6 +40,11 @@ export function PlanMealsRead(props: PlanMealsReadProps) {
           }
         >
           <ListItemText primary={meal.name} />
+          {meal.meal_grocery.length > 0 ? (
+            <ListItemIcon>
+              <LocalGroceryStore fontSize="small" color="info" />{" "}
+            </ListItemIcon>
+          ) : null}
         </ListItem>
       ))}
     </List>

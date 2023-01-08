@@ -1,3 +1,4 @@
+import { LocalGroceryStore } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -82,6 +83,9 @@ export default function PlanMealsEdit(props: PlanMealsProps) {
                 onClick={() => handleSelect(x.id)}
               >
                 <ListItemText primary={x.name} />
+                {x.meal_grocery.length > 0 ? (
+                  <LocalGroceryStore fontSize="small" color="info" />
+                ) : null}
               </ListItemButton>
             ))}
           </List>
