@@ -4,8 +4,14 @@ import { Database } from "./client.types";
 import { notEmpty } from "./helpers";
 
 const grocery_table = "grocery";
-const groceryQueryKeys = {
+export const groceryQueryKeys = {
   groceries: ["groceries"],
+  groceriesPlan: (planId: string, mealIds: string[]) => [
+    "groceries",
+    "plan",
+    planId,
+    ...mealIds,
+  ],
   groceryContent: (category: string, name: string) => [
     "groceries",
     "content",
@@ -14,7 +20,10 @@ const groceryQueryKeys = {
   ],
 };
 
-export type Grocery = Database["public"]["Tables"]["grocery"]["Row"];
+export type GroceryMeal = Database["public"]["Tables"]["meal_grocery"]["Row"];
+export type Grocery = Database["public"]["Tables"]["grocery"]["Row"] & {
+  meal_grocery: GroceryMeal[];
+};
 export type GroceryInsert = Database["public"]["Tables"]["grocery"]["Insert"];
 
 export const groceryCategories = [
@@ -40,6 +49,18 @@ export const useGroceries = () => {
   return useQuery({
     queryKey: groceryQueryKeys.groceries,
     queryFn: () => retrieveGroceries(),
+  });
+};
+
+export const usePlanGroceries = (
+  planId: string,
+  mealIds: string[],
+  enabled: boolean
+) => {
+  return useQuery({
+    queryKey: groceryQueryKeys.groceriesPlan(planId, mealIds),
+    queryFn: () => retrievePlanGroceries(mealIds),
+    enabled: enabled,
   });
 };
 
@@ -74,7 +95,24 @@ export const useGroceryUpsertMutation = (options: {
 // FUNCTIONS
 
 async function retrieveGroceries(): Promise<Grocery[]> {
-  const response = await supabase.from(grocery_table).select();
+  const columns = `
+    *,
+    meal_grocery(*)
+  `;
+  const response = await supabase.from(grocery_table).select(columns);
+  return ensureSuccess(response);
+}
+
+async function retrievePlanGroceries(mealIds: string[]): Promise<Grocery[]> {
+  const columns = `
+    *,
+    meal_grocery!inner(*)
+  `;
+  const response = await supabase
+    .from(grocery_table)
+    .select(columns)
+    .in("meal_grocery.meal_id", mealIds);
+
   return ensureSuccess(response);
 }
 

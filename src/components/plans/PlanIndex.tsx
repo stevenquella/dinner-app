@@ -51,7 +51,7 @@ export default function PlanIndex() {
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 1 }}>
         {plans.data?.map((plan) => (
-          <Card sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Card key={plan.id} sx={{ borderBottom: 1, borderColor: "divider" }}>
             <CardContent>
               <CardTitle
                 text={`${plan.date}${plan.notes ? `, ${plan.notes}` : ""}`}

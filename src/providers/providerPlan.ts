@@ -9,6 +9,7 @@ import {
   supabase,
 } from "./client";
 import { Database } from "./client.types";
+import { groceryQueryKeys } from "./providerGrocery";
 
 const plan_table = "plan";
 const plan_meal_table = "plan_meal";
@@ -83,6 +84,9 @@ export const usePlanUpsertMutation = (options: {
     onSuccess: (plan: Plan) => {
       queryClient.invalidateQueries({
         queryKey: [planQueryKeys.plans],
+      });
+      queryClient.invalidateQueries({
+        queryKey: groceryQueryKeys.groceriesPlan(plan.id, []),
       });
 
       queryClient.setQueryData(planQueryKeys.plan(plan.id), plan);

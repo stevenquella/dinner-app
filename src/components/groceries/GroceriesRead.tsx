@@ -8,6 +8,7 @@ import {
 export type GroceriesReadProps = {
   groceries?: Grocery[];
   ids?: string[];
+  showCount?: boolean;
   onDelete?: (id: string) => void;
 };
 
@@ -28,6 +29,7 @@ export default function GroceriesRead(props: GroceriesReadProps) {
             category={category}
             groceries={byCategory}
             onDelete={props.onDelete}
+            showCount={props.showCount ?? false}
           />
         );
       })}
@@ -38,6 +40,7 @@ export default function GroceriesRead(props: GroceriesReadProps) {
 type GroceriesReadCategoryProps = {
   category: string;
   groceries?: Grocery[];
+  showCount: boolean;
   onDelete?: (id: string) => void;
 };
 
@@ -54,9 +57,12 @@ function GroceriesReadCategory(props: GroceriesReadCategoryProps) {
         {props.category}
       </Typography>
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
-        {props.groceries?.map((g) => (
-          <Chip key={g.id} label={g.name} onDelete={handleDelete(g.id)} />
-        ))}
+        {props.groceries?.map((g) => {
+          const name = props.showCount
+            ? `${g.name} (${g.meal_grocery.length})`
+            : g.name;
+          return <Chip key={g.id} label={name} onDelete={handleDelete(g.id)} />;
+        })}
       </Box>
     </Box>
   );

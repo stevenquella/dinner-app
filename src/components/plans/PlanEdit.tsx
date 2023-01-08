@@ -79,7 +79,7 @@ export default function PlanEdit() {
   const planUpsert = usePlanUpsertMutation({
     onSuccess: ({ id }) => {
       if (isCreate) {
-        navigate(`/plans/edit/${id}`, { replace: true });
+        navigate(`/plans/read/${id}`, { replace: true });
       } else {
         navigate(-1);
       }
@@ -160,11 +160,6 @@ export default function PlanEdit() {
                 Edit Meals
               </Button>
             </CardActions>
-          </Card>
-          <Card sx={{ mt: 1 }}>
-            <CardContent>
-              <CardTitle text="Groceries" />
-            </CardContent>
           </Card>
         </form>
       </FormProvider>

@@ -7,22 +7,31 @@ import {
   Typography,
 } from "@mui/material";
 import { Link as RouterLink, useParams } from "react-router-dom";
+import { usePlanGroceries } from "../../providers/providerGrocery";
 import { useMeals } from "../../providers/providerMeal";
 import { usePlan } from "../../providers/providerPlan";
+import GroceriesRead from "../groceries/GroceriesRead";
 import CardTitle from "../items/CardTitle";
-import Page from "../Page";
+import Page, { combineStates } from "../Page";
 import { PlanMealsRead } from "./PlanMealsRead";
 
 export default function PlanRead() {
   const { id } = useParams();
 
+  const meals = useMeals();
   const plan = usePlan({
     id: id ?? null,
   });
-  const meals = useMeals();
+  const planGroceries = usePlanGroceries(
+    id ?? "",
+    plan.data?.plan_meal.map((x) => x.meal_id) ?? [],
+    id != null && !!plan.data
+  );
+
+  const pageState = combineStates([meals, plan, planGroceries]);
 
   return (
-    <Page {...plan}>
+    <Page {...pageState}>
       <Box
         sx={{
           display: "flex",
@@ -35,7 +44,10 @@ export default function PlanRead() {
         <Typography variant="h5">{plan.data?.date}</Typography>
 
         <Link component={RouterLink} to={`/plans/edit/${id}`}>
-          <Button variant="contained" disabled={plan.isLoading || plan.isError}>
+          <Button
+            variant="contained"
+            disabled={pageState.isLoading || plan.isError}
+          >
             Edit
           </Button>
         </Link>
@@ -68,7 +80,12 @@ export default function PlanRead() {
       </Card>
       <Card sx={{ mt: 1 }}>
         <CardContent>
-          <CardTitle text="Groceries" />
+          <CardTitle text={`Groceries (${planGroceries.data?.length})`} />
+          <GroceriesRead
+            groceries={planGroceries.data}
+            ids={planGroceries.data?.map((x) => x.id)}
+            showCount
+          />
         </CardContent>
       </Card>
     </Page>
