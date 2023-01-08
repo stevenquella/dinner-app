@@ -1,4 +1,10 @@
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material";
 import { Controller } from "react-hook-form";
 import { InputValidation } from "./types";
 
@@ -35,6 +41,11 @@ export default function SelectInput(props: TextInputProps) {
               </MenuItem>
             ))}
           </Select>
+          {item.fieldState.error != null ? (
+            <FormHelperText>{item.fieldState.error?.message}</FormHelperText>
+          ) : (
+            <span></span>
+          )}
         </FormControl>
       )}
     />

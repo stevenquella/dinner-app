@@ -49,11 +49,11 @@ export const useMeal = (options: {
     enabled: options.id != null,
     initialData: () => {
       return queryClient
-        .getQueryData<Meal[]>([mealQueryKeys.meals])
+        .getQueryData<Meal[]>(mealQueryKeys.meals)
         ?.find((x) => x.id === options.id);
     },
     initialDataUpdatedAt: () => {
-      return queryClient.getQueryState([mealQueryKeys.meals])?.dataUpdatedAt;
+      return queryClient.getQueryState(mealQueryKeys.meals)?.dataUpdatedAt;
     },
     onSuccess: (meal) => {
       if (meal && options.onSuccess) {

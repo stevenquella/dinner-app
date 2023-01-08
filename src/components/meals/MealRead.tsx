@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import { Link as RouterLink, useParams } from "react-router-dom";
 import { useMeal } from "../../providers/providerMeal";
-import GroceriesRead from "../groceries/GroceriesRead";
 import CardTitle from "../items/CardTitle";
 import Page from "../Page";
 
@@ -55,7 +54,6 @@ export default function MealRead() {
       <Card sx={{ mt: 1 }}>
         <CardContent>
           <CardTitle text="Groceries" />
-          <GroceriesRead />
         </CardContent>
       </Card>
     </Page>

@@ -56,11 +56,11 @@ export const usePlan = (options: {
     enabled: options.id != null,
     initialData: () => {
       return queryClient
-        .getQueryData<Plan[]>([planQueryKeys.plans])
+        .getQueryData<Plan[]>(planQueryKeys.plans)
         ?.find((x) => x.id === options.id);
     },
     initialDataUpdatedAt: () => {
-      return queryClient.getQueryState([planQueryKeys.plans])?.dataUpdatedAt;
+      return queryClient.getQueryState(planQueryKeys.plans)?.dataUpdatedAt;
     },
     onSuccess: (meal) => {
       if (meal && options.onSuccess) {
@@ -107,10 +107,10 @@ const columns = `
   notes,
   plan_meal (*)`;
 
-async function retrievePlans(search?: string): Promise<Plan[]> {
+async function retrievePlans(date?: string): Promise<Plan[]> {
   let query = supabase.from(plan_table).select(columns).order("date");
-  if (search) {
-    const searchDate = dayjs(search);
+  if (date) {
+    const searchDate = dayjs(date);
     const start = searchDate.add(-7, "day").toISOString();
     const end = searchDate.add(7, "day").toISOString();
     query = query.gte("date", start).lte("date", end);

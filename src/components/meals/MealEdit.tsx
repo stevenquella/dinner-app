@@ -9,16 +9,19 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
+import produce from "immer";
 import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
+import { useGroceries } from "../../providers/providerGrocery";
 import {
   useMeal,
   useMealDeleteMutation,
   useMealUpsertMutation,
 } from "../../providers/providerMeal";
+import GroceriesRead from "../groceries/GroceriesRead";
 import GroceryEdit from "../groceries/GroceryEdit";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
@@ -49,6 +52,7 @@ export default function MealEdit() {
   const userid = useAtomValue(useridAtom);
   const [addGrocery, setAddGrocery] = useState<boolean>(false);
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+  const [selectedGroceries, setSelectedGroceries] = useState<string[]>([]);
 
   const { id } = useParams();
   const isCreate: boolean = !(id != null);
@@ -60,6 +64,8 @@ export default function MealEdit() {
     },
   });
 
+  const groceries = useGroceries();
+
   const meal = useMeal({
     id: id ?? null,
     onSuccess: (meal) =>
@@ -68,6 +74,7 @@ export default function MealEdit() {
         notes: meal.notes ?? "",
       }),
   });
+
   const mealUpsert = useMealUpsertMutation({
     onSuccess: (id) => {
       if (isCreate) {
@@ -77,13 +84,35 @@ export default function MealEdit() {
       }
     },
   });
+
   const mealDelete = useMealDeleteMutation({
     onSuccess: () => navigate("/meals", { replace: true }),
   });
 
+  const handleAddGrocery = (id: string) => {
+    if (selectedGroceries.indexOf(id) === -1) {
+      setSelectedGroceries(
+        produce(selectedGroceries, (draft) => {
+          draft.push(id);
+        })
+      );
+    }
+  };
+
+  const handleDeleteGrocery = (id: string) => {
+    const index = selectedGroceries.indexOf(id);
+    if (index !== -1) {
+      setSelectedGroceries(
+        produce(selectedGroceries, (draft) => {
+          draft.splice(index, 1);
+        })
+      );
+    }
+  };
+
   const pageState: PageState = isCreate
-    ? combineStates([mealUpsert])
-    : combineStates([meal, mealUpsert, mealDelete]);
+    ? combineStates([groceries, mealUpsert])
+    : combineStates([groceries, meal, mealUpsert, mealDelete]);
 
   return (
     <Page {...pageState}>
@@ -140,17 +169,30 @@ export default function MealEdit() {
           </Card>
           <Card sx={{ mt: 1 }}>
             <CardContent>
-              <CardTitle text="Groceries" />
+              <CardTitle text={`Groceries (${selectedGroceries.length})`} />
+              <GroceriesRead
+                groceries={groceries.data}
+                ids={selectedGroceries}
+                onDelete={handleDeleteGrocery}
+              />
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
-              <Button color="secondary" onClick={() => setAddGrocery(true)}>
+              <Button
+                color="secondary"
+                onClick={() => setAddGrocery(true)}
+                disabled={pageState.isLoading || pageState.isError}
+              >
                 Add Grocery Item
               </Button>
             </CardActions>
           </Card>
         </form>
       </FormProvider>
-      <GroceryEdit open={addGrocery} onDismiss={() => setAddGrocery(false)} />
+      <GroceryEdit
+        open={addGrocery}
+        onDismiss={() => setAddGrocery(false)}
+        onAddGrocery={handleAddGrocery}
+      />
       {!isCreate ? (
         <div>
           <Button

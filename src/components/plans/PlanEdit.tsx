@@ -152,7 +152,7 @@ export default function PlanEdit() {
           </Card>
           <Card sx={{ mt: 1 }}>
             <CardContent>
-              <CardTitle text="Meals" />
+              <CardTitle text={`Meals (${selectedMeals.length})`} />
               <PlanMealsRead meals={meals.data} ids={selectedMeals} />
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>

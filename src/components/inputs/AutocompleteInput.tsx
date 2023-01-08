@@ -29,6 +29,8 @@ export default function AutocompleteInput(props: AutocompleteInputProps) {
               inputRef={item.field.ref}
               variant="filled"
               label={props.label}
+              error={item.fieldState.error != null}
+              helperText={item.fieldState.error?.message}
             />
           )}
         />
