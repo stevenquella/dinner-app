@@ -68,11 +68,13 @@ export default function MealEdit() {
 
   const meal = useMeal({
     id: id ?? null,
-    onSuccess: (meal) =>
+    onSuccess: (meal) => {
       formMethods.reset({
         name: meal.name,
         notes: meal.notes ?? "",
-      }),
+      });
+      setSelectedGroceries(meal.meal_grocery.map((x) => x.grocery_id));
+    },
   });
 
   const mealUpsert = useMealUpsertMutation({
@@ -121,9 +123,12 @@ export default function MealEdit() {
         <form
           onSubmit={formMethods.handleSubmit((x) =>
             mealUpsert.mutate({
-              id: id,
-              user_id: userid,
-              ...x,
+              meal: {
+                id: id,
+                user_id: userid,
+                ...x,
+              },
+              groceries: selectedGroceries,
             })
           )}
         >

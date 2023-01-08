@@ -11,8 +11,13 @@ import { Database } from "./client.types";
 import { notEmpty } from "./helpers";
 
 const meal_table = "meal";
+const meal_grocery_table = "meal_grocery";
+
 export type MealInsert = Database["public"]["Tables"]["meal"]["Insert"];
-export type Meal = Database["public"]["Tables"]["meal"]["Row"];
+export type MealGrocery = Database["public"]["Tables"]["meal_grocery"]["Row"];
+export type Meal = Database["public"]["Tables"]["meal"]["Row"] & {
+  meal_grocery: MealGrocery[];
+};
 
 const mealQueryKeys = {
   meals: ["meals"],
@@ -80,7 +85,8 @@ export const useMealUpsertMutation = (options: {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (meal: MealInsert) => upsertMeal(meal),
+    mutationFn: (data: { meal: MealInsert; groceries: string[] }) =>
+      upsertMeal(data.meal, data.groceries),
     onSuccess: (meal) => {
       queryClient.invalidateQueries({
         queryKey: [mealQueryKeys.meals],
@@ -110,8 +116,16 @@ export const useMealDeleteMutation = (options: { onSuccess: () => void }) => {
 
 // FUNCTIONS
 
+const columns = `
+  id,
+  user_id,
+  name,
+  notes,
+  meal_grocery (*)
+`;
+
 async function retrieveMeals(search?: string): Promise<Meal[]> {
-  let query = supabase.from(meal_table).select().order("name");
+  let query = supabase.from(meal_table).select(columns).order("name");
   if (search) {
     query = query.ilike("name", `%${search}%`);
   }
@@ -121,19 +135,50 @@ async function retrieveMeals(search?: string): Promise<Meal[]> {
 }
 
 async function retrieveMeal(id: string): Promise<Meal> {
-  const response = await supabase.from(meal_table).select().eq("id", id);
+  const response = await supabase.from(meal_table).select(columns).eq("id", id);
   return getSingleRow<Meal>(response);
 }
 
-async function upsertMeal(meal: MealInsert): Promise<Meal> {
-  const response = await supabase
+async function upsertMeal(
+  meal: MealInsert,
+  groceries: string[]
+): Promise<Meal> {
+  const upsertMealResponse = await supabase
     .from(meal_table)
     .upsert<MealInsert>(meal)
-    .select();
-  return getSingleRow(response);
+    .select("id");
+  const updatedMeal = getSingleRow(upsertMealResponse);
+
+  const deleteGroceriesResponse = await supabase
+    .from(meal_grocery_table)
+    .delete()
+    .eq("meal_id", updatedMeal.id);
+
+  ensureSuccess(deleteGroceriesResponse);
+
+  const upsertGroceriesResponse = await supabase
+    .from(meal_grocery_table)
+    .upsert(
+      groceries.map((id) => ({
+        user_id: meal.user_id,
+        meal_id: updatedMeal.id,
+        grocery_id: id,
+      }))
+    );
+
+  ensureSuccess(upsertGroceriesResponse);
+
+  return retrieveMeal(updatedMeal.id);
 }
 
 async function deleteMeal(id: string): Promise<boolean> {
+  const deleteGroceriesResponse = await supabase
+    .from(meal_grocery_table)
+    .delete()
+    .eq("meal_id", id);
+
+  ensureSuccess(deleteGroceriesResponse);
+
   const response = await supabase.from(meal_table).delete().eq("id", id);
   return ensureEmptySuccess(response);
 }

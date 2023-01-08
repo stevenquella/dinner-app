@@ -7,7 +7,7 @@ import {
 
 export type GroceriesReadProps = {
   groceries?: Grocery[];
-  ids: string[];
+  ids?: string[];
   onDelete?: (id: string) => void;
 };
 
