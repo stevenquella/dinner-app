@@ -11,6 +11,7 @@ import { Database } from "./client.types";
 import { notEmpty } from "./helpers";
 
 const meal_table = "meal";
+const meal_plan_table = "plan_meal";
 const meal_grocery_table = "meal_grocery";
 
 export type MealInsert = Database["public"]["Tables"]["meal"]["Insert"];
@@ -172,6 +173,13 @@ async function upsertMeal(
 }
 
 async function deleteMeal(id: string): Promise<boolean> {
+  const deletePlanMealsResponse = await supabase
+    .from(meal_plan_table)
+    .delete()
+    .eq("meal_id", id);
+
+  ensureSuccess(deletePlanMealsResponse);
+
   const deleteGroceriesResponse = await supabase
     .from(meal_grocery_table)
     .delete()

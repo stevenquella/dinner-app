@@ -5,6 +5,7 @@ import {
   CardContent,
   Dialog,
   DialogActions,
+  DialogContent,
   DialogTitle,
   Typography,
 } from "@mui/material";
@@ -211,6 +212,11 @@ export default function MealEdit() {
           </Button>
           <Dialog maxWidth="sm" fullWidth={true} open={confirmDelete}>
             <DialogTitle>Delete meal?</DialogTitle>
+            <DialogContent>
+              <Typography>
+                Deleting this meal will remove it from any related plans.
+              </Typography>
+            </DialogContent>
             <DialogActions>
               <Button color="info" onClick={() => setConfirmDelete(false)}>
                 Cancel
