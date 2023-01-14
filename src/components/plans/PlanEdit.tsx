@@ -24,10 +24,10 @@ import {
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 import CardTitle from "../items/CardTitle";
+import { MealsRelated } from "../meals/MealsRelated";
 import Page, { combineStates, PageState } from "../Page";
 import ScrollTop from "../ScrollTop";
 import PlanMealsEdit from "./PlanMealsEdit";
-import { PlanMealsRead } from "./PlanMealsRead";
 
 type PlanInputs = {
   date: string;
@@ -153,7 +153,11 @@ export default function PlanEdit() {
           <Card sx={{ mt: 1 }}>
             <CardContent>
               <CardTitle text={`Meals (${selectedMeals.length})`} />
-              <PlanMealsRead meals={meals.data} ids={selectedMeals} />
+              <MealsRelated
+                meals={meals.data}
+                ids={selectedMeals}
+                linkTarget="_blank"
+              />
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
               <Button color="secondary" onClick={() => setEditMeals(true)}>

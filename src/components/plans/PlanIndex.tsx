@@ -17,8 +17,8 @@ import {
 } from "../../providers/providerPlan";
 import SearchInput from "../inputs/SearchInput";
 import CardTitle from "../items/CardTitle";
+import { MealsRelated } from "../meals/MealsRelated";
 import Page from "../Page";
-import { PlanMealsRead } from "./PlanMealsRead";
 
 export default function PlanIndex() {
   const [plansSearch, setPlansSearch] = useAtom(plansSearchAtom);
@@ -64,7 +64,7 @@ export default function PlanIndex() {
               <CardTitle
                 text={`${plan.date}${plan.notes ? `, ${plan.notes}` : ""}`}
               />
-              <PlanMealsRead
+              <MealsRelated
                 meals={meals.data}
                 ids={plan.plan_meal.map((x) => x.meal_id)}
               />

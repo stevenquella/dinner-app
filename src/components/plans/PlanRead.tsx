@@ -12,8 +12,8 @@ import { useMeals } from "../../providers/providerMeal";
 import { usePlan } from "../../providers/providerPlan";
 import GroceriesRead from "../groceries/GroceriesRead";
 import CardTitle from "../items/CardTitle";
+import { MealsRelated } from "../meals/MealsRelated";
 import Page, { combineStates } from "../Page";
-import { PlanMealsRead } from "./PlanMealsRead";
 
 export default function PlanRead() {
   const { id } = useParams();
@@ -72,7 +72,7 @@ export default function PlanRead() {
       <Card sx={{ mt: 1 }}>
         <CardContent>
           <CardTitle text={`Meals (${plan.data?.plan_meal.length})`} />
-          <PlanMealsRead
+          <MealsRelated
             meals={meals.data}
             ids={plan.data?.plan_meal.map((x) => x.meal_id)}
           />

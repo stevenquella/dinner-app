@@ -1,4 +1,4 @@
-import { LocalGroceryStore, OpenInNew } from "@mui/icons-material";
+import { Launch, LocalGroceryStore } from "@mui/icons-material";
 import {
   IconButton,
   Link,
@@ -10,12 +10,13 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 import { getMealsById, Meal } from "../../providers/providerMeal";
 
-export type PlanMealsReadProps = {
+export type MealsRelatedProps = {
   meals?: Meal[];
   ids?: string[];
+  linkTarget?: string;
 };
 
-export function PlanMealsRead(props: PlanMealsReadProps) {
+export function MealsRelated(props: MealsRelatedProps) {
   return (
     <List disablePadding>
       {getMealsById(props.meals, props.ids).map((meal) => (
@@ -31,10 +32,10 @@ export function PlanMealsRead(props: PlanMealsReadProps) {
             <Link
               component={RouterLink}
               to={`/meals/read/${meal.id}`}
-              target="_blank"
+              target={props.linkTarget}
             >
               <IconButton edge="end">
-                <OpenInNew />
+                <Launch />
               </IconButton>
             </Link>
           }
@@ -47,6 +48,9 @@ export function PlanMealsRead(props: PlanMealsReadProps) {
           ) : null}
         </ListItem>
       ))}
+      {props.ids?.length === 0 ? (
+        <ListItemText primary="No related meals." />
+      ) : null}
     </List>
   );
 }

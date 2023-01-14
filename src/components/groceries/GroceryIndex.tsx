@@ -1,3 +1,4 @@
+import { Flatware } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -5,14 +6,25 @@ import {
   CardActionArea,
   CardContent,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Typography,
 } from "@mui/material";
-import { useGroceries } from "../../providers/providerGrocery";
+import { useState } from "react";
+import { Grocery, useGroceries } from "../../providers/providerGrocery";
+import { useMeals } from "../../providers/providerMeal";
 import HighlightText from "../items/HighlightText";
+import { MealsRelated } from "../meals/MealsRelated";
 import Page from "../Page";
+import GroceryEdit from "./GroceryEdit";
 
 export default function GroceryIndex() {
+  const meals = useMeals();
   const groceries = useGroceries();
+  const [createGrocery, setCreateGrocery] = useState<boolean>(false);
+  const [selectedGrocery, setSelectedGrocery] = useState<Grocery>();
 
   return (
     <Page {...groceries}>
@@ -26,21 +38,29 @@ export default function GroceryIndex() {
         }}
       >
         <Typography variant="h5">Groceries</Typography>
-        <Button variant="contained" size="small">
+        <Button
+          variant="contained"
+          size="small"
+          onClick={() => setCreateGrocery(true)}
+        >
           Create Groceries
         </Button>
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 1 }}>
         {groceries.data?.map((grocery) => (
           <Card sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <CardActionArea>
+            <CardActionArea onClick={() => setSelectedGrocery(grocery)}>
               <CardContent>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Typography variant="body1" flexGrow={1}>
                     <HighlightText text={grocery.name} search={""} />
                   </Typography>
                   {grocery.meal_grocery.length > 0 ? (
-                    <Chip label={grocery.meal_grocery.length} />
+                    <Chip
+                      icon={<Flatware />}
+                      label={grocery.meal_grocery.length}
+                      variant="outlined"
+                    />
                   ) : null}
                 </Box>
               </CardContent>
@@ -53,6 +73,31 @@ export default function GroceryIndex() {
       ) : (
         <span></span>
       )}
+
+      <GroceryEdit
+        open={createGrocery}
+        onDismiss={() => setCreateGrocery(false)}
+        onAddGrocery={() => {}}
+      />
+      <Dialog
+        keepMounted
+        maxWidth="sm"
+        fullWidth={true}
+        open={!!selectedGrocery}
+      >
+        <DialogTitle>{selectedGrocery?.name}</DialogTitle>
+        <DialogContent>
+          <MealsRelated
+            meals={meals.data}
+            ids={selectedGrocery?.meal_grocery.map((x) => x.meal_id)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button color="info" onClick={() => setSelectedGrocery(undefined)}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Page>
   );
 }
