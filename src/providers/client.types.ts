@@ -4,140 +4,114 @@ export type Json =
   | boolean
   | null
   | { [key: string]: Json }
-  | Json[];
+  | Json[]
 
 export interface Database {
   public: {
     Tables: {
       grocery: {
         Row: {
-          id: string;
-          user_id: string;
-          category: string;
-          name: string;
-        };
+          category: string
+          id: string
+          name: string
+          user_id: string
+        }
         Insert: {
-          id?: string;
-          user_id: string;
-          category: string;
-          name: string;
-        };
+          category: string
+          id?: string
+          name: string
+          user_id: string
+        }
         Update: {
-          id?: string;
-          user_id?: string;
-          category?: string;
-          name?: string;
-        };
-      };
+          category?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+      }
       meal: {
         Row: {
-          id: string;
-          name: string;
-          user_id: string;
-          notes: string | null;
-        };
+          id: string
+          name: string
+          notes: string | null
+          user_id: string
+        }
         Insert: {
-          id?: string;
-          name: string;
-          user_id: string;
-          notes?: string | null;
-        };
+          id?: string
+          name: string
+          notes?: string | null
+          user_id: string
+        }
         Update: {
-          id?: string;
-          name?: string;
-          user_id?: string;
-          notes?: string | null;
-        };
-      };
+          id?: string
+          name?: string
+          notes?: string | null
+          user_id?: string
+        }
+      }
       meal_grocery: {
         Row: {
-          user_id: string;
-          meal_id: string;
-          grocery_id: string;
-          order: number | null;
-        };
+          grocery_id: string
+          meal_id: string
+          user_id: string
+        }
         Insert: {
-          user_id: string;
-          meal_id: string;
-          grocery_id: string;
-          order?: number | null;
-        };
+          grocery_id: string
+          meal_id: string
+          user_id: string
+        }
         Update: {
-          user_id?: string;
-          meal_id?: string;
-          grocery_id?: string;
-          order?: number | null;
-        };
-      };
+          grocery_id?: string
+          meal_id?: string
+          user_id?: string
+        }
+      }
       plan: {
         Row: {
-          id: string;
-          user_id: string;
-          date: string;
-          notes: string | null;
-        };
+          date: string
+          id: string
+          notes: string | null
+          user_id: string
+        }
         Insert: {
-          id?: string;
-          user_id: string;
-          date: string;
-          notes?: string | null;
-        };
+          date: string
+          id?: string
+          notes?: string | null
+          user_id: string
+        }
         Update: {
-          id?: string;
-          user_id?: string;
-          date?: string;
-          notes?: string | null;
-        };
-      };
-      plan_grocery: {
-        Row: {
-          user_id: string;
-          plan_id: string;
-          grocery_id: string;
-          count: number;
-        };
-        Insert: {
-          user_id: string;
-          plan_id: string;
-          grocery_id: string;
-          count?: number;
-        };
-        Update: {
-          user_id?: string;
-          plan_id?: string;
-          grocery_id?: string;
-          count?: number;
-        };
-      };
+          date?: string
+          id?: string
+          notes?: string | null
+          user_id?: string
+        }
+      }
       plan_meal: {
         Row: {
-          user_id: string;
-          plan_id: string;
-          meal_id: string;
-          order: number | null;
-        };
+          meal_id: string
+          plan_id: string
+          user_id: string
+        }
         Insert: {
-          user_id: string;
-          plan_id: string;
-          meal_id: string;
-          order?: number | null;
-        };
+          meal_id: string
+          plan_id: string
+          user_id: string
+        }
         Update: {
-          user_id?: string;
-          plan_id?: string;
-          meal_id?: string;
-          order?: number | null;
-        };
-      };
-    };
+          meal_id?: string
+          plan_id?: string
+          user_id?: string
+        }
+      }
+    }
     Views: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Functions: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Enums: {
-      [_ in never]: never;
-    };
-  };
+      [_ in never]: never
+    }
+  }
 }

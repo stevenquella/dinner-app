@@ -29,10 +29,10 @@ export type GroceryInsert = Database["public"]["Tables"]["grocery"]["Insert"];
 export const groceryCategories = [
   "Produce",
   "Protein",
-  "Bakery",
   "Dairy",
   "Pantry",
   "Frozen",
+  "Bakery",
   "Other",
 ] as const;
 
@@ -99,7 +99,10 @@ async function retrieveGroceries(): Promise<Grocery[]> {
     *,
     meal_grocery(*)
   `;
-  const response = await supabase.from(grocery_table).select(columns);
+  const response = await supabase
+    .from(grocery_table)
+    .select(columns)
+    .order("name");
   return ensureSuccess(response);
 }
 

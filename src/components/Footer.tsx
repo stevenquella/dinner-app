@@ -1,11 +1,16 @@
-import { Flatware, ListAlt, Person } from "@mui/icons-material";
+import {
+  Flatware,
+  ListAlt,
+  LocalGroceryStore,
+  Person,
+} from "@mui/icons-material";
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 
 export default function Footer() {
   const location = useLocation();
-  const [nav, setNav] = useState<string>("/");
+  const [nav, setNav] = useState<string>();
 
   useEffect(() => {
     setNav(location.pathname);
@@ -24,7 +29,6 @@ export default function Footer() {
       }}
     >
       <BottomNavigation
-        showLabels
         value={nav}
         onChange={(_event, newValue) => setNav(newValue)}
       >
@@ -41,6 +45,13 @@ export default function Footer() {
           label="Meals"
           value="/meals"
           icon={<Flatware />}
+        />
+        <BottomNavigationAction
+          component={RouterLink}
+          to="groceries"
+          label="Groceries"
+          value="/groceries"
+          icon={<LocalGroceryStore />}
         />
         <BottomNavigationAction
           component={RouterLink}

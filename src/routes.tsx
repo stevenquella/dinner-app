@@ -2,6 +2,7 @@ import { RouteObject } from "react-router-dom";
 import App from "./App";
 import Profile from "./components/auth/Profile";
 import Error from "./components/Error";
+import GroceryIndex from "./components/groceries/GroceryIndex";
 import MealEdit from "./components/meals/MealEdit";
 import MealIndex from "./components/meals/MealIndex";
 import MealRead from "./components/meals/MealRead";
@@ -38,6 +39,10 @@ export const routes: RouteObject[] = [
       {
         path: "meals/read/:id",
         element: <MealRead />,
+      },
+      {
+        path: "groceries",
+        element: <GroceryIndex />,
       },
       {
         path: "profile",
