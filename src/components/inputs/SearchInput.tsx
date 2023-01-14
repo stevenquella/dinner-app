@@ -7,6 +7,7 @@ export type SearchInputProps = {
   defaultValue: string;
   label?: string;
   type?: string;
+  helperText?: string;
   onChange: (val: string) => void;
 };
 
@@ -30,6 +31,7 @@ export default function SearchInput(props: SearchInputProps) {
       fullWidth
       sx={{ bgcolor: "background.paper", mt: 2 }}
       InputLabelProps={{ shrink: props.type === "date" ? true : undefined }}
+      helperText={props.helperText}
     />
   );
 }

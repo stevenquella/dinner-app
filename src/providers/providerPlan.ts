@@ -71,6 +71,15 @@ export const usePlan = (options: {
   });
 };
 
+export function getSearchRange(date: string) {
+  if (date) {
+    const searchDate = dayjs(date);
+    const start = searchDate.add(-7, "day").format("YYYY-MM-DD");
+    const end = searchDate.add(7, "day").format("YYYY-MM-DD");
+    return { start, end };
+  }
+}
+
 // MUTATIONS
 
 export const usePlanUpsertMutation = (options: {
@@ -114,10 +123,8 @@ const columns = `
 async function retrievePlans(date?: string): Promise<Plan[]> {
   let query = supabase.from(plan_table).select(columns).order("date");
   if (date) {
-    const searchDate = dayjs(date);
-    const start = searchDate.add(-7, "day").toISOString();
-    const end = searchDate.add(7, "day").toISOString();
-    query = query.gte("date", start).lte("date", end);
+    const range = getSearchRange(date);
+    query = query.gte("date", range?.start).lte("date", range?.end);
   }
 
   const response = await query;

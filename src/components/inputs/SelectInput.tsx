@@ -25,7 +25,7 @@ export default function SelectInput(props: TextInputProps) {
       name={props.name}
       rules={props.rules}
       render={(item) => (
-        <FormControl fullWidth>
+        <FormControl fullWidth error={!!item.fieldState.error}>
           <InputLabel variant="filled">{props.label}</InputLabel>
           <Select
             id={props.name}

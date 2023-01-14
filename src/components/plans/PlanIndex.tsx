@@ -11,6 +11,7 @@ import { useAtom } from "jotai";
 import { Link as RouterLink } from "react-router-dom";
 import { useMeals } from "../../providers/providerMeal";
 import {
+  getSearchRange,
   plansSearchAtom,
   plansSearchQueryAtom,
 } from "../../providers/providerPlan";
@@ -23,6 +24,12 @@ export default function PlanIndex() {
   const [plansSearch, setPlansSearch] = useAtom(plansSearchAtom);
   const [plans] = useAtom(plansSearchQueryAtom);
   const meals = useMeals();
+
+  const range = getSearchRange(plansSearch);
+  let searchText;
+  if (range) {
+    searchText = `Showing plans from ${range.start} to ${range.end}.`;
+  }
 
   return (
     <Page {...plans}>
@@ -47,6 +54,7 @@ export default function PlanIndex() {
           type="date"
           defaultValue={plansSearch}
           onChange={setPlansSearch}
+          helperText={searchText}
         />
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 1 }}>

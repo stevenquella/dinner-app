@@ -22,6 +22,10 @@ export default function MealIndex() {
   const [mealSearch, setMealSearch] = useAtom(mealsSearchAtom);
   const [meals] = useAtom(mealsSearchQueryAtom);
 
+  const searchText = mealSearch
+    ? `Showing ${meals.data?.length} meals that contain '${mealSearch}'.`
+    : "Showing all meals.";
+
   return (
     <Page {...meals}>
       <Box
@@ -44,6 +48,7 @@ export default function MealIndex() {
           label="Search meals..."
           defaultValue={mealSearch}
           onChange={setMealSearch}
+          helperText={searchText}
         />
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 1 }}>
@@ -59,7 +64,10 @@ export default function MealIndex() {
                 <CardContent>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Typography variant="body1" flexGrow={1}>
-                      <HighlightText search={mealSearch} text={meal.name} />
+                      <HighlightText
+                        search={mealSearch?.trim()}
+                        text={meal.name}
+                      />
                     </Typography>
                     {meal.meal_grocery.length > 0 ? (
                       <LocalGroceryStore fontSize="small" color="info" />
