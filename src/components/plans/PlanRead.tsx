@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import { Link as RouterLink, useParams } from "react-router-dom";
 import { usePlanGroceries } from "../../providers/providerGrocery";
-import { useMeals } from "../../providers/providerMeal";
 import { usePlan } from "../../providers/providerPlan";
 import GroceriesRead from "../groceries/GroceriesRead";
 import CardTitle from "../items/CardTitle";
@@ -18,7 +17,6 @@ import Page, { combineStates } from "../Page";
 export default function PlanRead() {
   const { id } = useParams();
 
-  const meals = useMeals();
   const plan = usePlan({
     id: id ?? null,
   });
@@ -28,7 +26,7 @@ export default function PlanRead() {
     id != null && !!plan.data
   );
 
-  const pageState = combineStates([meals, plan, planGroceries]);
+  const pageState = combineStates([plan, planGroceries]);
 
   return (
     <Page {...pageState}>
@@ -72,10 +70,7 @@ export default function PlanRead() {
       <Card sx={{ mt: 1 }}>
         <CardContent>
           <CardTitle text={`Meals (${plan.data?.plan_meal.length})`} />
-          <MealsRelated
-            meals={meals.data}
-            ids={plan.data?.plan_meal.map((x) => x.meal_id)}
-          />
+          <MealsRelated ids={plan.data?.plan_meal.map((x) => x.meal_id)} />
         </CardContent>
       </Card>
       <Card sx={{ mt: 1 }}>

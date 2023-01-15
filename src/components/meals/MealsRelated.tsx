@@ -8,19 +8,19 @@ import {
   ListItemText,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import { Meal } from "../../providers/provider.types";
-import { getMealsById } from "../../providers/providerMeal";
+import { getMealsById, useMeals } from "../../providers/providerMeal";
 
 export type MealsRelatedProps = {
-  meals?: Meal[];
   ids?: string[];
   linkTarget?: string;
 };
 
 export function MealsRelated(props: MealsRelatedProps) {
+  const meals = useMeals();
+
   return (
     <List disablePadding>
-      {getMealsById(props.meals, props.ids).map((meal) => (
+      {getMealsById(meals.data, props.ids).map((meal) => (
         <ListItem
           key={meal.id}
           sx={{

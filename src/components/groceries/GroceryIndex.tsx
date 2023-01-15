@@ -15,14 +15,12 @@ import {
 import { useState } from "react";
 import { Grocery } from "../../providers/provider.types";
 import { useGroceries } from "../../providers/providerGrocery";
-import { useMeals } from "../../providers/providerMeal";
 import HighlightText from "../items/HighlightText";
 import { MealsRelated } from "../meals/MealsRelated";
 import Page from "../Page";
 import GroceryEdit from "./GroceryEdit";
 
 export default function GroceryIndex() {
-  const meals = useMeals();
   const groceries = useGroceries();
   const [createGrocery, setCreateGrocery] = useState<boolean>(false);
   const [selectedGrocery, setSelectedGrocery] = useState<Grocery>();
@@ -89,7 +87,6 @@ export default function GroceryIndex() {
         <DialogTitle>{selectedGrocery?.name}</DialogTitle>
         <DialogContent>
           <MealsRelated
-            meals={meals.data}
             ids={selectedGrocery?.meal_grocery.map((x) => x.meal_id)}
           />
         </DialogContent>

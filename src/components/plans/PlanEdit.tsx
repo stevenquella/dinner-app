@@ -15,7 +15,6 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
-import { useMeals } from "../../providers/providerMeal";
 import {
   usePlan,
   usePlanDeleteMutation,
@@ -64,7 +63,6 @@ export default function PlanEdit() {
     },
   });
 
-  const meals = useMeals();
   const plan = usePlan({
     id: id ?? null,
     onSuccess: (plan) => {
@@ -90,8 +88,8 @@ export default function PlanEdit() {
   });
 
   const pageState: PageState = isCreate
-    ? combineStates([meals, planUpsert])
-    : combineStates([meals, plan, planUpsert, planDelete]);
+    ? combineStates([planUpsert])
+    : combineStates([plan, planUpsert, planDelete]);
 
   return (
     <Page {...pageState}>
@@ -153,11 +151,7 @@ export default function PlanEdit() {
           <Card sx={{ mt: 1 }}>
             <CardContent>
               <CardTitle text={`Meals (${selectedMeals.length})`} />
-              <MealsRelated
-                meals={meals.data}
-                ids={selectedMeals}
-                linkTarget="_blank"
-              />
+              <MealsRelated ids={selectedMeals} linkTarget="_blank" />
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
               <Button color="secondary" onClick={() => setEditMeals(true)}>

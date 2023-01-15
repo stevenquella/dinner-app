@@ -9,7 +9,6 @@ import {
 } from "@mui/material";
 import { useAtom } from "jotai";
 import { Link as RouterLink } from "react-router-dom";
-import { useMeals } from "../../providers/providerMeal";
 import {
   getSearchRange,
   plansSearchAtom,
@@ -23,8 +22,6 @@ import Page from "../Page";
 export default function PlanIndex() {
   const [plansSearch, setPlansSearch] = useAtom(plansSearchAtom);
   const [plans] = useAtom(plansSearchQueryAtom);
-  const meals = useMeals();
-
   const range = getSearchRange(plansSearch);
   let searchText;
   if (range) {
@@ -64,10 +61,7 @@ export default function PlanIndex() {
               <CardTitle
                 text={`${plan.date}${plan.notes ? `, ${plan.notes}` : ""}`}
               />
-              <MealsRelated
-                meals={meals.data}
-                ids={plan.plan_meal.map((x) => x.meal_id)}
-              />
+              <MealsRelated ids={plan.plan_meal.map((x) => x.meal_id)} />
             </CardContent>
             <CardActions sx={{ flexDirection: "row-reverse" }}>
               <Link
