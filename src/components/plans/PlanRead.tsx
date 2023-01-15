@@ -28,6 +28,12 @@ export default function PlanRead() {
 
   const pageState = combineStates([plan, planGroceries]);
 
+  const handleShare = async () => {
+    await navigator?.share({
+      url: window.location.href,
+    });
+  };
+
   return (
     <Page {...pageState}>
       <Box
@@ -41,14 +47,33 @@ export default function PlanRead() {
       >
         <Typography variant="h5">{plan.data?.date}</Typography>
 
-        <Link component={RouterLink} to={`/plans/edit/${id}`}>
-          <Button
-            variant="contained"
-            disabled={pageState.isLoading || plan.isError}
-          >
-            Edit
-          </Button>
-        </Link>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 1,
+          }}
+        >
+          <Link component={RouterLink} to={`/plans/edit/${id}`}>
+            <Button
+              variant="contained"
+              disabled={pageState.isLoading || plan.isError}
+            >
+              Edit
+            </Button>
+          </Link>
+          {!!navigator.share ? (
+            <Button
+              variant="contained"
+              color="secondary"
+              disabled={pageState.isLoading || plan.isError}
+              onClick={() => handleShare()}
+            >
+              Share
+            </Button>
+          ) : null}
+        </Box>
       </Box>
 
       <Card>
