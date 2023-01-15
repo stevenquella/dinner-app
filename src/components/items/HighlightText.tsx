@@ -46,7 +46,10 @@ export default function HighlightText(props: HighlightTextProps) {
           {parts.map((part, i) => (
             <span key={`highlighttext_${i}`}>
               {part.isMatch ? (
-                <Typography component="span" sx={{ bgcolor: "yellow" }}>
+                <Typography
+                  component="span"
+                  sx={{ textDecoration: "underline" }}
+                >
                   {part.value}
                 </Typography>
               ) : (

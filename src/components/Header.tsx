@@ -30,14 +30,7 @@ export default function Header() {
             />
           </Grid>
           <Grid item>
-            <Typography
-              component="h2"
-              variant="h5"
-              color="inherit"
-              align="center"
-              noWrap
-              sx={{ flex: 1 }}
-            >
+            <Typography variant="h5" align="center" noWrap sx={{ flex: 1 }}>
               What's Supper?
             </Typography>
           </Grid>
