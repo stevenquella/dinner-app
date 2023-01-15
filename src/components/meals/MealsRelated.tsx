@@ -8,7 +8,8 @@ import {
   ListItemText,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import { getMealsById, Meal } from "../../providers/providerMeal";
+import { Meal } from "../../providers/provider.types";
+import { getMealsById } from "../../providers/providerMeal";
 
 export type MealsRelatedProps = {
   meals?: Meal[];

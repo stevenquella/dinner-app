@@ -13,7 +13,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { Grocery, useGroceries } from "../../providers/providerGrocery";
+import { Grocery } from "../../providers/provider.types";
+import { useGroceries } from "../../providers/providerGrocery";
 import { useMeals } from "../../providers/providerMeal";
 import HighlightText from "../items/HighlightText";
 import { MealsRelated } from "../meals/MealsRelated";

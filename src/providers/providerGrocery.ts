@@ -1,9 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ensureSuccess, getSingleRow, supabase } from "./client";
-import { Database } from "./client.types";
 import { notEmpty } from "./helpers";
+import { Grocery, GroceryInsert, grocery_table } from "./provider.types";
 
-const grocery_table = "grocery";
 export const groceryQueryKeys = {
   groceries: ["groceries"],
   groceriesPlan: (planId: string, mealIds: string[]) => [
@@ -19,12 +18,6 @@ export const groceryQueryKeys = {
     name,
   ],
 };
-
-export type GroceryMeal = Database["public"]["Tables"]["meal_grocery"]["Row"];
-export type Grocery = Database["public"]["Tables"]["grocery"]["Row"] & {
-  meal_grocery: GroceryMeal[];
-};
-export type GroceryInsert = Database["public"]["Tables"]["grocery"]["Insert"];
 
 export const groceryCategories = [
   "Produce",

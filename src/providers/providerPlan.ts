@@ -8,22 +8,19 @@ import {
   getSingleRow,
   supabase,
 } from "./client";
-import { Database } from "./client.types";
+import {
+  Plan,
+  PlanInsert,
+  PlanMeal,
+  PlanMealInsert,
+  plan_meal_table,
+  plan_table,
+} from "./provider.types";
 import { groceryQueryKeys } from "./providerGrocery";
-
-const plan_table = "plan";
-const plan_meal_table = "plan_meal";
-
-export type PlanMealInsert =
-  Database["public"]["Tables"]["plan_meal"]["Insert"];
-export type PlanMeal = Database["public"]["Tables"]["plan_meal"]["Row"];
-export type PlanInsert = Database["public"]["Tables"]["plan"]["Insert"];
-export type Plan = Database["public"]["Tables"]["plan"]["Row"] & {
-  plan_meal: PlanMeal[];
-};
+import { mealQueryKeys } from "./providerMeal";
 
 const planQueryKeys = {
-  plans: ["plans"],
+  plans: (start?: string, end?: string) => ["plans", start, end],
   plansearch: (search: string) => ["plans", "search", search],
   plan: (id: string) => ["plans", "id", id],
 };
@@ -33,15 +30,20 @@ const planQueryKeys = {
 export const plansSearchAtom = atom(dayjs().format("YYYY-MM-DD"));
 export const [, plansSearchQueryAtom] = atomsWithQuery((get) => ({
   queryKey: planQueryKeys.plansearch(get(plansSearchAtom)),
-  queryFn: () => retrievePlans(get(plansSearchAtom)),
+  queryFn: () => {
+    const range = getSearchRange(get(plansSearchAtom));
+    return retrievePlans(range?.start, range?.end);
+  },
 }));
 
 // QUERIES
 
-export const usePlans = () => {
+export const usePlans = (options?: { start?: string; end?: string }) => {
   return useQuery({
-    queryKey: planQueryKeys.plans,
-    queryFn: () => retrievePlans(),
+    queryKey: planQueryKeys.plans(options?.start, options?.end),
+    queryFn: () => {
+      return retrievePlans(options?.start, options?.end);
+    },
   });
 };
 
@@ -57,11 +59,11 @@ export const usePlan = (options: {
     enabled: options.id != null,
     initialData: () => {
       return queryClient
-        .getQueryData<Plan[]>(planQueryKeys.plans)
+        .getQueryData<Plan[]>(planQueryKeys.plans())
         ?.find((x) => x.id === options.id);
     },
     initialDataUpdatedAt: () => {
-      return queryClient.getQueryState(planQueryKeys.plans)?.dataUpdatedAt;
+      return queryClient.getQueryState(planQueryKeys.plans())?.dataUpdatedAt;
     },
     onSuccess: (meal) => {
       if (meal && options.onSuccess) {
@@ -112,6 +114,20 @@ export const usePlanDeleteMutation = (options: { onSuccess: () => void }) => {
   });
 };
 
+export const usePlanMealUpsertMutation = (options: {
+  onSuccess: () => void;
+}) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: PlanMealInsert) => upsertPlanMeal(data),
+    onSuccess: (item) => {
+      queryClient.invalidateQueries(planQueryKeys.plan(item.plan_id));
+      queryClient.invalidateQueries(mealQueryKeys.meal(item.meal_id));
+      options.onSuccess();
+    },
+  });
+};
+
 // FUNCTIONS
 const columns = `
   id,
@@ -120,11 +136,15 @@ const columns = `
   notes,
   plan_meal (*)`;
 
-async function retrievePlans(date?: string): Promise<Plan[]> {
+async function retrievePlans(start?: string, end?: string): Promise<Plan[]> {
   let query = supabase.from(plan_table).select(columns).order("date");
-  if (date) {
-    const range = getSearchRange(date);
-    query = query.gte("date", range?.start).lte("date", range?.end);
+
+  if (start) {
+    query = query.gte("date", start);
+  }
+
+  if (end) {
+    query = query.lte("date", end);
   }
 
   const response = await query;
@@ -177,4 +197,13 @@ async function deletePlan(id: string): Promise<boolean> {
     .eq("id", id);
 
   return ensureEmptySuccess(deletePlanResponse);
+}
+
+async function upsertPlanMeal(data: PlanMealInsert): Promise<PlanMeal> {
+  const upsertPlanMealResponse = await supabase
+    .from(plan_meal_table)
+    .upsert(data)
+    .select();
+
+  return getSingleRow(upsertPlanMealResponse);
 }

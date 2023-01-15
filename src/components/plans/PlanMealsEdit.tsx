@@ -66,30 +66,27 @@ export default function PlanMealsEdit(props: PlanMealsProps) {
         </Box>
       </DialogTitle>
       <DialogContent sx={{ p: 0 }}>
-        {meals.isLoading || meals.isError ? (
-          <CircularProgress />
-        ) : (
-          <List>
-            {meals.data.map((x) => (
-              <ListItemButton
-                key={x.id}
-                sx={{
-                  padding: 2,
-                  paddingLeft: 4,
-                  borderBottom: 1,
-                  borderColor: "divider",
-                }}
-                selected={props.selectedMeals.indexOf(x.id) !== -1}
-                onClick={() => handleSelect(x.id)}
-              >
-                <ListItemText primary={x.name} />
-                {x.meal_grocery.length > 0 ? (
-                  <LocalGroceryStore fontSize="small" color="info" />
-                ) : null}
-              </ListItemButton>
-            ))}
-          </List>
-        )}
+        {meals.isLoading || meals.isError ? <CircularProgress /> : null}
+        <List>
+          {meals.data?.map((x) => (
+            <ListItemButton
+              key={x.id}
+              sx={{
+                padding: 2,
+                paddingLeft: 4,
+                borderBottom: 1,
+                borderColor: "divider",
+              }}
+              selected={props.selectedMeals.indexOf(x.id) !== -1}
+              onClick={() => handleSelect(x.id)}
+            >
+              <ListItemText primary={x.name} />
+              {x.meal_grocery.length > 0 ? (
+                <LocalGroceryStore fontSize="small" color="info" />
+              ) : null}
+            </ListItemButton>
+          ))}
+        </List>
       </DialogContent>
       <DialogActions sx={{ borderTop: 1, borderColor: "divider" }}>
         <Button

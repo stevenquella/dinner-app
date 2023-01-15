@@ -7,20 +7,16 @@ import {
   getSingleRow,
   supabase,
 } from "./client";
-import { Database } from "./client.types";
 import { notEmpty } from "./helpers";
+import {
+  Meal,
+  MealInsert,
+  meal_grocery_table,
+  meal_table,
+  plan_meal_table,
+} from "./provider.types";
 
-const meal_table = "meal";
-const meal_plan_table = "plan_meal";
-const meal_grocery_table = "meal_grocery";
-
-export type MealInsert = Database["public"]["Tables"]["meal"]["Insert"];
-export type MealGrocery = Database["public"]["Tables"]["meal_grocery"]["Row"];
-export type Meal = Database["public"]["Tables"]["meal"]["Row"] & {
-  meal_grocery: MealGrocery[];
-};
-
-const mealQueryKeys = {
+export const mealQueryKeys = {
   meals: ["meals"],
   mealsearch: (search: string) => ["meals", "search", search],
   meal: (id: string) => ["meals", "id", id],
@@ -122,7 +118,8 @@ const columns = `
   user_id,
   name,
   notes,
-  meal_grocery (*)
+  meal_grocery (*),
+  plan_meal (*)
 `;
 
 async function retrieveMeals(search?: string): Promise<Meal[]> {
@@ -174,7 +171,7 @@ async function upsertMeal(
 
 async function deleteMeal(id: string): Promise<boolean> {
   const deletePlanMealsResponse = await supabase
-    .from(meal_plan_table)
+    .from(plan_meal_table)
     .delete()
     .eq("meal_id", id);
 

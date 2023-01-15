@@ -1,7 +1,7 @@
 import { Box, Chip, Typography } from "@mui/material";
+import { Grocery } from "../../providers/provider.types";
 import {
   getGroceriesById,
-  Grocery,
   groceryCategories,
 } from "../../providers/providerGrocery";
 
