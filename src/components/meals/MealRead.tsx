@@ -13,6 +13,7 @@ import { useMeal } from "../../providers/providerMeal";
 import GroceriesRead from "../groceries/GroceriesRead";
 import CardTitle from "../items/CardTitle";
 import Page, { combineStates } from "../Page";
+import PlansRelated from "../plans/PlansRelated";
 import MealSchedule from "./MealSchedule";
 
 export default function MealRead() {
@@ -85,6 +86,12 @@ export default function MealRead() {
             groceries={groceries.data}
             ids={meal.data?.meal_grocery.map((x) => x.grocery_id)}
           />
+        </CardContent>
+      </Card>
+      <Card sx={{ mt: 1 }}>
+        <CardContent>
+          <CardTitle text={`Plans (${meal.data?.plan_meal.length})`} />
+          <PlansRelated ids={meal.data?.plan_meal.map((x) => x.plan_id)} />
         </CardContent>
       </Card>
       <MealSchedule

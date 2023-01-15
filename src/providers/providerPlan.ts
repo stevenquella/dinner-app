@@ -8,6 +8,7 @@ import {
   getSingleRow,
   supabase,
 } from "./client";
+import { notEmpty } from "./helpers";
 import {
   Plan,
   PlanInsert,
@@ -80,6 +81,15 @@ export function getSearchRange(date: string) {
     const end = searchDate.add(7, "day").format("YYYY-MM-DD");
     return { start, end };
   }
+}
+
+export function getPlansById(plans?: Plan[] | undefined, ids?: string[]) {
+  return (
+    ids
+      ?.map((id) => plans?.find((x) => x.id === id))
+      .filter(notEmpty)
+      .sort((a, b) => b.date.localeCompare(a.date)) ?? []
+  );
 }
 
 // MUTATIONS
