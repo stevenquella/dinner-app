@@ -2,7 +2,7 @@ import { Alert, Container, LinearProgress } from "@mui/material";
 import { getErrorMessage } from "../providers/helpers";
 
 export type PageProps = PageState & {
-  children?: JSX.Element | JSX.Element[];
+  children?: React.ReactElement | React.ReactElement[];
 };
 
 export type PageState = {

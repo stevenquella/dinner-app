@@ -14,6 +14,7 @@ import GroceriesRead from "../groceries/GroceriesRead";
 import CardTitle from "../items/CardTitle";
 import Page, { combineStates } from "../Page";
 import PlansRelated from "../plans/PlansRelated";
+import ScrollTop from "../ScrollTop";
 import MealSchedule from "./MealSchedule";
 
 export default function MealRead() {
@@ -25,6 +26,7 @@ export default function MealRead() {
 
   return (
     <Page {...pageState}>
+      <ScrollTop />
       <Box
         sx={{
           display: "flex",

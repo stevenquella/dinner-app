@@ -13,6 +13,7 @@ import GroceriesRead from "../groceries/GroceriesRead";
 import CardTitle from "../items/CardTitle";
 import { MealsRelated } from "../meals/MealsRelated";
 import Page, { combineStates } from "../Page";
+import ScrollTop from "../ScrollTop";
 
 export default function PlanRead() {
   const { id } = useParams();
@@ -36,6 +37,7 @@ export default function PlanRead() {
 
   return (
     <Page {...pageState}>
+      <ScrollTop />
       <Box
         sx={{
           display: "flex",
