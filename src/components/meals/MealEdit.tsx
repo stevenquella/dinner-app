@@ -47,19 +47,9 @@ const formValidation: MealValidation = {
 export default function MealEdit() {
   const navigate = useNavigate();
   const userid = useAtomValue(useridAtom);
-  const [addGrocery, setAddGrocery] = useState<boolean>(false);
-  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-  const [selectedGroceries, setSelectedGroceries] = useState<string[]>([]);
 
   const { id } = useParams();
   const isCreate: boolean = !(id != null);
-
-  const formMethods = useForm<MealInputs>({
-    defaultValues: {
-      name: "",
-      notes: "",
-    },
-  });
 
   const groceries = useGroceries();
 
@@ -73,6 +63,18 @@ export default function MealEdit() {
       setSelectedGroceries(meal.meal_grocery.map((x) => x.grocery_id));
     },
   });
+
+  const formMethods = useForm<MealInputs>({
+    defaultValues: {
+      name: meal.data?.name ?? "",
+      notes: meal.data?.notes ?? "",
+    },
+  });
+  const [addGrocery, setAddGrocery] = useState<boolean>(false);
+  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+  const [selectedGroceries, setSelectedGroceries] = useState<string[]>(
+    meal.data?.meal_grocery?.map((x) => x.grocery_id) ?? []
+  );
 
   const mealUpsert = useMealUpsertMutation({
     onSuccess: (id) => {

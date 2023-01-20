@@ -23,7 +23,7 @@ export default function Footer() {
         borderColor: "divider",
       }}
     >
-      <BottomNavigation value={nav} onChange={(_event, newValue) => setNav(newValue)}>
+      <BottomNavigation showLabels value={nav} onChange={(_event, newValue) => setNav(newValue)}>
         <BottomNavigationAction component={RouterLink} to="/" label="Meal Plans" value="/" icon={<ListAlt />} />
         <BottomNavigationAction component={RouterLink} to="meals" label="Meals" value="/meals" icon={<Flatware />} />
         <BottomNavigationAction

@@ -25,15 +25,13 @@ export const useMeals = (search?: string) => {
   });
 };
 
-export const useMeal = (options: { id: string | null; onSuccess?: (meal: Meal) => void }) => {
+export const useMeal = (options: { id?: string | null; onSuccess?: (meal: Meal) => void }) => {
   return useQuery({
     queryKey: mealQueryKeys.meal(options.id ?? ""),
     queryFn: () => retrieveMeal(options.id ?? ""),
-    enabled: options.id != null,
+    enabled: !!options.id,
     onSuccess: (meal) => {
-      if (meal && options.onSuccess) {
-        options.onSuccess(meal);
-      }
+      options.onSuccess?.(meal);
     },
   });
 };

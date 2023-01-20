@@ -98,7 +98,7 @@ export const usePlanMealUpsertMutation = (options: { onSuccess: () => void }) =>
     mutationFn: (data: PlanMealInsert) => upsertPlanMeal(data),
     onSuccess: (item) => {
       queryClient.invalidateQueries(planQueryKeys.root);
-      queryClient.invalidateQueries(mealQueryKeys.meal(item.meal_id));
+      queryClient.invalidateQueries(mealQueryKeys.root);
       options.onSuccess();
     },
   });

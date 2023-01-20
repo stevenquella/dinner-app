@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import dayjs from "dayjs";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -45,19 +45,9 @@ const planValidation: PlanValidation = {
 export default function PlanEdit() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [userid] = useAtom(useridAtom);
-  const [selectedMeals, setSelectedMeals] = useState<string[]>([]);
-  const [editMeals, setEditMeals] = useState<boolean>(false);
-  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+  const userid = useAtomValue(useridAtom);
 
   const isCreate = !(id != null);
-
-  const formMethods = useForm<PlanInputs>({
-    defaultValues: {
-      date: dayjs().format("YYYY-MM-DD"),
-      notes: "",
-    },
-  });
 
   const plan = usePlan({
     id: id ?? null,
@@ -70,6 +60,17 @@ export default function PlanEdit() {
       setSelectedMeals(plan.plan_meal.map((x) => x.meal_id));
     },
   });
+
+  const formMethods = useForm<PlanInputs>({
+    defaultValues: {
+      date: plan.data?.date ?? dayjs().format("YYYY-MM-DD"),
+      notes: plan.data?.notes ?? "",
+    },
+  });
+  const [selectedMeals, setSelectedMeals] = useState<string[]>(plan.data?.plan_meal.map((x) => x.meal_id) ?? []);
+  const [editMeals, setEditMeals] = useState<boolean>(false);
+  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+
   const planUpsert = usePlanUpsertMutation({
     onSuccess: ({ id }) => {
       if (isCreate) {

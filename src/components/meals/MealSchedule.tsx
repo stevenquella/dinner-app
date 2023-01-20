@@ -8,6 +8,7 @@ import {
   List,
   ListItemButton,
   ListItemText,
+  Typography,
 } from "@mui/material";
 import dayjs from "dayjs";
 import { useAtomValue } from "jotai";
@@ -44,8 +45,8 @@ export default function MealSchedule(props: MealScheduleProps) {
             <ListItemButton
               key={plan.id}
               sx={{
-                padding: 2,
-                paddingLeft: 4,
+                p: 2,
+                pl: 4,
                 borderBottom: 1,
                 borderColor: "divider",
               }}
@@ -56,6 +57,13 @@ export default function MealSchedule(props: MealScheduleProps) {
             </ListItemButton>
           ))}
         </List>
+        {plans.data?.length === 0 ? (
+          <Typography variant="body1" sx={{ pl: 3 }}>
+            No future plans found.
+          </Typography>
+        ) : (
+          <span></span>
+        )}
       </DialogContent>
       <DialogActions sx={{ borderTop: 1, borderColor: "divider" }}>
         <Button color="info" size="large" onClick={() => props.onDismiss()}>
