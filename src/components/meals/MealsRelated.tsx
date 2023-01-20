@@ -33,7 +33,7 @@ export function MealsRelated(props: MealsRelatedProps) {
           <ListItemText primary={meal.name} />
           {meal.meal_grocery.length > 0 ? (
             <ListItemIcon>
-              <LocalGroceryStore fontSize="small" color="info" />{" "}
+              <LocalGroceryStore fontSize="small" color="info" />
             </ListItemIcon>
           ) : null}
         </ListItem>
