@@ -74,10 +74,7 @@ export default function GroceryEdit(props: GroceryEditProps) {
       x.name?.toLowerCase() === currentName?.trim().toLowerCase()
   );
 
-  const options: string[] =
-    groceries.data
-      ?.filter((x) => x.category === currentCategory)
-      .map((x) => x.name) ?? [];
+  const options: string[] = groceries.data?.filter((x) => x.category === currentCategory).map((x) => x.name) ?? [];
 
   const dialogState = combineStates([groceries, groceryUpsert]);
 
@@ -109,12 +106,7 @@ export default function GroceryEdit(props: GroceryEditProps) {
               values={groceryCategorySelect}
               rules={formValidation.category}
             />
-            <AutocompleteInput
-              name="name"
-              label="Name"
-              options={options}
-              rules={formValidation.name}
-            />
+            <AutocompleteInput name="name" label="Name" options={options} rules={formValidation.name} />
           </Box>
           <Box
             sx={{
@@ -126,11 +118,7 @@ export default function GroceryEdit(props: GroceryEditProps) {
               p: 1,
             }}
           >
-            <Button
-              type="submit"
-              color="primary"
-              disabled={dialogState.isLoading || dialogState.isError}
-            >
+            <Button type="submit" color="primary" disabled={dialogState.isLoading || dialogState.isError}>
               Add
             </Button>
             <Button color="info" onClick={() => props.onDismiss()}>

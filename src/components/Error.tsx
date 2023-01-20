@@ -11,9 +11,7 @@ export default function Error() {
     <div>
       <Header />
       <Container fixed sx={{ py: 2 }}>
-        {errorMessage != null ? (
-          <Alert severity="error">{errorMessage}</Alert>
-        ) : null}
+        {errorMessage != null ? <Alert severity="error">{errorMessage}</Alert> : null}
       </Container>
       <Footer />
     </div>

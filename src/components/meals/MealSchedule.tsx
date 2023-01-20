@@ -13,10 +13,7 @@ import dayjs from "dayjs";
 import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { useridAtom } from "../../providers/providerAuth";
-import {
-  usePlanMealUpsertMutation,
-  usePlans,
-} from "../../providers/providerPlan";
+import { usePlanMealUpsertMutation, usePlans } from "../../providers/providerPlan";
 import { combineStates } from "../Page";
 
 export type MealScheduleProps = {

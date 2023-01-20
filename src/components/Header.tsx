@@ -12,12 +12,7 @@ export default function Header() {
       }}
     >
       <Link component={RouterLink} to="/" underline="none">
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="center"
-          columnSpacing={1}
-        >
+        <Grid container alignItems="center" justifyContent="center" columnSpacing={1}>
           <Grid item>
             <Box
               component="img"

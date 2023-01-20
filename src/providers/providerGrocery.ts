@@ -2,32 +2,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ensureSuccess, getSingleRow, supabase } from "./client";
 import { notEmpty } from "./helpers";
 import { Grocery, GroceryInsert, grocery_table } from "./provider.types";
+import { mealQueryKeys } from "./providerMeal";
+import { planQueryKeys } from "./providerPlan";
 
 export const groceryQueryKeys = {
-  groceries: ["groceries"],
-  groceriesPlan: (planId: string, mealIds: string[]) => [
-    "groceries",
-    "plan",
-    planId,
-    ...mealIds,
-  ],
-  groceryContent: (category: string, name: string) => [
-    "groceries",
-    "content",
-    category,
-    name,
-  ],
+  root: ["groceries"],
 };
 
-export const groceryCategories = [
-  "Produce",
-  "Protein",
-  "Dairy",
-  "Pantry",
-  "Frozen",
-  "Bakery",
-  "Other",
-] as const;
+export const groceryCategories = ["Produce", "Protein", "Dairy", "Pantry", "Frozen", "Bakery", "Other"] as const;
 
 export type GroceryCategory = typeof groceryCategories[number];
 
@@ -40,27 +22,12 @@ export const groceryCategorySelect = groceryCategories.map((x) => ({
 
 export const useGroceries = () => {
   return useQuery({
-    queryKey: groceryQueryKeys.groceries,
+    queryKey: groceryQueryKeys.root,
     queryFn: () => retrieveGroceries(),
   });
 };
 
-export const usePlanGroceries = (
-  planId: string,
-  mealIds: string[],
-  enabled: boolean
-) => {
-  return useQuery({
-    queryKey: groceryQueryKeys.groceriesPlan(planId, mealIds),
-    queryFn: () => retrievePlanGroceries(mealIds),
-    enabled: enabled,
-  });
-};
-
-export function getGroceriesById(
-  groceries?: Grocery[] | undefined,
-  ids?: string[]
-) {
+export function getGroceriesById(groceries?: Grocery[] | undefined, ids?: string[]) {
   return (
     ids
       ?.map((id) => groceries?.find((x) => x.id === id))
@@ -71,15 +38,15 @@ export function getGroceriesById(
 
 // MUTATIONS
 
-export const useGroceryUpsertMutation = (options: {
-  onSuccess: (g: Grocery) => void;
-}) => {
+export const useGroceryUpsertMutation = (options: { onSuccess: (g: Grocery) => void }) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data: GroceryInsert) => upsertGrocery(data),
     onSuccess: (grocery: Grocery) => {
-      queryClient.invalidateQueries(groceryQueryKeys.groceries);
+      queryClient.invalidateQueries(planQueryKeys.root);
+      queryClient.invalidateQueries(mealQueryKeys.root);
+      queryClient.invalidateQueries(groceryQueryKeys.root);
       options.onSuccess(grocery);
     },
   });
@@ -92,23 +59,7 @@ async function retrieveGroceries(): Promise<Grocery[]> {
     *,
     meal_grocery(*)
   `;
-  const response = await supabase
-    .from(grocery_table)
-    .select(columns)
-    .order("name");
-  return ensureSuccess(response);
-}
-
-async function retrievePlanGroceries(mealIds: string[]): Promise<Grocery[]> {
-  const columns = `
-    *,
-    meal_grocery!inner(*)
-  `;
-  const response = await supabase
-    .from(grocery_table)
-    .select(columns)
-    .in("meal_grocery.meal_id", mealIds);
-
+  const response = await supabase.from(grocery_table).select(columns).order("name");
   return ensureSuccess(response);
 }
 

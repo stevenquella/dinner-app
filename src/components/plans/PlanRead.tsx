@@ -1,13 +1,5 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Link,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Card, CardContent, Link, Typography } from "@mui/material";
 import { Link as RouterLink, useParams } from "react-router-dom";
-import { usePlanGroceries } from "../../providers/providerGrocery";
 import { usePlan } from "../../providers/providerPlan";
 import GroceriesRead from "../groceries/GroceriesRead";
 import CardTitle from "../items/CardTitle";
@@ -21,13 +13,8 @@ export default function PlanRead() {
   const plan = usePlan({
     id: id ?? null,
   });
-  const planGroceries = usePlanGroceries(
-    id ?? "",
-    plan.data?.plan_meal.map((x) => x.meal_id) ?? [],
-    id != null && !!plan.data
-  );
 
-  const pageState = combineStates([plan, planGroceries]);
+  const pageState = combineStates([plan]);
 
   const handleShare = async () => {
     await navigator?.share({
@@ -58,10 +45,7 @@ export default function PlanRead() {
           }}
         >
           <Link component={RouterLink} to={`/plans/edit/${id}`}>
-            <Button
-              variant="contained"
-              disabled={pageState.isLoading || plan.isError}
-            >
+            <Button variant="contained" disabled={pageState.isLoading || plan.isError}>
               Edit
             </Button>
           </Link>
@@ -102,12 +86,8 @@ export default function PlanRead() {
       </Card>
       <Card sx={{ mt: 1 }}>
         <CardContent>
-          <CardTitle text={`Groceries (${planGroceries.data?.length})`} />
-          <GroceriesRead
-            groceries={planGroceries.data}
-            ids={planGroceries.data?.map((x) => x.id)}
-            showCount
-          />
+          <CardTitle text={`Groceries (${plan.data?.groceries?.length})`} />
+          <GroceriesRead groceries={plan.data?.groceries} ids={plan.data?.groceries?.map((x) => x.id)} showCount />
         </CardContent>
       </Card>
     </Page>

@@ -37,11 +37,7 @@ export default function GroceryIndex() {
         }}
       >
         <Typography variant="h5">Groceries</Typography>
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => setCreateGrocery(true)}
-        >
+        <Button variant="contained" size="small" onClick={() => setCreateGrocery(true)}>
           Create Groceries
         </Button>
       </Box>
@@ -55,11 +51,7 @@ export default function GroceryIndex() {
                     <HighlightText text={grocery.name} search={""} />
                   </Typography>
                   {grocery.meal_grocery.length > 0 ? (
-                    <Chip
-                      icon={<Flatware />}
-                      label={grocery.meal_grocery.length}
-                      variant="outlined"
-                    />
+                    <Chip icon={<Flatware />} label={grocery.meal_grocery.length} variant="outlined" />
                   ) : null}
                 </Box>
               </CardContent>
@@ -67,28 +59,13 @@ export default function GroceryIndex() {
           </Card>
         ))}
       </Box>
-      {groceries.data?.length === 0 ? (
-        <Typography variant="body1">No groceries found.</Typography>
-      ) : (
-        <span></span>
-      )}
+      {groceries.data?.length === 0 ? <Typography variant="body1">No groceries found.</Typography> : <span></span>}
 
-      <GroceryEdit
-        open={createGrocery}
-        onDismiss={() => setCreateGrocery(false)}
-        onAddGrocery={() => {}}
-      />
-      <Dialog
-        keepMounted
-        maxWidth="sm"
-        fullWidth={true}
-        open={!!selectedGrocery}
-      >
+      <GroceryEdit open={createGrocery} onDismiss={() => setCreateGrocery(false)} onAddGrocery={() => {}} />
+      <Dialog keepMounted maxWidth="sm" fullWidth={true} open={!!selectedGrocery}>
         <DialogTitle>{selectedGrocery?.name}</DialogTitle>
         <DialogContent>
-          <MealsRelated
-            ids={selectedGrocery?.meal_grocery.map((x) => x.meal_id)}
-          />
+          <MealsRelated ids={selectedGrocery?.meal_grocery.map((x) => x.meal_id)} />
         </DialogContent>
         <DialogActions>
           <Button color="info" onClick={() => setSelectedGrocery(undefined)}>

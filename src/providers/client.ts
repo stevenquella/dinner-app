@@ -27,9 +27,7 @@ export function ensureSuccess<T>(response: PostgrestResponse<T>): T[] {
   }
 }
 
-export function ensureEmptySuccess(
-  response: PostgrestResponse<undefined>
-): boolean {
+export function ensureEmptySuccess(response: PostgrestResponse<undefined>): boolean {
   const { error } = response;
   if (error == null) {
     return true;

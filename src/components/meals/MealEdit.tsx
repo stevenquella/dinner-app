@@ -17,11 +17,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
 import { useGroceries } from "../../providers/providerGrocery";
-import {
-  useMeal,
-  useMealDeleteMutation,
-  useMealUpsertMutation,
-} from "../../providers/providerMeal";
+import { useMeal, useMealDeleteMutation, useMealUpsertMutation } from "../../providers/providerMeal";
 import GroceriesRead from "../groceries/GroceriesRead";
 import GroceryEdit from "../groceries/GroceryEdit";
 import TextInput from "../inputs/TextInput";
@@ -142,14 +138,8 @@ export default function MealEdit() {
               pb: 2,
             }}
           >
-            <Typography variant="h5">
-              {isCreate ? "Create Meal" : "Edit Meal"}
-            </Typography>
-            <Button
-              variant="contained"
-              type="submit"
-              disabled={pageState.isLoading || meal.isError}
-            >
+            <Typography variant="h5">{isCreate ? "Create Meal" : "Edit Meal"}</Typography>
+            <Button variant="contained" type="submit" disabled={pageState.isLoading || meal.isError}>
               {isCreate ? "Create" : "Update"}
             </Button>
           </Box>
@@ -164,11 +154,7 @@ export default function MealEdit() {
                 }}
               >
                 <CardTitle text="Summary" />
-                <TextInput
-                  name="name"
-                  label="Name"
-                  rules={formValidation.name}
-                />
+                <TextInput name="name" label="Name" rules={formValidation.name} />
                 <TextInput name="notes" label="Notes" multiline rows={20} />
               </Box>
             </CardContent>
@@ -176,11 +162,7 @@ export default function MealEdit() {
           <Card sx={{ mt: 1 }}>
             <CardContent>
               <CardTitle text={`Groceries (${selectedGroceries.length})`} />
-              <GroceriesRead
-                groceries={groceries.data}
-                ids={selectedGroceries}
-                onDelete={handleDeleteGrocery}
-              />
+              <GroceriesRead groceries={groceries.data} ids={selectedGroceries} onDelete={handleDeleteGrocery} />
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
               <Button
@@ -194,11 +176,7 @@ export default function MealEdit() {
           </Card>
         </form>
       </FormProvider>
-      <GroceryEdit
-        open={addGrocery}
-        onDismiss={() => setAddGrocery(false)}
-        onAddGrocery={handleAddGrocery}
-      />
+      <GroceryEdit open={addGrocery} onDismiss={() => setAddGrocery(false)} onAddGrocery={handleAddGrocery} />
       {!isCreate ? (
         <div>
           <Button
@@ -213,9 +191,7 @@ export default function MealEdit() {
           <Dialog maxWidth="sm" fullWidth={true} open={confirmDelete}>
             <DialogTitle>Delete meal?</DialogTitle>
             <DialogContent>
-              <Typography>
-                Deleting this meal will remove it from any related plans.
-              </Typography>
+              <Typography>Deleting this meal will remove it from any related plans.</Typography>
             </DialogContent>
             <DialogActions>
               <Button color="info" onClick={() => setConfirmDelete(false)}>

@@ -1,12 +1,5 @@
 import { Launch, LocalGroceryStore } from "@mui/icons-material";
-import {
-  IconButton,
-  Link,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
+import { IconButton, Link, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { getMealsById, useMeals } from "../../providers/providerMeal";
 
@@ -30,11 +23,7 @@ export function MealsRelated(props: MealsRelatedProps) {
             borderColor: "divider",
           }}
           secondaryAction={
-            <Link
-              component={RouterLink}
-              to={`/meals/read/${meal.id}`}
-              target={props.linkTarget}
-            >
+            <Link component={RouterLink} to={`/meals/read/${meal.id}`} target={props.linkTarget}>
               <IconButton edge="end">
                 <Launch />
               </IconButton>
@@ -49,9 +38,7 @@ export function MealsRelated(props: MealsRelatedProps) {
           ) : null}
         </ListItem>
       ))}
-      {props.ids?.length === 0 ? (
-        <ListItemText primary="No related meals." />
-      ) : null}
+      {props.ids?.length === 0 ? <ListItemText primary="No related meals." /> : null}
     </List>
   );
 }

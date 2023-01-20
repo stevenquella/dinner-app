@@ -57,11 +57,7 @@ export default function PlanMealsEdit(props: PlanMealsProps) {
         Select Meals
         <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
           {getMealsById(meals.data, props.selectedMeals).map((meal) => (
-            <Chip
-              key={meal.id}
-              label={meal.name}
-              onDelete={() => handleDelete(meal.id)}
-            />
+            <Chip key={meal.id} label={meal.name} onDelete={() => handleDelete(meal.id)} />
           ))}
         </Box>
       </DialogTitle>
@@ -81,19 +77,13 @@ export default function PlanMealsEdit(props: PlanMealsProps) {
               onClick={() => handleSelect(x.id)}
             >
               <ListItemText primary={x.name} />
-              {x.meal_grocery.length > 0 ? (
-                <LocalGroceryStore fontSize="small" color="info" />
-              ) : null}
+              {x.meal_grocery.length > 0 ? <LocalGroceryStore fontSize="small" color="info" /> : null}
             </ListItemButton>
           ))}
         </List>
       </DialogContent>
       <DialogActions sx={{ borderTop: 1, borderColor: "divider" }}>
-        <Button
-          size="large"
-          color="warning"
-          onClick={() => props.onChangeSelectedMeals([])}
-        >
+        <Button size="large" color="warning" onClick={() => props.onChangeSelectedMeals([])}>
           Clear
         </Button>
         <Button size="large" onClick={() => props.onDismiss()}>

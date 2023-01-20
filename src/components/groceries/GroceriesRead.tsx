@@ -1,9 +1,6 @@
 import { Box, Chip, Typography } from "@mui/material";
 import { Grocery } from "../../providers/provider.types";
-import {
-  getGroceriesById,
-  groceryCategories,
-} from "../../providers/providerGrocery";
+import { getGroceriesById, groceryCategories } from "../../providers/providerGrocery";
 
 export type GroceriesReadProps = {
   groceries?: Grocery[];
@@ -58,9 +55,7 @@ function GroceriesReadCategory(props: GroceriesReadCategoryProps) {
       </Typography>
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
         {props.groceries?.map((g) => {
-          const name = props.showCount
-            ? `${g.name} (${g.meal_grocery.length})`
-            : g.name;
+          const name = props.showCount ? `${g.name} (${g.meal_grocery.length})` : g.name;
           return <Chip key={g.id} label={name} onDelete={handleDelete(g.id)} />;
         })}
       </Box>

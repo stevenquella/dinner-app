@@ -12,9 +12,7 @@ const authQueryKeys = {
 };
 
 // QUERIES
-export const useSession = (options: {
-  onSuccess: (val: Session | null) => void;
-}) => {
+export const useSession = (options: { onSuccess: (val: Session | null) => void }) => {
   return useQuery({
     queryKey: [authQueryKeys.session],
     queryFn: () => getSession(),
@@ -28,8 +26,7 @@ export const useSignInMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { email: string; password: string }) =>
-      signIn(data.email, data.password),
+    mutationFn: (data: { email: string; password: string }) => signIn(data.email, data.password),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };
@@ -38,8 +35,7 @@ export const useSignUpMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { email: string; password: string }) =>
-      signUp(data.email, data.password),
+    mutationFn: (data: { email: string; password: string }) => signUp(data.email, data.password),
     onSuccess: () => queryClient.invalidateQueries(),
   });
 };

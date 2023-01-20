@@ -1,15 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { atom } from "jotai";
-import { atomsWithQuery } from "jotai-tanstack-query";
-import {
-  ensureEmptySuccess,
-  ensureSuccess,
-  getSingleRow,
-  supabase,
-} from "./client";
+import { ensureEmptySuccess, ensureSuccess, getSingleRow, supabase } from "./client";
 import { notEmpty } from "./helpers";
 import {
+  Grocery,
+  grocery_table,
   Plan,
   PlanInsert,
   PlanMeal,
@@ -17,58 +13,35 @@ import {
   plan_meal_table,
   plan_table,
 } from "./provider.types";
-import { groceryQueryKeys } from "./providerGrocery";
 import { mealQueryKeys } from "./providerMeal";
 
-const planQueryKeys = {
-  plans: (start?: string, end?: string) => ["plans", start, end],
-  plansearch: (search: string) => ["plans", "search", search],
+export const planQueryKeys = {
+  root: ["plans"],
+  plans_search: (start?: string, end?: string) => ["plans", "search", start, end],
   plan: (id: string) => ["plans", "id", id],
 };
 
 // ATOMS
 
 export const plansSearchAtom = atom(dayjs().format("YYYY-MM-DD"));
-export const [, plansSearchQueryAtom] = atomsWithQuery((get) => ({
-  queryKey: planQueryKeys.plansearch(get(plansSearchAtom)),
-  queryFn: () => {
-    const range = getSearchRange(get(plansSearchAtom));
-    return retrievePlans(range?.start, range?.end);
-  },
-}));
 
 // QUERIES
 
 export const usePlans = (options?: { start?: string; end?: string }) => {
   return useQuery({
-    queryKey: planQueryKeys.plans(options?.start, options?.end),
-    queryFn: () => {
-      return retrievePlans(options?.start, options?.end);
-    },
+    queryKey: options ? planQueryKeys.plans_search(options?.start, options?.end) : planQueryKeys.root,
+    queryFn: () => retrievePlans(options?.start, options?.end),
   });
 };
 
-export const usePlan = (options: {
-  id: string | null;
-  onSuccess?: (plan: Plan) => void;
-}) => {
-  const queryClient = useQueryClient();
-
+export const usePlan = (options: { id: string | null; onSuccess?: (plan: Plan) => void }) => {
   return useQuery({
     queryKey: planQueryKeys.plan(options.id ?? ""),
     queryFn: () => retrievePlan(options.id ?? ""),
     enabled: options.id != null,
-    initialData: () => {
-      return queryClient
-        .getQueryData<Plan[]>(planQueryKeys.plans())
-        ?.find((x) => x.id === options.id);
-    },
-    initialDataUpdatedAt: () => {
-      return queryClient.getQueryState(planQueryKeys.plans())?.dataUpdatedAt;
-    },
-    onSuccess: (meal) => {
-      if (meal && options.onSuccess) {
-        options.onSuccess(meal);
+    onSuccess: (plan) => {
+      if (plan && options.onSuccess) {
+        options.onSuccess(plan);
       }
     },
   });
@@ -94,44 +67,37 @@ export function getPlansById(plans?: Plan[] | undefined, ids?: string[]) {
 
 // MUTATIONS
 
-export const usePlanUpsertMutation = (options: {
-  onSuccess: (plan: Plan) => void;
-}) => {
+export const usePlanUpsertMutation = (options: { onSuccess: (plan: Plan) => void }) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { plan: PlanInsert; meals: string[] }) =>
-      upsertPlan(data.plan, data.meals),
+    mutationFn: (data: { plan: PlanInsert; meals: string[] }) => upsertPlan(data.plan, data.meals),
     onSuccess: (plan: Plan) => {
-      queryClient.invalidateQueries({
-        queryKey: [planQueryKeys.plans],
-      });
-      queryClient.invalidateQueries({
-        queryKey: groceryQueryKeys.groceriesPlan(plan.id, []),
-      });
-
-      queryClient.setQueryData(planQueryKeys.plan(plan.id), plan);
-
+      queryClient.invalidateQueries(planQueryKeys.root);
+      queryClient.invalidateQueries(mealQueryKeys.root);
       options.onSuccess(plan);
     },
   });
 };
 
 export const usePlanDeleteMutation = (options: { onSuccess: () => void }) => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => deletePlan(id),
-    onSuccess: () => options.onSuccess(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(planQueryKeys.root);
+      queryClient.invalidateQueries(mealQueryKeys.root);
+      options.onSuccess();
+    },
   });
 };
 
-export const usePlanMealUpsertMutation = (options: {
-  onSuccess: () => void;
-}) => {
+export const usePlanMealUpsertMutation = (options: { onSuccess: () => void }) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: PlanMealInsert) => upsertPlanMeal(data),
     onSuccess: (item) => {
-      queryClient.invalidateQueries(planQueryKeys.plan(item.plan_id));
+      queryClient.invalidateQueries(planQueryKeys.root);
       queryClient.invalidateQueries(mealQueryKeys.meal(item.meal_id));
       options.onSuccess();
     },
@@ -163,20 +129,33 @@ async function retrievePlans(start?: string, end?: string): Promise<Plan[]> {
 
 async function retrievePlan(id: string): Promise<Plan> {
   const response = await supabase.from(plan_table).select(columns).eq("id", id);
-  return getSingleRow(response);
+
+  const plan = getSingleRow<Plan>(response);
+
+  if (plan.plan_meal.length > 0) {
+    const groceryColumns = `
+    *,
+    meal_grocery!inner(*)
+  `;
+    const groceries = await supabase
+      .from(grocery_table)
+      .select(groceryColumns)
+      .in(
+        "meal_grocery.meal_id",
+        plan.plan_meal.map((x) => x.meal_id)
+      );
+
+    plan.groceries = ensureSuccess<Grocery>(groceries);
+  }
+
+  return plan;
 }
 
 async function upsertPlan(plan: PlanInsert, meals: string[]): Promise<Plan> {
-  const upsertPlanResponse = await supabase
-    .from(plan_table)
-    .upsert(plan)
-    .select("id");
+  const upsertPlanResponse = await supabase.from(plan_table).upsert(plan).select("id");
   const updatedPlan = getSingleRow(upsertPlanResponse);
 
-  const deletePlanMealsResponse = await supabase
-    .from(plan_meal_table)
-    .delete()
-    .eq("plan_id", updatedPlan.id);
+  const deletePlanMealsResponse = await supabase.from(plan_meal_table).delete().eq("plan_id", updatedPlan.id);
 
   ensureSuccess(deletePlanMealsResponse);
 
@@ -194,26 +173,17 @@ async function upsertPlan(plan: PlanInsert, meals: string[]): Promise<Plan> {
 }
 
 async function deletePlan(id: string): Promise<boolean> {
-  const deletePlanMealsResponse = await supabase
-    .from(plan_meal_table)
-    .delete()
-    .eq("plan_id", id);
+  const deletePlanMealsResponse = await supabase.from(plan_meal_table).delete().eq("plan_id", id);
 
   ensureSuccess(deletePlanMealsResponse);
 
-  const deletePlanResponse = await supabase
-    .from(plan_table)
-    .delete()
-    .eq("id", id);
+  const deletePlanResponse = await supabase.from(plan_table).delete().eq("id", id);
 
   return ensureEmptySuccess(deletePlanResponse);
 }
 
 async function upsertPlanMeal(data: PlanMealInsert): Promise<PlanMeal> {
-  const upsertPlanMealResponse = await supabase
-    .from(plan_meal_table)
-    .upsert(data)
-    .select();
+  const upsertPlanMealResponse = await supabase.from(plan_meal_table).upsert(data).select();
 
   return getSingleRow(upsertPlanMealResponse);
 }

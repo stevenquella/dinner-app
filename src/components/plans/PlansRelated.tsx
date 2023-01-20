@@ -32,9 +32,7 @@ export default function PlansRelated(props: PlansRelatedProps) {
           <ListItemText primary={plan.date} secondary={plan.notes} />
         </ListItem>
       ))}
-      {props.ids?.length === 0 ? (
-        <ListItemText primary="No related plans." />
-      ) : null}
+      {props.ids?.length === 0 ? <ListItemText primary="No related plans." /> : null}
     </List>
   );
 }

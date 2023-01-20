@@ -15,11 +15,7 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
-import {
-  usePlan,
-  usePlanDeleteMutation,
-  usePlanUpsertMutation,
-} from "../../providers/providerPlan";
+import { usePlan, usePlanDeleteMutation, usePlanUpsertMutation } from "../../providers/providerPlan";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 import CardTitle from "../items/CardTitle";
@@ -87,9 +83,7 @@ export default function PlanEdit() {
     onSuccess: () => navigate(`/`, { replace: true }),
   });
 
-  const pageState: PageState = isCreate
-    ? combineStates([planUpsert])
-    : combineStates([plan, planUpsert, planDelete]);
+  const pageState: PageState = isCreate ? combineStates([planUpsert]) : combineStates([plan, planUpsert, planDelete]);
 
   return (
     <Page {...pageState}>
@@ -116,14 +110,8 @@ export default function PlanEdit() {
               pb: 2,
             }}
           >
-            <Typography variant="h5">
-              {isCreate ? "Create Plan" : "Edit Plan"}
-            </Typography>
-            <Button
-              variant="contained"
-              type="submit"
-              disabled={pageState.isLoading || plan.isError}
-            >
+            <Typography variant="h5">{isCreate ? "Create Plan" : "Edit Plan"}</Typography>
+            <Button variant="contained" type="submit" disabled={pageState.isLoading || plan.isError}>
               {isCreate ? "Create" : "Update"}
             </Button>
           </Box>
@@ -138,12 +126,7 @@ export default function PlanEdit() {
                 }}
               >
                 <CardTitle text="Summary" />
-                <TextInput
-                  name="date"
-                  label="Date"
-                  type="date"
-                  rules={planValidation.date}
-                />
+                <TextInput name="date" label="Date" type="date" rules={planValidation.date} />
                 <TextInput name="notes" label="Notes" />
               </Box>
             </CardContent>

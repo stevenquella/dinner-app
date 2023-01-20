@@ -1,62 +1,35 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { atom } from "jotai";
-import { atomsWithQuery } from "jotai-tanstack-query";
-import {
-  ensureEmptySuccess,
-  ensureSuccess,
-  getSingleRow,
-  supabase,
-} from "./client";
+import { ensureEmptySuccess, ensureSuccess, getSingleRow, supabase } from "./client";
 import { notEmpty } from "./helpers";
-import {
-  Meal,
-  MealInsert,
-  meal_grocery_table,
-  meal_table,
-  plan_meal_table,
-} from "./provider.types";
+import { Meal, MealInsert, meal_grocery_table, meal_table, plan_meal_table } from "./provider.types";
+import { groceryQueryKeys } from "./providerGrocery";
+import { planQueryKeys } from "./providerPlan";
 
 export const mealQueryKeys = {
-  meals: ["meals"],
-  mealsearch: (search: string) => ["meals", "search", search],
+  root: ["meals"],
+  meals_search: (search: string) => ["meals", "search", search],
   meal: (id: string) => ["meals", "id", id],
 };
 
 // ATOMS
 
 export const mealsSearchAtom = atom<string>("");
-export const [, mealsSearchQueryAtom] = atomsWithQuery((get) => ({
-  queryKey: mealQueryKeys.mealsearch(get(mealsSearchAtom)),
-  queryFn: () => retrieveMeals(get(mealsSearchAtom)),
-}));
 
 // QUERIES
 
-export const useMeals = () => {
+export const useMeals = (search?: string) => {
   return useQuery({
-    queryKey: mealQueryKeys.meals,
-    queryFn: () => retrieveMeals(),
+    queryKey: search ? mealQueryKeys.meals_search(search) : mealQueryKeys.root,
+    queryFn: () => retrieveMeals(search),
   });
 };
 
-export const useMeal = (options: {
-  id: string | null;
-  onSuccess?: (meal: Meal) => void;
-}) => {
-  const queryClient = useQueryClient();
-
+export const useMeal = (options: { id: string | null; onSuccess?: (meal: Meal) => void }) => {
   return useQuery({
     queryKey: mealQueryKeys.meal(options.id ?? ""),
     queryFn: () => retrieveMeal(options.id ?? ""),
     enabled: options.id != null,
-    initialData: () => {
-      return queryClient
-        .getQueryData<Meal[]>(mealQueryKeys.meals)
-        ?.find((x) => x.id === options.id);
-    },
-    initialDataUpdatedAt: () => {
-      return queryClient.getQueryState(mealQueryKeys.meals)?.dataUpdatedAt;
-    },
     onSuccess: (meal) => {
       if (meal && options.onSuccess) {
         options.onSuccess(meal);
@@ -76,21 +49,15 @@ export function getMealsById(meals?: Meal[] | undefined, ids?: string[]) {
 
 // MUTATIONS
 
-export const useMealUpsertMutation = (options: {
-  onSuccess: (id: string) => void;
-}) => {
+export const useMealUpsertMutation = (options: { onSuccess: (id: string) => void }) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { meal: MealInsert; groceries: string[] }) =>
-      upsertMeal(data.meal, data.groceries),
+    mutationFn: (data: { meal: MealInsert; groceries: string[] }) => upsertMeal(data.meal, data.groceries),
     onSuccess: (meal) => {
-      queryClient.invalidateQueries({
-        queryKey: [mealQueryKeys.meals],
-      });
-
-      queryClient.setQueryData(mealQueryKeys.meal(meal.id), meal);
-
+      queryClient.invalidateQueries(planQueryKeys.root);
+      queryClient.invalidateQueries(mealQueryKeys.root);
+      queryClient.invalidateQueries(groceryQueryKeys.root);
       options.onSuccess(meal.id);
     },
   });
@@ -102,10 +69,9 @@ export const useMealDeleteMutation = (options: { onSuccess: () => void }) => {
   return useMutation({
     mutationFn: (id: string) => deleteMeal(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [mealQueryKeys.meals],
-      });
-
+      queryClient.invalidateQueries(planQueryKeys.root);
+      queryClient.invalidateQueries(mealQueryKeys.root);
+      queryClient.invalidateQueries(groceryQueryKeys.root);
       options.onSuccess();
     },
   });
@@ -137,32 +103,21 @@ async function retrieveMeal(id: string): Promise<Meal> {
   return getSingleRow<Meal>(response);
 }
 
-async function upsertMeal(
-  meal: MealInsert,
-  groceries: string[]
-): Promise<Meal> {
-  const upsertMealResponse = await supabase
-    .from(meal_table)
-    .upsert<MealInsert>(meal)
-    .select("id");
+async function upsertMeal(meal: MealInsert, groceries: string[]): Promise<Meal> {
+  const upsertMealResponse = await supabase.from(meal_table).upsert<MealInsert>(meal).select("id");
   const updatedMeal = getSingleRow(upsertMealResponse);
 
-  const deleteGroceriesResponse = await supabase
-    .from(meal_grocery_table)
-    .delete()
-    .eq("meal_id", updatedMeal.id);
+  const deleteGroceriesResponse = await supabase.from(meal_grocery_table).delete().eq("meal_id", updatedMeal.id);
 
   ensureSuccess(deleteGroceriesResponse);
 
-  const upsertGroceriesResponse = await supabase
-    .from(meal_grocery_table)
-    .upsert(
-      groceries.map((id) => ({
-        user_id: meal.user_id,
-        meal_id: updatedMeal.id,
-        grocery_id: id,
-      }))
-    );
+  const upsertGroceriesResponse = await supabase.from(meal_grocery_table).upsert(
+    groceries.map((id) => ({
+      user_id: meal.user_id,
+      meal_id: updatedMeal.id,
+      grocery_id: id,
+    }))
+  );
 
   ensureSuccess(upsertGroceriesResponse);
 
@@ -170,17 +125,11 @@ async function upsertMeal(
 }
 
 async function deleteMeal(id: string): Promise<boolean> {
-  const deletePlanMealsResponse = await supabase
-    .from(plan_meal_table)
-    .delete()
-    .eq("meal_id", id);
+  const deletePlanMealsResponse = await supabase.from(plan_meal_table).delete().eq("meal_id", id);
 
   ensureSuccess(deletePlanMealsResponse);
 
-  const deleteGroceriesResponse = await supabase
-    .from(meal_grocery_table)
-    .delete()
-    .eq("meal_id", id);
+  const deleteGroceriesResponse = await supabase.from(meal_grocery_table).delete().eq("meal_id", id);
 
   ensureSuccess(deleteGroceriesResponse);
 

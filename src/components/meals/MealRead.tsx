@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Link,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Card, CardContent, Link, Typography } from "@mui/material";
 import { useState } from "react";
 import { Link as RouterLink, useParams } from "react-router-dom";
 import { useGroceries } from "../../providers/providerGrocery";
@@ -47,10 +40,7 @@ export default function MealRead() {
           }}
         >
           <Link component={RouterLink} to={`/meals/edit/${id}`}>
-            <Button
-              variant="contained"
-              disabled={pageState.isLoading || meal.isError}
-            >
+            <Button variant="contained" disabled={pageState.isLoading || meal.isError}>
               Edit
             </Button>
           </Link>
@@ -84,10 +74,7 @@ export default function MealRead() {
       <Card sx={{ mt: 1 }}>
         <CardContent>
           <CardTitle text={`Groceries (${meal.data?.meal_grocery.length})`} />
-          <GroceriesRead
-            groceries={groceries.data}
-            ids={meal.data?.meal_grocery.map((x) => x.grocery_id)}
-          />
+          <GroceriesRead groceries={groceries.data} ids={meal.data?.meal_grocery.map((x) => x.grocery_id)} />
         </CardContent>
       </Card>
       <Card sx={{ mt: 1 }}>
@@ -96,11 +83,7 @@ export default function MealRead() {
           <PlansRelated ids={meal.data?.plan_meal.map((x) => x.plan_id)} />
         </CardContent>
       </Card>
-      <MealSchedule
-        mealid={id ?? ""}
-        open={scheduleMeal}
-        onDismiss={() => setScheduleMeal(false)}
-      />
+      <MealSchedule mealid={id ?? ""} open={scheduleMeal} onDismiss={() => setScheduleMeal(false)} />
     </Page>
   );
 }
