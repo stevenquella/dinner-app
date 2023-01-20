@@ -23,20 +23,14 @@ export default function HighlightText(props: HighlightTextProps) {
       }
 
       parts.push({
-        value: props.text.substring(
-          matchIndex,
-          matchIndex + props.search.length
-        ),
+        value: props.text.substring(matchIndex, matchIndex + props.search.length),
         isMatch: true,
       });
 
       // add part after match section
       if (matchIndex + props.search.length < props.text.length) {
         parts.push({
-          value: props.text.substring(
-            matchIndex + props.search.length,
-            props.text.length
-          ),
+          value: props.text.substring(matchIndex + props.search.length, props.text.length),
           isMatch: false,
         });
       }
@@ -46,7 +40,7 @@ export default function HighlightText(props: HighlightTextProps) {
           {parts.map((part, i) => (
             <span key={`highlighttext_${i}`}>
               {part.isMatch ? (
-                <Typography component="span" sx={{ bgcolor: "yellow" }}>
+                <Typography component="span" sx={{ textDecoration: "underline" }}>
                   {part.value}
                 </Typography>
               ) : (

@@ -1,16 +1,11 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Link,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Card, CardContent, Link, Typography } from "@mui/material";
 import { Link as RouterLink, useParams } from "react-router-dom";
-import { useMeals } from "../../providers/providerMeal";
 import { usePlan } from "../../providers/providerPlan";
-import Page from "../Page";
-import { PlanMealsRead } from "./PlanMealsRead";
+import GroceriesRead from "../groceries/GroceriesRead";
+import CardTitle from "../items/CardTitle";
+import { MealsRelated } from "../meals/MealsRelated";
+import Page, { combineStates } from "../Page";
+import ScrollTop from "../ScrollTop";
 
 export default function PlanRead() {
   const { id } = useParams();
@@ -18,10 +13,18 @@ export default function PlanRead() {
   const plan = usePlan({
     id: id ?? null,
   });
-  const meals = useMeals();
+
+  const pageState = combineStates([plan]);
+
+  const handleShare = async () => {
+    await navigator?.share({
+      url: window.location.href,
+    });
+  };
 
   return (
-    <Page {...plan}>
+    <Page {...pageState}>
+      <ScrollTop />
       <Box
         sx={{
           display: "flex",
@@ -33,11 +36,30 @@ export default function PlanRead() {
       >
         <Typography variant="h5">{plan.data?.date}</Typography>
 
-        <Link component={RouterLink} to={`/plans/edit/${id}`}>
-          <Button variant="contained" disabled={plan.isLoading || plan.isError}>
-            Edit
-          </Button>
-        </Link>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 1,
+          }}
+        >
+          <Link component={RouterLink} to={`/plans/edit/${id}`}>
+            <Button variant="contained" disabled={pageState.isLoading || plan.isError}>
+              Edit
+            </Button>
+          </Link>
+          {!!navigator.share ? (
+            <Button
+              variant="contained"
+              color="secondary"
+              disabled={pageState.isLoading || plan.isError}
+              onClick={() => handleShare()}
+            >
+              Share
+            </Button>
+          ) : null}
+        </Box>
       </Box>
 
       <Card>
@@ -49,8 +71,7 @@ export default function PlanRead() {
               rowGap: 1,
             }}
           >
-            <Typography variant="caption">Summary</Typography>
-
+            <CardTitle text="Summary" />
             <Typography variant="body1" whiteSpace="pre-wrap">
               {plan.data?.notes}
             </Typography>
@@ -59,16 +80,14 @@ export default function PlanRead() {
       </Card>
       <Card sx={{ mt: 1 }}>
         <CardContent>
-          <Typography variant="caption">Meals</Typography>
-          <PlanMealsRead
-            meals={meals.data}
-            ids={plan.data?.plan_meal.map((x) => x.meal_id)}
-          />
+          <CardTitle text={`Meals (${plan.data?.plan_meal.length})`} />
+          <MealsRelated ids={plan.data?.plan_meal.map((x) => x.meal_id)} />
         </CardContent>
       </Card>
       <Card sx={{ mt: 1 }}>
         <CardContent>
-          <Typography variant="caption">Groceries</Typography>
+          <CardTitle text={`Groceries (${plan.data?.groceries?.length})`} />
+          <GroceriesRead groceries={plan.data?.groceries} ids={plan.data?.groceries?.map((x) => x.id)} showCount />
         </CardContent>
       </Card>
     </Page>

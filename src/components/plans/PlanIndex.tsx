@@ -1,27 +1,21 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Link,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, Link, Typography } from "@mui/material";
 import { useAtom } from "jotai";
 import { Link as RouterLink } from "react-router-dom";
-import { useMeals } from "../../providers/providerMeal";
-import {
-  plansSearchAtom,
-  plansSearchQueryAtom,
-} from "../../providers/providerPlan";
+import { getSearchRange, plansSearchAtom, usePlans } from "../../providers/providerPlan";
 import SearchInput from "../inputs/SearchInput";
+import CardTitle from "../items/CardTitle";
+import { MealsRelated } from "../meals/MealsRelated";
 import Page from "../Page";
-import { PlanMealsRead } from "./PlanMealsRead";
 
 export default function PlanIndex() {
   const [plansSearch, setPlansSearch] = useAtom(plansSearchAtom);
-  const [plans] = useAtom(plansSearchQueryAtom);
-  const meals = useMeals();
+  const range = getSearchRange(plansSearch);
+  const plans = usePlans(range);
+
+  let searchText;
+  if (range) {
+    searchText = `Showing plans from ${range.start} to ${range.end}.`;
+  }
 
   return (
     <Page {...plans}>
@@ -46,39 +40,25 @@ export default function PlanIndex() {
           type="date"
           defaultValue={plansSearch}
           onChange={setPlansSearch}
+          helperText={searchText}
         />
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 1 }}>
         {plans.data?.map((plan) => (
-          <Card sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Card key={plan.id} sx={{ borderBottom: 1, borderColor: "divider" }}>
             <CardContent>
-              <Typography variant="body1" fontWeight="medium" marginBottom={1}>
-                {plan.date}
-                {plan.notes ? `, ${plan.notes}` : ""}
-              </Typography>
-              <PlanMealsRead
-                meals={meals.data}
-                ids={plan.plan_meal.map((x) => x.meal_id)}
-              />
+              <CardTitle text={`${plan.date}${plan.notes ? `, ${plan.notes}` : ""}`} />
+              <MealsRelated ids={plan.plan_meal.map((x) => x.meal_id)} />
             </CardContent>
             <CardActions sx={{ flexDirection: "row-reverse" }}>
-              <Link
-                key={plan.id}
-                component={RouterLink}
-                to={`/plans/read/${plan.id}`}
-                underline="none"
-              >
+              <Link key={plan.id} component={RouterLink} to={`/plans/read/${plan.id}`} underline="none">
                 <Button color="secondary">Open</Button>
               </Link>
             </CardActions>
           </Card>
         ))}
       </Box>
-      {plans.data?.length === 0 ? (
-        <Typography variant="body1">No plans found.</Typography>
-      ) : (
-        <span></span>
-      )}
+      {plans.data?.length === 0 ? <Typography variant="body1">No plans found.</Typography> : <span></span>}
     </Page>
   );
 }

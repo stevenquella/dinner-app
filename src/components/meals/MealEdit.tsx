@@ -1,25 +1,28 @@
 import {
   Button,
   Card,
+  CardActions,
   CardContent,
   Dialog,
   DialogActions,
+  DialogContent,
   DialogTitle,
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
+import produce from "immer";
 import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
-import {
-  useMeal,
-  useMealDeleteMutation,
-  useMealUpsertMutation,
-} from "../../providers/providerMeal";
+import { useGroceries } from "../../providers/providerGrocery";
+import { useMeal, useMealDeleteMutation, useMealUpsertMutation } from "../../providers/providerMeal";
+import GroceriesRead from "../groceries/GroceriesRead";
+import GroceryEdit from "../groceries/GroceryEdit";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
+import CardTitle from "../items/CardTitle";
 import Page, { combineStates, PageState } from "../Page";
 import ScrollTop from "../ScrollTop";
 
@@ -44,26 +47,35 @@ const formValidation: MealValidation = {
 export default function MealEdit() {
   const navigate = useNavigate();
   const userid = useAtomValue(useridAtom);
-  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
   const { id } = useParams();
   const isCreate: boolean = !(id != null);
 
-  const formMethods = useForm<MealInputs>({
-    defaultValues: {
-      name: "",
-      notes: "",
-    },
-  });
+  const groceries = useGroceries();
 
   const meal = useMeal({
     id: id ?? null,
-    onSuccess: (meal) =>
+    onSuccess: (meal) => {
       formMethods.reset({
         name: meal.name,
         notes: meal.notes ?? "",
-      }),
+      });
+      setSelectedGroceries(meal.meal_grocery.map((x) => x.grocery_id));
+    },
   });
+
+  const formMethods = useForm<MealInputs>({
+    defaultValues: {
+      name: meal.data?.name ?? "",
+      notes: meal.data?.notes ?? "",
+    },
+  });
+  const [addGrocery, setAddGrocery] = useState<boolean>(false);
+  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+  const [selectedGroceries, setSelectedGroceries] = useState<string[]>(
+    meal.data?.meal_grocery?.map((x) => x.grocery_id) ?? []
+  );
+
   const mealUpsert = useMealUpsertMutation({
     onSuccess: (id) => {
       if (isCreate) {
@@ -73,13 +85,35 @@ export default function MealEdit() {
       }
     },
   });
+
   const mealDelete = useMealDeleteMutation({
     onSuccess: () => navigate("/meals", { replace: true }),
   });
 
+  const handleAddGrocery = (id: string) => {
+    if (selectedGroceries.indexOf(id) === -1) {
+      setSelectedGroceries(
+        produce(selectedGroceries, (draft) => {
+          draft.push(id);
+        })
+      );
+    }
+  };
+
+  const handleDeleteGrocery = (id: string) => {
+    const index = selectedGroceries.indexOf(id);
+    if (index !== -1) {
+      setSelectedGroceries(
+        produce(selectedGroceries, (draft) => {
+          draft.splice(index, 1);
+        })
+      );
+    }
+  };
+
   const pageState: PageState = isCreate
-    ? combineStates([mealUpsert])
-    : combineStates([meal, mealUpsert, mealDelete]);
+    ? combineStates([groceries, mealUpsert])
+    : combineStates([groceries, meal, mealUpsert, mealDelete]);
 
   return (
     <Page {...pageState}>
@@ -88,9 +122,12 @@ export default function MealEdit() {
         <form
           onSubmit={formMethods.handleSubmit((x) =>
             mealUpsert.mutate({
-              id: id,
-              user_id: userid,
-              ...x,
+              meal: {
+                id: id,
+                user_id: userid,
+                ...x,
+              },
+              groceries: selectedGroceries,
             })
           )}
         >
@@ -103,14 +140,8 @@ export default function MealEdit() {
               pb: 2,
             }}
           >
-            <Typography variant="h5">
-              {isCreate ? "Create Meal" : "Edit Meal"}
-            </Typography>
-            <Button
-              variant="contained"
-              type="submit"
-              disabled={pageState.isLoading || meal.isError}
-            >
+            <Typography variant="h5">{isCreate ? "Create Meal" : "Edit Meal"}</Typography>
+            <Button variant="contained" type="submit" disabled={pageState.isLoading || meal.isError}>
               {isCreate ? "Create" : "Update"}
             </Button>
           </Box>
@@ -124,23 +155,30 @@ export default function MealEdit() {
                   rowGap: 1,
                 }}
               >
-                <Typography variant="caption">Summary</Typography>
-                <TextInput
-                  name="name"
-                  label="Name"
-                  rules={formValidation.name}
-                />
+                <CardTitle text="Summary" />
+                <TextInput name="name" label="Name" rules={formValidation.name} />
                 <TextInput name="notes" label="Notes" multiline rows={20} />
               </Box>
             </CardContent>
           </Card>
           <Card sx={{ mt: 1 }}>
             <CardContent>
-              <Typography variant="caption">Groceries</Typography>
+              <CardTitle text={`Groceries (${selectedGroceries.length})`} />
+              <GroceriesRead groceries={groceries.data} ids={selectedGroceries} onDelete={handleDeleteGrocery} />
             </CardContent>
+            <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
+              <Button
+                color="secondary"
+                onClick={() => setAddGrocery(true)}
+                disabled={pageState.isLoading || pageState.isError}
+              >
+                Add Grocery Item
+              </Button>
+            </CardActions>
           </Card>
         </form>
       </FormProvider>
+      <GroceryEdit open={addGrocery} onDismiss={() => setAddGrocery(false)} onAddGrocery={handleAddGrocery} />
       {!isCreate ? (
         <div>
           <Button
@@ -154,6 +192,9 @@ export default function MealEdit() {
           </Button>
           <Dialog maxWidth="sm" fullWidth={true} open={confirmDelete}>
             <DialogTitle>Delete meal?</DialogTitle>
+            <DialogContent>
+              <Typography>Deleting this meal will remove it from any related plans.</Typography>
+            </DialogContent>
             <DialogActions>
               <Button color="info" onClick={() => setConfirmDelete(false)}>
                 Cancel

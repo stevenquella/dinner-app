@@ -1,9 +1,6 @@
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import {
-  useSignInMutation,
-  useSignUpMutation,
-} from "../../providers/providerAuth";
+import { useSignInMutation, useSignUpMutation } from "../../providers/providerAuth";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 import Page, { combineStates } from "../Page";
@@ -62,13 +59,7 @@ export default function LogIn() {
                   p: 1,
                 }}
               >
-                <TextInput
-                  name="email"
-                  label="Email"
-                  type="email"
-                  autocomplete="email"
-                  rules={formValidation.email}
-                />
+                <TextInput name="email" label="Email" type="email" autocomplete="email" rules={formValidation.email} />
                 <TextInput
                   name="password"
                   label="Password"
@@ -84,11 +75,7 @@ export default function LogIn() {
                     columnGap: 1,
                   }}
                 >
-                  <Button
-                    variant="contained"
-                    type="submit"
-                    disabled={pageState.isLoading}
-                  >
+                  <Button variant="contained" type="submit" disabled={pageState.isLoading}>
                     LOG IN
                   </Button>
                   <Typography variant="body1">OR</Typography>

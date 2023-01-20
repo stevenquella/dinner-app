@@ -1,21 +1,25 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Link,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Card, CardContent, Link, Typography } from "@mui/material";
+import { useState } from "react";
 import { Link as RouterLink, useParams } from "react-router-dom";
+import { useGroceries } from "../../providers/providerGrocery";
 import { useMeal } from "../../providers/providerMeal";
-import Page from "../Page";
+import GroceriesRead from "../groceries/GroceriesRead";
+import CardTitle from "../items/CardTitle";
+import Page, { combineStates } from "../Page";
+import PlansRelated from "../plans/PlansRelated";
+import ScrollTop from "../ScrollTop";
+import MealSchedule from "./MealSchedule";
 
 export default function MealRead() {
   const { id } = useParams();
+  const groceries = useGroceries();
   const meal = useMeal({ id: id ?? null });
+  const pageState = combineStates([groceries, meal]);
+  const [scheduleMeal, setScheduleMeal] = useState<boolean>(false);
 
   return (
-    <Page {...meal}>
+    <Page {...pageState}>
+      <ScrollTop />
       <Box
         sx={{
           display: "flex",
@@ -27,11 +31,28 @@ export default function MealRead() {
       >
         <Typography variant="h5">{meal.data?.name}</Typography>
 
-        <Link component={RouterLink} to={`/meals/edit/${id}`}>
-          <Button variant="contained" disabled={meal.isLoading || meal.isError}>
-            Edit
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 1,
+          }}
+        >
+          <Link component={RouterLink} to={`/meals/edit/${id}`}>
+            <Button variant="contained" disabled={pageState.isLoading || meal.isError}>
+              Edit
+            </Button>
+          </Link>
+          <Button
+            variant="contained"
+            color="secondary"
+            disabled={pageState.isLoading || meal.isError}
+            onClick={() => setScheduleMeal(true)}
+          >
+            Schedule
           </Button>
-        </Link>
+        </Box>
       </Box>
 
       <Card>
@@ -43,8 +64,7 @@ export default function MealRead() {
               rowGap: 1,
             }}
           >
-            <Typography variant="caption">Summary</Typography>
-
+            <CardTitle text="Summary" />
             <Typography variant="body1" whiteSpace="pre-wrap">
               {meal.data?.notes}
             </Typography>
@@ -53,9 +73,17 @@ export default function MealRead() {
       </Card>
       <Card sx={{ mt: 1 }}>
         <CardContent>
-          <Typography variant="caption">Groceries</Typography>
+          <CardTitle text={`Groceries (${meal.data?.meal_grocery.length})`} />
+          <GroceriesRead groceries={groceries.data} ids={meal.data?.meal_grocery.map((x) => x.grocery_id)} />
         </CardContent>
       </Card>
+      <Card sx={{ mt: 1 }}>
+        <CardContent>
+          <CardTitle text={`Plans (${meal.data?.plan_meal.length})`} />
+          <PlansRelated ids={meal.data?.plan_meal.map((x) => x.plan_id)} />
+        </CardContent>
+      </Card>
+      <MealSchedule mealid={id ?? ""} open={scheduleMeal} onDismiss={() => setScheduleMeal(false)} />
     </Page>
   );
 }

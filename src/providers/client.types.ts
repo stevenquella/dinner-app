@@ -1,132 +1,100 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json }
-  | Json[];
+export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
 
 export interface Database {
   public: {
     Tables: {
       grocery: {
         Row: {
-          id: string;
-          user_id: string;
           category: string;
+          id: string;
           name: string;
+          user_id: string;
         };
         Insert: {
-          id?: string;
-          user_id: string;
           category: string;
+          id?: string;
           name: string;
+          user_id: string;
         };
         Update: {
-          id?: string;
-          user_id?: string;
           category?: string;
+          id?: string;
           name?: string;
+          user_id?: string;
         };
       };
       meal: {
         Row: {
           id: string;
           name: string;
-          user_id: string;
           notes: string | null;
+          user_id: string;
         };
         Insert: {
           id?: string;
           name: string;
-          user_id: string;
           notes?: string | null;
+          user_id: string;
         };
         Update: {
           id?: string;
           name?: string;
-          user_id?: string;
           notes?: string | null;
+          user_id?: string;
         };
       };
       meal_grocery: {
         Row: {
-          user_id: string;
-          meal_id: string;
           grocery_id: string;
-          order: number | null;
+          meal_id: string;
+          user_id: string;
         };
         Insert: {
-          user_id: string;
-          meal_id: string;
           grocery_id: string;
-          order?: number | null;
+          meal_id: string;
+          user_id: string;
         };
         Update: {
-          user_id?: string;
-          meal_id?: string;
           grocery_id?: string;
-          order?: number | null;
+          meal_id?: string;
+          user_id?: string;
         };
       };
       plan: {
         Row: {
+          date: string;
           id: string;
-          user_id: string;
-          date: string;
           notes: string | null;
+          user_id: string;
         };
         Insert: {
-          id?: string;
-          user_id: string;
           date: string;
-          notes?: string | null;
-        };
-        Update: {
           id?: string;
-          user_id?: string;
-          date?: string;
           notes?: string | null;
-        };
-      };
-      plan_grocery: {
-        Row: {
           user_id: string;
-          plan_id: string;
-          grocery_id: string;
-          count: number;
-        };
-        Insert: {
-          user_id: string;
-          plan_id: string;
-          grocery_id: string;
-          count?: number;
         };
         Update: {
+          date?: string;
+          id?: string;
+          notes?: string | null;
           user_id?: string;
-          plan_id?: string;
-          grocery_id?: string;
-          count?: number;
         };
       };
       plan_meal: {
         Row: {
-          user_id: string;
-          plan_id: string;
           meal_id: string;
-          order: number | null;
+          plan_id: string;
+          user_id: string;
         };
         Insert: {
-          user_id: string;
-          plan_id: string;
           meal_id: string;
-          order?: number | null;
+          plan_id: string;
+          user_id: string;
         };
         Update: {
-          user_id?: string;
-          plan_id?: string;
           meal_id?: string;
-          order?: number | null;
+          plan_id?: string;
+          user_id?: string;
         };
       };
     };

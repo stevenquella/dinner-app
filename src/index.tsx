@@ -18,10 +18,14 @@ const theme = createTheme(themeOptions);
 
 const router = createBrowserRouter(routes);
 
-const queryClient = new QueryClient();
-const queryProviderValues: (readonly [Atom<unknown>, unknown])[] = [
-  [queryClientAtom, queryClient],
-];
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
+    },
+  },
+});
+const queryProviderValues: (readonly [Atom<unknown>, unknown])[] = [[queryClientAtom, queryClient]];
 
 const root = createRoot(document.getElementById("root") as HTMLElement);
 

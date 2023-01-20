@@ -10,22 +10,19 @@ import {
   Typography,
 } from "@mui/material";
 import dayjs from "dayjs";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
-import { useMeals } from "../../providers/providerMeal";
-import {
-  usePlan,
-  usePlanDeleteMutation,
-  usePlanUpsertMutation,
-} from "../../providers/providerPlan";
+import { usePlan, usePlanDeleteMutation, usePlanUpsertMutation } from "../../providers/providerPlan";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
+import CardTitle from "../items/CardTitle";
+import { MealsRelated } from "../meals/MealsRelated";
 import Page, { combineStates, PageState } from "../Page";
+import ScrollTop from "../ScrollTop";
 import PlanMealsEdit from "./PlanMealsEdit";
-import { PlanMealsRead } from "./PlanMealsRead";
 
 type PlanInputs = {
   date: string;
@@ -48,21 +45,10 @@ const planValidation: PlanValidation = {
 export default function PlanEdit() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [userid] = useAtom(useridAtom);
-  const [selectedMeals, setSelectedMeals] = useState<string[]>([]);
-  const [editMeals, setEditMeals] = useState<boolean>(false);
-  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+  const userid = useAtomValue(useridAtom);
 
   const isCreate = !(id != null);
 
-  const formMethods = useForm<PlanInputs>({
-    defaultValues: {
-      date: dayjs().format("YYYY-MM-DD"),
-      notes: "",
-    },
-  });
-
-  const meals = useMeals();
   const plan = usePlan({
     id: id ?? null,
     onSuccess: (plan) => {
@@ -74,10 +60,21 @@ export default function PlanEdit() {
       setSelectedMeals(plan.plan_meal.map((x) => x.meal_id));
     },
   });
+
+  const formMethods = useForm<PlanInputs>({
+    defaultValues: {
+      date: plan.data?.date ?? dayjs().format("YYYY-MM-DD"),
+      notes: plan.data?.notes ?? "",
+    },
+  });
+  const [selectedMeals, setSelectedMeals] = useState<string[]>(plan.data?.plan_meal.map((x) => x.meal_id) ?? []);
+  const [editMeals, setEditMeals] = useState<boolean>(false);
+  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+
   const planUpsert = usePlanUpsertMutation({
     onSuccess: ({ id }) => {
       if (isCreate) {
-        navigate(`/plans/edit/${id}`, { replace: true });
+        navigate(`/plans/read/${id}`, { replace: true });
       } else {
         navigate(-1);
       }
@@ -87,12 +84,11 @@ export default function PlanEdit() {
     onSuccess: () => navigate(`/`, { replace: true }),
   });
 
-  const pageState: PageState = isCreate
-    ? combineStates([meals, planUpsert])
-    : combineStates([meals, plan, planUpsert, planDelete]);
+  const pageState: PageState = isCreate ? combineStates([planUpsert]) : combineStates([plan, planUpsert, planDelete]);
 
   return (
     <Page {...pageState}>
+      <ScrollTop />
       <FormProvider {...formMethods}>
         <form
           onSubmit={formMethods.handleSubmit((x) =>
@@ -115,14 +111,8 @@ export default function PlanEdit() {
               pb: 2,
             }}
           >
-            <Typography variant="h5">
-              {isCreate ? "Create Plan" : "Edit Plan"}
-            </Typography>
-            <Button
-              variant="contained"
-              type="submit"
-              disabled={pageState.isLoading || plan.isError}
-            >
+            <Typography variant="h5">{isCreate ? "Create Plan" : "Edit Plan"}</Typography>
+            <Button variant="contained" type="submit" disabled={pageState.isLoading || plan.isError}>
               {isCreate ? "Create" : "Update"}
             </Button>
           </Box>
@@ -136,32 +126,22 @@ export default function PlanEdit() {
                   rowGap: 1,
                 }}
               >
-                <Typography variant="body1">Summary</Typography>
-                <TextInput
-                  name="date"
-                  label="Date"
-                  type="date"
-                  rules={planValidation.date}
-                />
+                <CardTitle text="Summary" />
+                <TextInput name="date" label="Date" type="date" rules={planValidation.date} />
                 <TextInput name="notes" label="Notes" />
               </Box>
             </CardContent>
           </Card>
           <Card sx={{ mt: 1 }}>
             <CardContent>
-              <Typography variant="body1">Meals</Typography>
-              <PlanMealsRead meals={meals.data} ids={selectedMeals} />
+              <CardTitle text={`Meals (${selectedMeals.length})`} />
+              <MealsRelated ids={selectedMeals} linkTarget="_blank" />
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
               <Button color="secondary" onClick={() => setEditMeals(true)}>
                 Edit Meals
               </Button>
             </CardActions>
-          </Card>
-          <Card sx={{ mt: 1 }}>
-            <CardContent>
-              <Typography variant="body1">Groceries</Typography>
-            </CardContent>
           </Card>
         </form>
       </FormProvider>
