@@ -1,6 +1,7 @@
 import { LocalGroceryStore } from "@mui/icons-material";
 import { Box, Button, Card, CardActionArea, CardContent, Link, Typography } from "@mui/material";
 import { useAtom } from "jotai";
+import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { mealsSearchAtom, useMeals } from "../../providers/providerMeal";
 import SearchInput from "../inputs/SearchInput";
@@ -14,6 +15,9 @@ export default function MealIndex() {
   const searchText = mealSearch
     ? `Showing ${meals.data?.length} meals that contain '${mealSearch}'.`
     : "Showing all meals.";
+
+  const showIncrement = 100;
+  const [shownCount, setShownCount] = useState(showIncrement);
 
   return (
     <Page {...meals}>
@@ -41,7 +45,7 @@ export default function MealIndex() {
         />
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 1 }}>
-        {meals.data?.map((meal) => (
+        {meals.data?.slice(0, shownCount).map((meal) => (
           <Link key={meal.id} component={RouterLink} to={`/meals/read/${meal.id}`} underline="none">
             <Card sx={{ borderBottom: 1, borderColor: "divider" }}>
               <CardActionArea>
@@ -59,6 +63,14 @@ export default function MealIndex() {
         ))}
       </Box>
       {meals.data?.length === 0 ? <Typography variant="body1">No meals found.</Typography> : <span></span>}
+
+      {shownCount < (meals.data?.length ?? 0) ? (
+        <Button color="secondary" sx={{ mt: 1 }} onClick={() => setShownCount(shownCount + showIncrement)}>
+          Show More
+        </Button>
+      ) : (
+        <span></span>
+      )}
     </Page>
   );
 }

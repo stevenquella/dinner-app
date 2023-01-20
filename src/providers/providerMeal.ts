@@ -87,12 +87,12 @@ const columns = `
 `;
 
 async function retrieveMeals(search?: string): Promise<Meal[]> {
-  let query = supabase.from(meal_table).select(columns).order("name");
+  let query = supabase.from(meal_table).select(columns);
   if (search) {
     query = query.ilike("name", `%${search.trim()}%`);
   }
 
-  const response = await query;
+  const response = await query.order("name");
   return ensureSuccess(response);
 }
 
