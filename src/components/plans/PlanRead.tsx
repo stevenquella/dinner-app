@@ -80,13 +80,13 @@ export default function PlanRead() {
       </Card>
       <Card sx={{ mt: 1 }}>
         <CardContent>
-          <CardTitle text={`Meals (${plan.data?.plan_meal.length})`} />
+          <CardTitle text={`Meals (${plan.data?.plan_meal.length ?? 0})`} />
           <MealsRelated ids={plan.data?.plan_meal.map((x) => x.meal_id)} />
         </CardContent>
       </Card>
       <Card sx={{ mt: 1 }}>
         <CardContent>
-          <CardTitle text={`Groceries (${plan.data?.groceries?.length})`} />
+          <CardTitle text={`Groceries (${plan.data?.groceries?.length ?? 0})`} />
           <GroceriesRead groceries={plan.data?.groceries} ids={plan.data?.groceries?.map((x) => x.id)} showCount />
         </CardContent>
       </Card>

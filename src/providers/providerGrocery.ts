@@ -2,8 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ensureSuccess, getSingleRow, supabase } from "./client";
 import { notEmpty } from "./helpers";
 import { Grocery, GroceryInsert, grocery_table } from "./provider.types";
-import { mealQueryKeys } from "./providerMeal";
-import { planQueryKeys } from "./providerPlan";
 
 export const groceryQueryKeys = {
   root: ["groceries"],
@@ -44,8 +42,6 @@ export const useGroceryUpsertMutation = (options: { onSuccess: (g: Grocery) => v
   return useMutation({
     mutationFn: (data: GroceryInsert) => upsertGrocery(data),
     onSuccess: (grocery: Grocery) => {
-      queryClient.invalidateQueries(planQueryKeys.root);
-      queryClient.invalidateQueries(mealQueryKeys.root);
       queryClient.invalidateQueries(groceryQueryKeys.root);
       options.onSuccess(grocery);
     },

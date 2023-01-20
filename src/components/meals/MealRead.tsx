@@ -73,13 +73,13 @@ export default function MealRead() {
       </Card>
       <Card sx={{ mt: 1 }}>
         <CardContent>
-          <CardTitle text={`Groceries (${meal.data?.meal_grocery.length})`} />
+          <CardTitle text={`Groceries (${meal.data?.meal_grocery.length ?? 0})`} />
           <GroceriesRead groceries={groceries.data} ids={meal.data?.meal_grocery.map((x) => x.grocery_id)} />
         </CardContent>
       </Card>
       <Card sx={{ mt: 1 }}>
         <CardContent>
-          <CardTitle text={`Plans (${meal.data?.plan_meal.length})`} />
+          <CardTitle text={`Plans (${meal.data?.plan_meal.length ?? 0})`} />
           <PlansRelated ids={meal.data?.plan_meal.map((x) => x.plan_id)} />
         </CardContent>
       </Card>
