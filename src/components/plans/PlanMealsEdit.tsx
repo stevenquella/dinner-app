@@ -13,24 +13,21 @@ import {
   ListItemText,
 } from "@mui/material";
 import produce from "immer";
+import { useAtom } from "jotai";
+import { useNavigate } from "react-router-dom";
 import { getMealsById, useMeals } from "../../providers/providerMeal";
+import { planMealsAtom } from "./PlanEdit";
 
-export type PlanMealsProps = {
-  open: boolean;
-  onDismiss: () => void;
-
-  selectedMeals: string[];
-  onChangeSelectedMeals: (items: string[]) => void;
-};
-
-export default function PlanMealsEdit(props: PlanMealsProps) {
+export default function PlanMealsEdit() {
+  const navigate = useNavigate();
   const meals = useMeals();
+  const [selectedMeals, setSelectedMeals] = useAtom(planMealsAtom);
 
   const handleSelect = (id: string) => {
-    const index = props.selectedMeals.indexOf(id);
+    const index = selectedMeals.indexOf(id);
 
-    props.onChangeSelectedMeals(
-      produce(props.selectedMeals, (draft) => {
+    setSelectedMeals(
+      produce(selectedMeals, (draft) => {
         if (index === -1) {
           draft.push(id);
         } else {
@@ -41,10 +38,10 @@ export default function PlanMealsEdit(props: PlanMealsProps) {
   };
 
   const handleDelete = (id: string) => {
-    const index = props.selectedMeals.indexOf(id);
+    const index = selectedMeals.indexOf(id);
     if (index !== -1) {
-      props.onChangeSelectedMeals(
-        produce(props.selectedMeals, (draft) => {
+      setSelectedMeals(
+        produce(selectedMeals, (draft) => {
           draft.splice(index, 1);
         })
       );
@@ -52,11 +49,11 @@ export default function PlanMealsEdit(props: PlanMealsProps) {
   };
 
   return (
-    <Dialog open={props.open} fullScreen>
+    <Dialog open={true} fullScreen>
       <DialogTitle sx={{ borderBottom: 1, borderColor: "divider" }}>
         Select Meals
         <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
-          {getMealsById(meals.data, props.selectedMeals).map((meal) => (
+          {getMealsById(meals.data, selectedMeals).map((meal) => (
             <Chip key={meal.id} label={meal.name} onDelete={() => handleDelete(meal.id)} />
           ))}
         </Box>
@@ -73,7 +70,7 @@ export default function PlanMealsEdit(props: PlanMealsProps) {
                 borderBottom: 1,
                 borderColor: "divider",
               }}
-              selected={props.selectedMeals.indexOf(x.id) !== -1}
+              selected={selectedMeals.indexOf(x.id) !== -1}
               onClick={() => handleSelect(x.id)}
             >
               <ListItemText primary={x.name} />
@@ -83,10 +80,10 @@ export default function PlanMealsEdit(props: PlanMealsProps) {
         </List>
       </DialogContent>
       <DialogActions sx={{ borderTop: 1, borderColor: "divider" }}>
-        <Button size="large" color="warning" onClick={() => props.onChangeSelectedMeals([])}>
+        <Button size="large" color="warning" onClick={() => setSelectedMeals([])}>
           Clear
         </Button>
-        <Button size="large" onClick={() => props.onDismiss()}>
+        <Button size="large" onClick={() => navigate(-1)}>
           Done
         </Button>
       </DialogActions>

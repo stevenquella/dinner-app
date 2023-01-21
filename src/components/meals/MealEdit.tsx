@@ -1,27 +1,17 @@
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Typography,
-} from "@mui/material";
+import { Button, Card, CardActions, CardContent, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import produce from "immer";
-import { useAtomValue } from "jotai";
-import { useState } from "react";
+import { atom, useAtom, useAtomValue } from "jotai";
+import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
 import { useGroceries } from "../../providers/providerGrocery";
-import { useMeal, useMealDeleteMutation, useMealUpsertMutation } from "../../providers/providerMeal";
+import { useMeal, useMealUpsertMutation } from "../../providers/providerMeal";
 import GroceriesRead from "../groceries/GroceriesRead";
-import GroceryEdit from "../groceries/GroceryEdit";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
+import ButtonLink from "../items/ButtonLink";
 import CardTitle from "../items/CardTitle";
 import Page, { combineStates, PageState } from "../Page";
 import ScrollTop from "../ScrollTop";
@@ -43,6 +33,8 @@ const formValidation: MealValidation = {
     },
   },
 };
+
+export const mealGroceriesAtom = atom<string[]>([]);
 
 export default function MealEdit() {
   const navigate = useNavigate();
@@ -70,11 +62,8 @@ export default function MealEdit() {
       notes: meal.data?.notes ?? "",
     },
   });
-  const [addGrocery, setAddGrocery] = useState<boolean>(false);
-  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-  const [selectedGroceries, setSelectedGroceries] = useState<string[]>(
-    meal.data?.meal_grocery?.map((x) => x.grocery_id) ?? []
-  );
+
+  const [selectedGroceries, setSelectedGroceries] = useAtom(mealGroceriesAtom);
 
   const mealUpsert = useMealUpsertMutation({
     onSuccess: (id) => {
@@ -85,20 +74,6 @@ export default function MealEdit() {
       }
     },
   });
-
-  const mealDelete = useMealDeleteMutation({
-    onSuccess: () => navigate("/meals", { replace: true }),
-  });
-
-  const handleAddGrocery = (id: string) => {
-    if (selectedGroceries.indexOf(id) === -1) {
-      setSelectedGroceries(
-        produce(selectedGroceries, (draft) => {
-          draft.push(id);
-        })
-      );
-    }
-  };
 
   const handleDeleteGrocery = (id: string) => {
     const index = selectedGroceries.indexOf(id);
@@ -111,9 +86,13 @@ export default function MealEdit() {
     }
   };
 
+  useEffect(() => {
+    setSelectedGroceries(meal.data?.meal_grocery?.map((x) => x.grocery_id) ?? []);
+  }, [meal.data?.meal_grocery, setSelectedGroceries]);
+
   const pageState: PageState = isCreate
     ? combineStates([groceries, mealUpsert])
-    : combineStates([groceries, meal, mealUpsert, mealDelete]);
+    : combineStates([groceries, meal, mealUpsert]);
 
   return (
     <Page {...pageState}>
@@ -167,47 +146,30 @@ export default function MealEdit() {
               <GroceriesRead groceries={groceries.data} ids={selectedGroceries} onDelete={handleDeleteGrocery} />
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
-              <Button
+              <ButtonLink
                 color="secondary"
-                onClick={() => setAddGrocery(true)}
+                to="groceries"
                 disabled={pageState.isLoading || pageState.isError}
-              >
-                Add Grocery Item
-              </Button>
+                text="Add Groceries"
+              />
             </CardActions>
           </Card>
         </form>
       </FormProvider>
-      <GroceryEdit open={addGrocery} onDismiss={() => setAddGrocery(false)} onAddGrocery={handleAddGrocery} />
       {!isCreate ? (
-        <div>
-          <Button
-            variant="outlined"
-            color="error"
-            sx={{ mt: 2 }}
-            onClick={() => setConfirmDelete(true)}
-            disabled={pageState.isLoading || pageState.isError}
-          >
-            DELETE
-          </Button>
-          <Dialog maxWidth="sm" fullWidth={true} open={confirmDelete}>
-            <DialogTitle>Delete meal?</DialogTitle>
-            <DialogContent>
-              <Typography>Deleting this meal will remove it from any related plans.</Typography>
-            </DialogContent>
-            <DialogActions>
-              <Button color="info" onClick={() => setConfirmDelete(false)}>
-                Cancel
-              </Button>
-              <Button color="error" onClick={() => mealDelete.mutate(id ?? "")}>
-                Delete
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </div>
+        <ButtonLink
+          to="delete"
+          variant="outlined"
+          color="error"
+          sx={{ mt: 2 }}
+          disabled={pageState.isLoading || pageState.isError}
+          text="Delete"
+        />
       ) : (
         <div></div>
       )}
+
+      <Outlet />
     </Page>
   );
 }

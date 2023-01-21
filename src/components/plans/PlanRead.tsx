@@ -1,7 +1,8 @@
-import { Box, Button, Card, CardContent, Link, Typography } from "@mui/material";
-import { Link as RouterLink, useParams } from "react-router-dom";
+import { Box, Button, Card, CardContent, Typography } from "@mui/material";
+import { useParams } from "react-router-dom";
 import { usePlan } from "../../providers/providerPlan";
 import GroceriesRead from "../groceries/GroceriesRead";
+import ButtonLink from "../items/ButtonLink";
 import CardTitle from "../items/CardTitle";
 import { MealsRelated } from "../meals/MealsRelated";
 import Page, { combineStates } from "../Page";
@@ -44,11 +45,13 @@ export default function PlanRead() {
             gap: 1,
           }}
         >
-          <Link component={RouterLink} to={`/plans/edit/${id}`}>
-            <Button variant="contained" disabled={pageState.isLoading || plan.isError}>
-              Edit
-            </Button>
-          </Link>
+          <ButtonLink
+            to={`/plans/edit/${id}`}
+            variant="contained"
+            disabled={pageState.isLoading || plan.isError}
+            text="Edit"
+          />
+
           {!!navigator.share ? (
             <Button
               variant="contained"

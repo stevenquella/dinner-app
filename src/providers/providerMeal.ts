@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { atom } from "jotai";
 import { ensureEmptySuccess, ensureSuccess, getSingleRow, supabase } from "./client";
 import { notEmpty } from "./helpers";
 import { Meal, MealInsert, meal_grocery_table, meal_table, plan_meal_table } from "./provider.types";
@@ -11,10 +10,6 @@ export const mealQueryKeys = {
   meals_search: (search: string) => ["meals", "search", search],
   meal: (id: string) => ["meals", "id", id],
 };
-
-// ATOMS
-
-export const mealsSearchAtom = atom<string>("");
 
 // QUERIES
 
@@ -87,12 +82,12 @@ const columns = `
 `;
 
 async function retrieveMeals(search?: string): Promise<Meal[]> {
-  let query = supabase.from(meal_table).select(columns).order("name");
+  let query = supabase.from(meal_table).select(columns);
   if (search) {
     query = query.ilike("name", `%${search.trim()}%`);
   }
 
-  const response = await query;
+  const response = await query.order("name");
   return ensureSuccess(response);
 }
 

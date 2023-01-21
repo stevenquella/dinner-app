@@ -1,28 +1,18 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, Typography } from "@mui/material";
 import dayjs from "dayjs";
-import { useAtomValue } from "jotai";
-import { useState } from "react";
+import { atom, useAtom, useAtomValue } from "jotai";
+import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
-import { usePlan, usePlanDeleteMutation, usePlanUpsertMutation } from "../../providers/providerPlan";
+import { usePlan, usePlanUpsertMutation } from "../../providers/providerPlan";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
+import ButtonLink from "../items/ButtonLink";
 import CardTitle from "../items/CardTitle";
 import { MealsRelated } from "../meals/MealsRelated";
 import Page, { combineStates, PageState } from "../Page";
 import ScrollTop from "../ScrollTop";
-import PlanMealsEdit from "./PlanMealsEdit";
 
 type PlanInputs = {
   date: string;
@@ -41,6 +31,8 @@ const planValidation: PlanValidation = {
     },
   },
 };
+
+export const planMealsAtom = atom<string[]>([]);
 
 export default function PlanEdit() {
   const navigate = useNavigate();
@@ -67,9 +59,6 @@ export default function PlanEdit() {
       notes: plan.data?.notes ?? "",
     },
   });
-  const [selectedMeals, setSelectedMeals] = useState<string[]>(plan.data?.plan_meal.map((x) => x.meal_id) ?? []);
-  const [editMeals, setEditMeals] = useState<boolean>(false);
-  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
   const planUpsert = usePlanUpsertMutation({
     onSuccess: ({ id }) => {
@@ -80,12 +69,13 @@ export default function PlanEdit() {
       }
     },
   });
-  const planDelete = usePlanDeleteMutation({
-    onSuccess: () => navigate(`/`, { replace: true }),
-  });
 
-  const pageState: PageState = isCreate ? combineStates([planUpsert]) : combineStates([plan, planUpsert, planDelete]);
+  const [selectedMeals, setSelectedMeals] = useAtom(planMealsAtom);
+  useEffect(() => {
+    setSelectedMeals(plan.data?.plan_meal.map((x) => x.meal_id) ?? []);
+  }, [plan.data?.plan_meal, setSelectedMeals]);
 
+  const pageState: PageState = isCreate ? combineStates([planUpsert]) : combineStates([plan, planUpsert]);
   return (
     <Page {...pageState}>
       <ScrollTop />
@@ -138,45 +128,26 @@ export default function PlanEdit() {
               <MealsRelated ids={selectedMeals} linkTarget="_blank" />
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
-              <Button color="secondary" onClick={() => setEditMeals(true)}>
-                Edit Meals
-              </Button>
+              <ButtonLink to="meals" color="secondary" text="Edit Meals" />
             </CardActions>
           </Card>
         </form>
       </FormProvider>
-      <PlanMealsEdit
-        open={editMeals}
-        onDismiss={() => setEditMeals(false)}
-        selectedMeals={selectedMeals}
-        onChangeSelectedMeals={setSelectedMeals}
-      />
+
       {!isCreate ? (
-        <div>
-          <Button
-            variant="outlined"
-            color="error"
-            sx={{ mt: 2 }}
-            onClick={() => setConfirmDelete(true)}
-            disabled={pageState.isLoading || pageState.isError}
-          >
-            DELETE
-          </Button>
-          <Dialog maxWidth="sm" fullWidth={true} open={confirmDelete}>
-            <DialogTitle>Delete plan?</DialogTitle>
-            <DialogActions>
-              <Button color="info" onClick={() => setConfirmDelete(false)}>
-                Cancel
-              </Button>
-              <Button color="error" onClick={() => planDelete.mutate(id ?? "")}>
-                Delete
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </div>
+        <ButtonLink
+          to="delete"
+          variant="outlined"
+          color="error"
+          sx={{ mt: 2 }}
+          disabled={pageState.isLoading || pageState.isError}
+          text="Delete"
+        />
       ) : (
-        <div></div>
+        <span></span>
       )}
+
+      <Outlet />
     </Page>
   );
 }

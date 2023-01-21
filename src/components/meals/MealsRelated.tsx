@@ -24,7 +24,7 @@ export function MealsRelated(props: MealsRelatedProps) {
           }}
           secondaryAction={
             <Link component={RouterLink} to={`/meals/read/${meal.id}`} target={props.linkTarget}>
-              <IconButton edge="end">
+              <IconButton edge="end" title="Open Meal">
                 <Launch />
               </IconButton>
             </Link>
@@ -38,7 +38,12 @@ export function MealsRelated(props: MealsRelatedProps) {
           ) : null}
         </ListItem>
       ))}
-      {props.ids?.length === 0 ? <ListItemText primary="No related meals." /> : null}
+
+      {props.ids?.length === 0 ? (
+        <ListItem disableGutters>
+          <ListItemText primary="No related meals."></ListItemText>
+        </ListItem>
+      ) : null}
     </List>
   );
 }

@@ -13,30 +13,27 @@ import {
 import dayjs from "dayjs";
 import { useAtomValue } from "jotai";
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
 import { usePlanMealUpsertMutation, usePlans } from "../../providers/providerPlan";
 import { combineStates } from "../Page";
 
-export type MealScheduleProps = {
-  mealid: string;
-  open: boolean;
-  onDismiss: () => void;
-};
-
-export default function MealSchedule(props: MealScheduleProps) {
+export default function MealSchedule() {
+  const navigate = useNavigate();
+  const { id } = useParams();
   const userid = useAtomValue(useridAtom);
   const plans = usePlans({
     start: dayjs().format("YYYY-MM-DD"),
   });
   const [selectedPlan, setSelectedPlan] = useState<string>();
   const planMealUpsert = usePlanMealUpsertMutation({
-    onSuccess: () => props.onDismiss(),
+    onSuccess: () => navigate(-1),
   });
 
   const dialogState = combineStates([plans, planMealUpsert]);
 
   return (
-    <Dialog fullScreen open={props.open}>
+    <Dialog fullScreen open={true}>
       <DialogTitle>Select Plan</DialogTitle>
       <DialogContent sx={{ p: 0 }}>
         {plans.isLoading || plans.isError ? <CircularProgress /> : null}
@@ -66,7 +63,7 @@ export default function MealSchedule(props: MealScheduleProps) {
         )}
       </DialogContent>
       <DialogActions sx={{ borderTop: 1, borderColor: "divider" }}>
-        <Button color="info" size="large" onClick={() => props.onDismiss()}>
+        <Button color="info" size="large" onClick={() => navigate(-1)}>
           Cancel
         </Button>
         <Button
@@ -74,7 +71,7 @@ export default function MealSchedule(props: MealScheduleProps) {
           onClick={() =>
             planMealUpsert.mutate({
               user_id: userid,
-              meal_id: props.mealid,
+              meal_id: id ?? "",
               plan_id: selectedPlan ?? "",
             })
           }
