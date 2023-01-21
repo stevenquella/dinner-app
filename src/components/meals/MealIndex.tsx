@@ -1,23 +1,25 @@
 import { LocalGroceryStore } from "@mui/icons-material";
 import { Box, Button, Card, CardActionArea, CardContent, Link, Typography } from "@mui/material";
-import { useAtom } from "jotai";
-import { useState } from "react";
+import { atom, useAtom } from "jotai";
 import { Link as RouterLink } from "react-router-dom";
-import { mealsSearchAtom, useMeals } from "../../providers/providerMeal";
+import { useMeals } from "../../providers/providerMeal";
 import SearchInput from "../inputs/SearchInput";
 import HighlightText from "../items/HighlightText";
 import Page from "../Page";
 
+const showIncrement = 50;
+const mealsSearchAtom = atom<string>("");
+const mealsShownAtom = atom<number>(showIncrement);
+
 export default function MealIndex() {
   const [mealSearch, setMealSearch] = useAtom(mealsSearchAtom);
+  const [shownCount, setShownCount] = useAtom(mealsShownAtom);
+
   const meals = useMeals(mealSearch);
 
   const searchText = mealSearch
     ? `Showing ${meals.data?.length} meals that contain '${mealSearch}'.`
     : "Showing all meals.";
-
-  const showIncrement = 100;
-  const [shownCount, setShownCount] = useState(showIncrement);
 
   return (
     <Page {...meals}>

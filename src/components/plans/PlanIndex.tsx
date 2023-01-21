@@ -1,11 +1,14 @@
 import { Box, Button, Card, CardActions, CardContent, Link, Typography } from "@mui/material";
-import { useAtom } from "jotai";
+import dayjs from "dayjs";
+import { atom, useAtom } from "jotai";
 import { Link as RouterLink } from "react-router-dom";
-import { getSearchRange, plansSearchAtom, usePlans } from "../../providers/providerPlan";
+import { getSearchRange, usePlans } from "../../providers/providerPlan";
 import SearchInput from "../inputs/SearchInput";
 import CardTitle from "../items/CardTitle";
 import { MealsRelated } from "../meals/MealsRelated";
 import Page from "../Page";
+
+const plansSearchAtom = atom(dayjs().format("YYYY-MM-DD"));
 
 export default function PlanIndex() {
   const [plansSearch, setPlansSearch] = useAtom(plansSearchAtom);

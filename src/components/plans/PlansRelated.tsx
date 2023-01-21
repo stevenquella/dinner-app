@@ -23,7 +23,7 @@ export default function PlansRelated(props: PlansRelatedProps) {
           }}
           secondaryAction={
             <Link component={RouterLink} to={`/plans/read/${plan.id}`}>
-              <IconButton edge="end">
+              <IconButton edge="end" title="Open Plan">
                 <Launch />
               </IconButton>
             </Link>

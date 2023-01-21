@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { atom } from "jotai";
 import { ensureEmptySuccess, ensureSuccess, getSingleRow, supabase } from "./client";
 import { notEmpty } from "./helpers";
 import {
@@ -20,10 +19,6 @@ export const planQueryKeys = {
   plans_search: (start?: string, end?: string) => ["plans", "search", start, end],
   plan: (id: string) => ["plans", "id", id],
 };
-
-// ATOMS
-
-export const plansSearchAtom = atom(dayjs().format("YYYY-MM-DD"));
 
 // QUERIES
 

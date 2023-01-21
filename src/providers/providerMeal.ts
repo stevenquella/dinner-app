@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { atom } from "jotai";
 import { ensureEmptySuccess, ensureSuccess, getSingleRow, supabase } from "./client";
 import { notEmpty } from "./helpers";
 import { Meal, MealInsert, meal_grocery_table, meal_table, plan_meal_table } from "./provider.types";
@@ -11,10 +10,6 @@ export const mealQueryKeys = {
   meals_search: (search: string) => ["meals", "search", search],
   meal: (id: string) => ["meals", "id", id],
 };
-
-// ATOMS
-
-export const mealsSearchAtom = atom<string>("");
 
 // QUERIES
 

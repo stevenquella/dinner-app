@@ -12,6 +12,7 @@ import {
   DialogTitle,
   Typography,
 } from "@mui/material";
+import { atom, useAtom } from "jotai";
 import { useState } from "react";
 import { Grocery } from "../../providers/provider.types";
 import { useGroceries } from "../../providers/providerGrocery";
@@ -20,8 +21,12 @@ import { MealsRelated } from "../meals/MealsRelated";
 import Page from "../Page";
 import GroceryEdit from "./GroceryEdit";
 
+const showIncrement = 50;
+const groceriesShownAtom = atom<number>(showIncrement);
+
 export default function GroceryIndex() {
   const groceries = useGroceries();
+  const [shownCount, setShownCount] = useAtom(groceriesShownAtom);
   const [createGrocery, setCreateGrocery] = useState<boolean>(false);
   const [selectedGrocery, setSelectedGrocery] = useState<Grocery>();
 
@@ -42,8 +47,8 @@ export default function GroceryIndex() {
         </Button>
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 1 }}>
-        {groceries.data?.map((grocery) => (
-          <Card sx={{ borderBottom: 1, borderColor: "divider" }}>
+        {groceries.data?.slice(0, shownCount).map((grocery) => (
+          <Card key={grocery.id} sx={{ borderBottom: 1, borderColor: "divider" }}>
             <CardActionArea onClick={() => setSelectedGrocery(grocery)}>
               <CardContent>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -60,6 +65,13 @@ export default function GroceryIndex() {
         ))}
       </Box>
       {groceries.data?.length === 0 ? <Typography variant="body1">No groceries found.</Typography> : <span></span>}
+      {shownCount < (groceries.data?.length ?? 0) ? (
+        <Button color="secondary" sx={{ mt: 1 }} onClick={() => setShownCount(shownCount + showIncrement)}>
+          Show More
+        </Button>
+      ) : (
+        <span></span>
+      )}
 
       <GroceryEdit open={createGrocery} onDismiss={() => setCreateGrocery(false)} onAddGrocery={() => {}} />
       <Dialog keepMounted maxWidth="sm" fullWidth={true} open={!!selectedGrocery}>
