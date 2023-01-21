@@ -19,7 +19,6 @@ import { useGroceries } from "../../providers/providerGrocery";
 import HighlightText from "../items/HighlightText";
 import { MealsRelated } from "../meals/MealsRelated";
 import Page from "../Page";
-import GroceryEdit from "./GroceryEdit";
 
 const showIncrement = 50;
 const groceriesShownAtom = atom<number>(showIncrement);
@@ -27,7 +26,6 @@ const groceriesShownAtom = atom<number>(showIncrement);
 export default function GroceryIndex() {
   const groceries = useGroceries();
   const [shownCount, setShownCount] = useAtom(groceriesShownAtom);
-  const [createGrocery, setCreateGrocery] = useState<boolean>(false);
   const [selectedGrocery, setSelectedGrocery] = useState<Grocery>();
 
   return (
@@ -42,9 +40,6 @@ export default function GroceryIndex() {
         }}
       >
         <Typography variant="h5">Groceries</Typography>
-        <Button variant="contained" size="small" onClick={() => setCreateGrocery(true)}>
-          Create Groceries
-        </Button>
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 1 }}>
         {groceries.data?.slice(0, shownCount).map((grocery) => (
@@ -73,7 +68,6 @@ export default function GroceryIndex() {
         <span></span>
       )}
 
-      <GroceryEdit open={createGrocery} onDismiss={() => setCreateGrocery(false)} onAddGrocery={() => {}} />
       <Dialog keepMounted maxWidth="sm" fullWidth={true} open={!!selectedGrocery}>
         <DialogTitle>{selectedGrocery?.name}</DialogTitle>
         <DialogContent>

@@ -1,6 +1,8 @@
 import { Box, Button, Dialog, DialogTitle, Typography } from "@mui/material";
-import { useAtomValue } from "jotai";
+import produce from "immer";
+import { useAtom, useAtomValue } from "jotai";
 import { FormProvider, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
 import {
   GroceryCategory,
@@ -12,12 +14,7 @@ import AutocompleteInput from "../inputs/AutocompleteInput";
 import SelectInput from "../inputs/SelectInput";
 import { InputValidation } from "../inputs/types";
 import { combineStates } from "../Page";
-
-export type GroceryEditProps = {
-  open: boolean;
-  onDismiss: () => void;
-  onAddGrocery: (id: string) => void;
-};
+import { mealGroceriesAtom } from "./MealEdit";
 
 type GroceryInputs = {
   category: GroceryCategory;
@@ -43,9 +40,11 @@ const formValidation: GroceryValidation = {
   },
 };
 
-export default function GroceryEdit(props: GroceryEditProps) {
+export default function MealGroceryEdit() {
+  const navigate = useNavigate();
   const userid = useAtomValue(useridAtom);
   const groceries = useGroceries();
+  const [selectedGroceries, setSelectedGroceries] = useAtom(mealGroceriesAtom);
 
   const formMethods = useForm<GroceryInputs>({
     defaultValues: {
@@ -59,7 +58,14 @@ export default function GroceryEdit(props: GroceryEditProps) {
 
   const groceryUpsert = useGroceryUpsertMutation({
     onSuccess: (g) => {
-      props.onAddGrocery(g.id);
+      const index = selectedGroceries.indexOf(g.id);
+      setSelectedGroceries(
+        produce(selectedGroceries, (draft) => {
+          if (index === -1) {
+            draft.push(g.id);
+          }
+        })
+      );
 
       formMethods.reset({
         category: currentCategory,
@@ -79,7 +85,7 @@ export default function GroceryEdit(props: GroceryEditProps) {
   const dialogState = combineStates([groceries, groceryUpsert]);
 
   return (
-    <Dialog keepMounted maxWidth="sm" fullWidth={true} open={props.open}>
+    <Dialog keepMounted maxWidth="sm" fullWidth={true} open={true}>
       <DialogTitle>Add Grocery Item</DialogTitle>
       <FormProvider {...formMethods}>
         <form
@@ -121,7 +127,7 @@ export default function GroceryEdit(props: GroceryEditProps) {
             <Button type="submit" color="primary" disabled={dialogState.isLoading || dialogState.isError}>
               Add
             </Button>
-            <Button color="info" onClick={() => props.onDismiss()}>
+            <Button color="info" onClick={() => navigate(-1)}>
               Close
             </Button>
             <Typography variant="caption" sx={{ pl: 2, flexGrow: 1 }}>

@@ -16,12 +16,12 @@ import produce from "immer";
 import { useAtom } from "jotai";
 import { useNavigate } from "react-router-dom";
 import { getMealsById, useMeals } from "../../providers/providerMeal";
-import { planMeals } from "./PlanEdit";
+import { planMealsAtom } from "./PlanEdit";
 
 export default function PlanMealsEdit() {
   const navigate = useNavigate();
   const meals = useMeals();
-  const [selectedMeals, setSelectedMeals] = useAtom(planMeals);
+  const [selectedMeals, setSelectedMeals] = useAtom(planMealsAtom);
 
   const handleSelect = (id: string) => {
     const index = selectedMeals.indexOf(id);

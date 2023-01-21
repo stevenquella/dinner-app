@@ -32,7 +32,7 @@ const planValidation: PlanValidation = {
   },
 };
 
-export const planMeals = atom<string[]>([]);
+export const planMealsAtom = atom<string[]>([]);
 
 export default function PlanEdit() {
   const navigate = useNavigate();
@@ -70,7 +70,7 @@ export default function PlanEdit() {
     },
   });
 
-  const [selectedMeals, setSelectedMeals] = useAtom(planMeals);
+  const [selectedMeals, setSelectedMeals] = useAtom(planMealsAtom);
   useEffect(() => {
     setSelectedMeals(plan.data?.plan_meal.map((x) => x.meal_id) ?? []);
   }, [plan.data?.plan_meal, setSelectedMeals]);
