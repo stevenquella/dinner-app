@@ -8,6 +8,7 @@ import MealIndex from "./components/meals/MealIndex";
 import MealRead from "./components/meals/MealRead";
 import PlanEdit from "./components/plans/PlanEdit";
 import PlanIndex from "./components/plans/PlanIndex";
+import PlanMealsEdit from "./components/plans/PlanMealsEdit";
 import PlanRead from "./components/plans/PlanRead";
 
 export const routes: RouteObject[] = [
@@ -23,6 +24,12 @@ export const routes: RouteObject[] = [
       {
         path: "plans/edit/:id?",
         element: <PlanEdit />,
+        children: [
+          {
+            path: "meals",
+            element: <PlanMealsEdit />,
+          },
+        ],
       },
       {
         path: "plans/read/:id",

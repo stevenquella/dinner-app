@@ -7,13 +7,14 @@ import {
   Dialog,
   DialogActions,
   DialogTitle,
+  Link,
   Typography,
 } from "@mui/material";
 import dayjs from "dayjs";
-import { useAtomValue } from "jotai";
-import { useState } from "react";
+import { atom, useAtom, useAtomValue } from "jotai";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link as RouterLink, Outlet, useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
 import { usePlan, usePlanDeleteMutation, usePlanUpsertMutation } from "../../providers/providerPlan";
 import TextInput from "../inputs/TextInput";
@@ -22,7 +23,6 @@ import CardTitle from "../items/CardTitle";
 import { MealsRelated } from "../meals/MealsRelated";
 import Page, { combineStates, PageState } from "../Page";
 import ScrollTop from "../ScrollTop";
-import PlanMealsEdit from "./PlanMealsEdit";
 
 type PlanInputs = {
   date: string;
@@ -41,6 +41,8 @@ const planValidation: PlanValidation = {
     },
   },
 };
+
+export const planMeals = atom<string[]>([]);
 
 export default function PlanEdit() {
   const navigate = useNavigate();
@@ -67,8 +69,7 @@ export default function PlanEdit() {
       notes: plan.data?.notes ?? "",
     },
   });
-  const [selectedMeals, setSelectedMeals] = useState<string[]>(plan.data?.plan_meal.map((x) => x.meal_id) ?? []);
-  const [editMeals, setEditMeals] = useState<boolean>(false);
+  const [selectedMeals, setSelectedMeals] = useAtom(planMeals);
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
   const planUpsert = usePlanUpsertMutation({
@@ -84,8 +85,11 @@ export default function PlanEdit() {
     onSuccess: () => navigate(`/`, { replace: true }),
   });
 
-  const pageState: PageState = isCreate ? combineStates([planUpsert]) : combineStates([plan, planUpsert, planDelete]);
+  useEffect(() => {
+    setSelectedMeals(plan.data?.plan_meal.map((x) => x.meal_id) ?? []);
+  }, [plan.data?.plan_meal, setSelectedMeals]);
 
+  const pageState: PageState = isCreate ? combineStates([planUpsert]) : combineStates([plan, planUpsert, planDelete]);
   return (
     <Page {...pageState}>
       <ScrollTop />
@@ -138,19 +142,18 @@ export default function PlanEdit() {
               <MealsRelated ids={selectedMeals} linkTarget="_blank" />
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
-              <Button color="secondary" onClick={() => setEditMeals(true)}>
-                Edit Meals
-              </Button>
+              <Link
+                component={RouterLink}
+                underline="none"
+                to={isCreate ? `/plans/edit/meals` : `/plans/edit/${id}/meals`}
+              >
+                <Button color="secondary">Edit Meals</Button>
+              </Link>
             </CardActions>
           </Card>
         </form>
       </FormProvider>
-      <PlanMealsEdit
-        open={editMeals}
-        onDismiss={() => setEditMeals(false)}
-        selectedMeals={selectedMeals}
-        onChangeSelectedMeals={setSelectedMeals}
-      />
+
       {!isCreate ? (
         <div>
           <Button
@@ -177,6 +180,8 @@ export default function PlanEdit() {
       ) : (
         <div></div>
       )}
+
+      <Outlet />
     </Page>
   );
 }
