@@ -5,6 +5,7 @@ import { useGroceries } from "../../providers/providerGrocery";
 import { useMeal } from "../../providers/providerMeal";
 import GroceriesRead from "../groceries/GroceriesRead";
 import CardTitle from "../items/CardTitle";
+import UrlMatches from "../items/UrlMatches";
 import Page, { combineStates } from "../Page";
 import PlansRelated from "../plans/PlansRelated";
 import ScrollTop from "../ScrollTop";
@@ -57,18 +58,18 @@ export default function MealRead() {
 
       <Card>
         <CardContent>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              rowGap: 1,
-            }}
-          >
+          <Box>
             <CardTitle text="Summary" />
             <Typography variant="body1" whiteSpace="pre-wrap">
               {meal.data?.notes}
             </Typography>
           </Box>
+        </CardContent>
+      </Card>
+      <Card sx={{ mt: 1 }}>
+        <CardContent>
+          <CardTitle text="Links" />
+          <UrlMatches text={meal.data?.notes} />
         </CardContent>
       </Card>
       <Card sx={{ mt: 1 }}>
