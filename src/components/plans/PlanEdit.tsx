@@ -1,22 +1,11 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  Link,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, Link, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { atom, useAtom, useAtomValue } from "jotai";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Link as RouterLink, Outlet, useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
-import { usePlan, usePlanDeleteMutation, usePlanUpsertMutation } from "../../providers/providerPlan";
+import { usePlan, usePlanUpsertMutation } from "../../providers/providerPlan";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
 import CardTitle from "../items/CardTitle";
@@ -69,8 +58,6 @@ export default function PlanEdit() {
       notes: plan.data?.notes ?? "",
     },
   });
-  const [selectedMeals, setSelectedMeals] = useAtom(planMeals);
-  const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
 
   const planUpsert = usePlanUpsertMutation({
     onSuccess: ({ id }) => {
@@ -81,15 +68,13 @@ export default function PlanEdit() {
       }
     },
   });
-  const planDelete = usePlanDeleteMutation({
-    onSuccess: () => navigate(`/`, { replace: true }),
-  });
 
+  const [selectedMeals, setSelectedMeals] = useAtom(planMeals);
   useEffect(() => {
     setSelectedMeals(plan.data?.plan_meal.map((x) => x.meal_id) ?? []);
   }, [plan.data?.plan_meal, setSelectedMeals]);
 
-  const pageState: PageState = isCreate ? combineStates([planUpsert]) : combineStates([plan, planUpsert, planDelete]);
+  const pageState: PageState = isCreate ? combineStates([planUpsert]) : combineStates([plan, planUpsert]);
   return (
     <Page {...pageState}>
       <ScrollTop />
@@ -142,11 +127,7 @@ export default function PlanEdit() {
               <MealsRelated ids={selectedMeals} linkTarget="_blank" />
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
-              <Link
-                component={RouterLink}
-                underline="none"
-                to={isCreate ? `/plans/edit/meals` : `/plans/edit/${id}/meals`}
-              >
+              <Link component={RouterLink} underline="none" to="meals">
                 <Button color="secondary">Edit Meals</Button>
               </Link>
             </CardActions>
@@ -155,28 +136,11 @@ export default function PlanEdit() {
       </FormProvider>
 
       {!isCreate ? (
-        <div>
-          <Button
-            variant="outlined"
-            color="error"
-            sx={{ mt: 2 }}
-            onClick={() => setConfirmDelete(true)}
-            disabled={pageState.isLoading || pageState.isError}
-          >
+        <Link component={RouterLink} underline="none" to="delete">
+          <Button variant="outlined" color="error" sx={{ mt: 2 }} disabled={pageState.isLoading || pageState.isError}>
             DELETE
           </Button>
-          <Dialog maxWidth="sm" fullWidth={true} open={confirmDelete}>
-            <DialogTitle>Delete plan?</DialogTitle>
-            <DialogActions>
-              <Button color="info" onClick={() => setConfirmDelete(false)}>
-                Cancel
-              </Button>
-              <Button color="error" onClick={() => planDelete.mutate(id ?? "")}>
-                Delete
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </div>
+        </Link>
       ) : (
         <div></div>
       )}

@@ -6,6 +6,7 @@ import GroceryIndex from "./components/groceries/GroceryIndex";
 import MealEdit from "./components/meals/MealEdit";
 import MealIndex from "./components/meals/MealIndex";
 import MealRead from "./components/meals/MealRead";
+import PlanDelete from "./components/plans/PlanDelete";
 import PlanEdit from "./components/plans/PlanEdit";
 import PlanIndex from "./components/plans/PlanIndex";
 import PlanMealsEdit from "./components/plans/PlanMealsEdit";
@@ -28,6 +29,10 @@ export const routes: RouteObject[] = [
           {
             path: "meals",
             element: <PlanMealsEdit />,
+          },
+          {
+            path: "delete",
+            element: <PlanDelete />,
           },
         ],
       },
