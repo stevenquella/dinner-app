@@ -1,13 +1,14 @@
-import { Box, Button, Card, CardActions, CardContent, Link, Typography } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { Link as RouterLink, Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { useridAtom } from "../../providers/providerAuth";
 import { usePlan, usePlanUpsertMutation } from "../../providers/providerPlan";
 import TextInput from "../inputs/TextInput";
 import { InputValidation } from "../inputs/types";
+import ButtonLink from "../items/ButtonLink";
 import CardTitle from "../items/CardTitle";
 import { MealsRelated } from "../meals/MealsRelated";
 import Page, { combineStates, PageState } from "../Page";
@@ -127,22 +128,23 @@ export default function PlanEdit() {
               <MealsRelated ids={selectedMeals} linkTarget="_blank" />
             </CardContent>
             <CardActions sx={{ py: 1, px: 2, flexDirection: "row-reverse" }}>
-              <Link component={RouterLink} underline="none" to="meals">
-                <Button color="secondary">Edit Meals</Button>
-              </Link>
+              <ButtonLink to="meals" color="secondary" text="Edit Meals" />
             </CardActions>
           </Card>
         </form>
       </FormProvider>
 
       {!isCreate ? (
-        <Link component={RouterLink} underline="none" to="delete">
-          <Button variant="outlined" color="error" sx={{ mt: 2 }} disabled={pageState.isLoading || pageState.isError}>
-            DELETE
-          </Button>
-        </Link>
+        <ButtonLink
+          to="delete"
+          variant="outlined"
+          color="error"
+          sx={{ mt: 2 }}
+          disabled={pageState.isLoading || pageState.isError}
+          text="Delete"
+        />
       ) : (
-        <div></div>
+        <span></span>
       )}
 
       <Outlet />

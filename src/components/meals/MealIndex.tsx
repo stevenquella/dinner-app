@@ -4,6 +4,7 @@ import { atom, useAtom } from "jotai";
 import { Link as RouterLink } from "react-router-dom";
 import { useMeals } from "../../providers/providerMeal";
 import SearchInput from "../inputs/SearchInput";
+import ButtonLink from "../items/ButtonLink";
 import HighlightText from "../items/HighlightText";
 import Page from "../Page";
 
@@ -33,11 +34,7 @@ export default function MealIndex() {
         }}
       >
         <Typography variant="h5">Meals</Typography>
-        <Link component={RouterLink} to="/meals/edit">
-          <Button variant="contained" size="small">
-            Create Meal
-          </Button>
-        </Link>
+        <ButtonLink to="/meals/edit" variant="contained" size="small" text="Create Meal" />
         <SearchInput
           name="search"
           label="Search meals..."

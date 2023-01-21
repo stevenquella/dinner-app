@@ -1,9 +1,9 @@
-import { Box, Button, Card, CardActions, CardContent, Link, Typography } from "@mui/material";
+import { Box, Card, CardActions, CardContent, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { atom, useAtom } from "jotai";
-import { Link as RouterLink } from "react-router-dom";
 import { getSearchRange, usePlans } from "../../providers/providerPlan";
 import SearchInput from "../inputs/SearchInput";
+import ButtonLink from "../items/ButtonLink";
 import CardTitle from "../items/CardTitle";
 import { MealsRelated } from "../meals/MealsRelated";
 import Page from "../Page";
@@ -32,11 +32,7 @@ export default function PlanIndex() {
         }}
       >
         <Typography variant="h5">Plans</Typography>
-        <Link component={RouterLink} to="/plans/edit">
-          <Button variant="contained" size="small">
-            Create Plan
-          </Button>
-        </Link>
+        <ButtonLink variant="contained" size="small" to="/plans/edit" text="Create Plan" />
         <SearchInput
           name="search"
           label="Search plans..."
@@ -54,9 +50,7 @@ export default function PlanIndex() {
               <MealsRelated ids={plan.plan_meal.map((x) => x.meal_id)} />
             </CardContent>
             <CardActions sx={{ flexDirection: "row-reverse" }}>
-              <Link key={plan.id} component={RouterLink} to={`/plans/read/${plan.id}`} underline="none">
-                <Button color="secondary">Open</Button>
-              </Link>
+              <ButtonLink color="secondary" to={`/plans/read/${plan.id}`} text="Open" />
             </CardActions>
           </Card>
         ))}

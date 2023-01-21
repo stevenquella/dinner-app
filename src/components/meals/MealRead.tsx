@@ -1,9 +1,10 @@
-import { Box, Button, Card, CardContent, Link, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 import { useState } from "react";
-import { Link as RouterLink, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useGroceries } from "../../providers/providerGrocery";
 import { useMeal } from "../../providers/providerMeal";
 import GroceriesRead from "../groceries/GroceriesRead";
+import ButtonLink from "../items/ButtonLink";
 import CardTitle from "../items/CardTitle";
 import UrlMatches from "../items/UrlMatches";
 import Page, { combineStates } from "../Page";
@@ -40,11 +41,12 @@ export default function MealRead() {
             gap: 1,
           }}
         >
-          <Link component={RouterLink} to={`/meals/edit/${id}`}>
-            <Button variant="contained" disabled={pageState.isLoading || meal.isError}>
-              Edit
-            </Button>
-          </Link>
+          <ButtonLink
+            to={`/meals/edit/${id}`}
+            variant="contained"
+            disabled={pageState.isLoading || meal.isError}
+            text="Edit"
+          />
           <Button
             variant="contained"
             color="secondary"
