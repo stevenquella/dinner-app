@@ -3,6 +3,7 @@ import App from "./App";
 import Profile from "./components/auth/Profile";
 import Error from "./components/Error";
 import GroceryIndex from "./components/groceries/GroceryIndex";
+import GroceryRead from "./components/groceries/GroceryRead";
 import MealDelete from "./components/meals/MealDelete";
 import MealEdit from "./components/meals/MealEdit";
 import MealGroceryEdit from "./components/meals/MealGroceryEdit";
@@ -74,6 +75,12 @@ export const routes: RouteObject[] = [
       {
         path: "groceries",
         element: <GroceryIndex />,
+        children: [
+          {
+            path: ":id",
+            element: <GroceryRead />,
+          },
+        ],
       },
       {
         path: "profile",

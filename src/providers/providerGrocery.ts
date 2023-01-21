@@ -5,6 +5,7 @@ import { Grocery, GroceryInsert, grocery_table } from "./provider.types";
 
 export const groceryQueryKeys = {
   root: ["groceries"],
+  grocery: (id: string) => ["groceries", "id", id],
 };
 
 export const groceryCategories = ["Produce", "Protein", "Dairy", "Pantry", "Frozen", "Bakery", "Other"] as const;
@@ -22,6 +23,13 @@ export const useGroceries = () => {
   return useQuery({
     queryKey: groceryQueryKeys.root,
     queryFn: () => retrieveGroceries(),
+  });
+};
+
+export const useGrocery = (id: string) => {
+  return useQuery({
+    queryKey: groceryQueryKeys.grocery(id),
+    queryFn: () => retrieveGrocery(id),
   });
 };
 
@@ -49,14 +57,19 @@ export const useGroceryUpsertMutation = (options: { onSuccess: (g: Grocery) => v
 };
 
 // FUNCTIONS
-
-async function retrieveGroceries(): Promise<Grocery[]> {
-  const columns = `
+const columns = `
     *,
     meal_grocery(*)
   `;
+
+async function retrieveGroceries(): Promise<Grocery[]> {
   const response = await supabase.from(grocery_table).select(columns).order("name");
   return ensureSuccess(response);
+}
+
+async function retrieveGrocery(id: string): Promise<Grocery> {
+  const response = await supabase.from(grocery_table).select(columns).eq("id", id);
+  return getSingleRow(response);
 }
 
 async function upsertGrocery(grocery: GroceryInsert): Promise<Grocery> {

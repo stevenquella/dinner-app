@@ -1,23 +1,9 @@
 import { Flatware } from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  Card,
-  CardActionArea,
-  CardContent,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Card, CardActionArea, CardContent, Chip, Link, Typography } from "@mui/material";
 import { atom, useAtom } from "jotai";
-import { useState } from "react";
-import { Grocery } from "../../providers/provider.types";
+import { Link as RouterLink, Outlet } from "react-router-dom";
 import { useGroceries } from "../../providers/providerGrocery";
 import HighlightText from "../items/HighlightText";
-import { MealsRelated } from "../meals/MealsRelated";
 import Page from "../Page";
 
 const showIncrement = 50;
@@ -26,8 +12,6 @@ const groceriesShownAtom = atom<number>(showIncrement);
 export default function GroceryIndex() {
   const groceries = useGroceries();
   const [shownCount, setShownCount] = useAtom(groceriesShownAtom);
-  const [selectedGrocery, setSelectedGrocery] = useState<Grocery>();
-
   return (
     <Page {...groceries}>
       <Box
@@ -43,20 +27,22 @@ export default function GroceryIndex() {
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", rowGap: 1 }}>
         {groceries.data?.slice(0, shownCount).map((grocery) => (
-          <Card key={grocery.id} sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <CardActionArea onClick={() => setSelectedGrocery(grocery)}>
-              <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Typography variant="body1" flexGrow={1}>
-                    <HighlightText text={grocery.name} search={""} />
-                  </Typography>
-                  {grocery.meal_grocery.length > 0 ? (
-                    <Chip icon={<Flatware />} label={grocery.meal_grocery.length} variant="outlined" />
-                  ) : null}
-                </Box>
-              </CardContent>
-            </CardActionArea>
-          </Card>
+          <Link key={grocery.id} component={RouterLink} to={grocery.id} underline="none">
+            <Card sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <CardActionArea>
+                <CardContent>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Typography variant="body1" flexGrow={1}>
+                      <HighlightText text={grocery.name} search={""} />
+                    </Typography>
+                    {grocery.meal_grocery.length > 0 ? (
+                      <Chip icon={<Flatware />} label={grocery.meal_grocery.length} variant="outlined" />
+                    ) : null}
+                  </Box>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          </Link>
         ))}
       </Box>
       {groceries.data?.length === 0 ? <Typography variant="body1">No groceries found.</Typography> : <span></span>}
@@ -68,17 +54,7 @@ export default function GroceryIndex() {
         <span></span>
       )}
 
-      <Dialog keepMounted maxWidth="sm" fullWidth={true} open={!!selectedGrocery}>
-        <DialogTitle>{selectedGrocery?.name}</DialogTitle>
-        <DialogContent>
-          <MealsRelated ids={selectedGrocery?.meal_grocery.map((x) => x.meal_id)} />
-        </DialogContent>
-        <DialogActions>
-          <Button color="info" onClick={() => setSelectedGrocery(undefined)}>
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Outlet />
     </Page>
   );
 }
